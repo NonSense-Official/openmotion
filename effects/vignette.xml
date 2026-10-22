@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.effects.vignette" name="Vignette" desc="Darkens the edges of the layer." category="matte" tags="matte,classic,frame,raster" thumb="thumb/vignette.png">
+
+    <!--<strings>-->
+        <!--<locale lang="en">-->
+            <!--<string name="name">Directional Blur</string>-->
+            <!--<string name="desc">Blurs the layer in a specific direction</string>-->
+            <!--<string name="strength">Strength</string>-->
+            <!--<string name="angle">Angle</string>-->
+        <!--</locale>-->
+    <!--</strings>-->
+
+    <params>
+        <texture id="inputImg" srcType="content" />
+
+        <spinner id="scale" default="0.95" min="0.001" max="2.0" step="0.001" label="Size" ticks="0.5,1.0" type="percent" />
+        <spinner id="roundness" default="1.5" min="0.0" max="9.9" step="0.01" label="Roundness" ticks="1.0,2.0" type="percent" />
+        <spinner id="feather" default="0.5" min="0.001" max="1.0" step="0.001" label="Feather" />
+
+        <spinner id="strength" default="0.8" min="0.0" max="1.0" step="0.005" label="Strength" />
+        <spinner id="tint" default="0.2" min="0.0" max="1.0" step="0.01" label="Tint" type="percent" />
+        <color id="overlaycolor" default="#FF000000" label="Color" alpha="false" />
+        <switch id="punchout" default="false" label="Punch Out" />
+
+    </params>
+
+    <shader type="fragment"><![CDATA[
+
+        void main() {
+
+            vec2 st = acLayerNorm;
+            st -= vec2(0.5,0.5);
+            st *= 2.;
+            st /= (scale+(feather/4.0));
+
+            float n = roundness+1.;
+            float d = pow(abs(st.x),n)+pow(abs(st.y),n);
+            float p = smoothstep(1.-feather,1.,d);
+
+            vec4 color = texture2DCv(inputImg.texture,acScreenNorm.st);
+            vec4 darkColor = color;
+            darkColor.rgb *= darkColor.rgb;
+            darkColor.rgb = mix(darkColor.rgb,overlaycolor.rgb*color.a,tint);
+            if(punchout) {
+                gl_FragColor = mix(color,vec4(0.),p*strength);
+            } else {
+                gl_FragColor = mix(color,darkColor,p*strength);
+            }
+        }
+
+    ]]></shader>
+
+</effect>

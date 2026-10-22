@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.effects.threshold" name="Threshold" desc="Converts the layer to black and white with a hard cutoff at the specified luminance threshold." category="color" tags="color,glitch,raster" thumb="thumb/threshold.webp">
+
+    <params>
+        <texture id="inputImg" srcType="content" />
+        <spinner id="threshold" default="0.4" min="0.0" max="1.0" label="Threshold" />
+        <spinner id="feather" default="0.0" min="0.0" max="1.0" label="Feather" />
+        <switch id="invert" default="false" label="Invert" />
+        <selector id="blendMode" default="0" style="dropdown" label="Blending Mode">
+            <choice label="Normal" value="0" />
+            <choice label="Multiply" value="1" />
+            <choice label="Screen" value="2" />
+        </selector>
+    </params>
+
+    <shader type="fragment"><![CDATA[
+
+        const vec3 luminanceWeighting = vec3(0.2126, 0.7152, 0.0722);
+
+        void main() {
+            vec4 texColor = texture2DCv(inputImg.texture,acScreenNorm);
+            float luminance = dot(texColor.rgb, luminanceWeighting);
+            float f = max(min((feather/4.),abs(0.5-threshold)),0.00196);
+            float t = ((threshold-0.5)*(1.003+f*2.))+0.5;
+            float p = smoothstep(t-f, t+f, luminance);
+
+            if( invert )
+                p = 1.-p;
+
+            vec3 rgb;
+            if( blendMode==1 ) {
+                rgb = texColor.rgb * p;
+            } else if( blendMode==2 ) {
+                rgb = 1.-((1.-texColor.rgb)*(1.-p));
+            } else {
+                rgb = vec3(p,p,p);
+            }
+
+            gl_FragColor = vec4(rgb,texColor.a);
+        }
+
+    ]]></shader>
+
+</effect>

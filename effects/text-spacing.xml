@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.effects.textspacing" name="Text Spacing" desc="Adjusts the spacing between individual letters or between lines of text in a text layer." affinity="text!" type="text" category="text" tags="text,membersOnly" experimental="false" thumb="thumb/textspacing.webp">
+
+    <params>
+
+        <spinner id="letterspacing" default="0.0" min="-10.0" max="10.0" type="percent" step="0.01" label="Letter Spacing" ticks="-0.5,-1.0,-5.0,0.0,0.5,1.0,5.0" />
+        <spinner id="linespacing" default="1.0" min="0.0" max="9.999" type="percent" step="0.001" label="Line Spacing" ticks="1.0,1.5,2.0,2.5" />
+
+    </params>
+
+</effect>

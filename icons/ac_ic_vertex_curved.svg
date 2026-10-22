@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100.0 55.0" width="24" height="24">
+  <path d="M57.464,10.021C77.438,13.675 92.494,31.256 92.307,52.255" fill="none" stroke="#ffffff" stroke-width="4.0" stroke-linecap="round" fill-opacity="0.3" fill-rule="evenodd"/>
+  <path d="M7.203,51.498C7.391,30.494 22.765,13.179 42.81,9.887" fill="none" stroke="#ffffff" stroke-width="4.0" stroke-linecap="round" fill-opacity="0.3" fill-rule="evenodd"/>
+  <path d="M42.808,9.261C42.845,5.215 46.154,1.965 50.199,2C54.245,2.036 57.496,5.345 57.458,9.39C57.422,13.436 54.115,16.686 50.068,16.65C46.022,16.615 42.773,13.306 42.808,9.261Z" fill="none" stroke="#ffffff" stroke-width="4.0" fill-rule="evenodd"/>
+  <path d="M7.203,9.324L42.809,9.324" fill="none" stroke="#ffffff" stroke-width="4.0" stroke-linecap="round" fill-rule="evenodd"/>
+  <path d="M57.459,9.324L92.307,9.324" fill="none" stroke="#ffffff" stroke-width="4.0" stroke-linecap="round" fill-rule="evenodd"/>
+  <path d="M87.106,16.894L98,16.894C99.105,16.894 100,15.998 100,14.894L100,4C100,2.895 99.105,2 98,2L87.106,2C86.002,2 85.106,2.895 85.106,4L85.106,14.894C85.106,15.998 86.002,16.894 87.106,16.894Z" fill="#ffffff" fill-rule="evenodd"/>
+  <path d="M2,16.894L12.894,16.894C13.998,16.894 14.894,15.998 14.894,14.894L14.894,4C14.894,2.895 13.998,2 12.894,2L2,2C0.895,2 -0,2.895 0,4L-0,14.894C-0,15.998 0.895,16.894 2,16.894Z" fill="#ffffff" fill-rule="evenodd"/>
+</svg>

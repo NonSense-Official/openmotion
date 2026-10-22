@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.effects.texttransform" name="Text Transform" desc="Transforms individual letters, words, lines, or pieces of letters within a specified range of a text layer." affinity="text!" type="text" category="text" tags="text,kinetic,membersOnly" thumb="thumb/texttransform.webp">
+
+    <!--<strings>-->
+        <!--<locale lang="en">-->
+            <!--<string name="name">Drawing Progress</string>-->
+            <!--<string name="desc">Drawing Progress</string>-->
+        <!--</locale>-->
+    <!--</strings>-->
+
+    <params>
+
+        <section text="Range" />
+        <spinner id="start" default="0.0" min="0.0" max="1.0" type="percent" step="0.001" label="Start" ticks="0.0,0.5,1.0" />
+        <spinner id="end" default="1.0" min="0.0" max="1.0"  type="percent" step="0.001"  label="End" ticks="0.0,0.5,1.0" />
+        <spinner id="phase" default="0.0" min="-1.0" max="2.0" type="percent"  step="0.001" label="Phase" ticks="-1.0,0.0,1.0" />
+
+        <section text="Transform" />
+        <selector id="component" default="1" style="dropdown" label="Component" >
+            <choice label="Contour" value="0" />
+            <choice label="Letter" value="1" />
+            <choice label="Word" value="2" />
+            <choice label="Line" value="3" />
+        </selector>
+        <selector id="anchor" default="0" style="radio" label="Anchor" >
+            <choice label="Layer" value="0" />
+            <choice label="Component" value="1" />
+        </selector>
+        <point id="offset" default="0.0,0.0" label="Offset" />
+        <spinner id="angle" default="0.0" min="-1800.0" max="1800.0" label="Angle" ticks="-90,-45,0,45,90" snap="-90,-45,0,45,90" type="angle" step="0.1" />
+        <spinner id="scale" default="0.0" min="-1.0" max="10.0" label="Scale" ticks="0.0" snap="-90,-45,0,45,90" step="0.01" />
+        <spinner id="stretch" default="0.0" min="-1.0" max="10.0" label="Stretch" ticks="0.0" snap="-90,-45,0,45,90" step="0.01" />
+        <spinner id="alpha" default="0" min="-1" max="1" step="0.001" label="Alpha" ticks="0.0" />
+
+        <section text="Visual Attributes" />
+        <switch id="useFillColor" default="false" label="Override Fill Color" />
+        <color id="fillColor" default="#FF00FF00" label="Fill Color" alpha="false" />
+
+        <section text="Interpolation &amp; Easing" />
+        <slider id="easeIn" default="0" min="-1" max="1" label="Ease In" step="0.01" type="percent" snap="0" ticks="0" />
+        <slider id="easeOut" default="0" min="-1" max="1" label="Ease Out" step="0.01" type="percent" snap="0" ticks="0"  />
+        <spinner id="overlap" default="0" min="0" max="10" label="Overlap" step="0.01" type="percent" />
+        <selector id="shape" default="0" style="radio" label="Shape" >
+            <choice label="Square" value="0" />
+            <choice label="Smooth" value="1" />
+            <choice label="Triangle" value="2" />
+        </selector>
+
+        <section text="Random Order" />
+        <switch id="randomOrder" default="false" label="Random Order" />
+        <spinner id="seed" default="0.0" min="0.0" max="5.0" step="0.01" label="Seed" />
+
+    </params>
+
+</effect>

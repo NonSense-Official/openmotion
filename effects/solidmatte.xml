@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.solidmatte" name="Solid Matte" desc="Composites the layer on a solid color matte, filling transparent parts of the layer with a solid background color." category="matte" tags="matte,raster" thumb="thumb/solidmatte.webp">
+
+    <params>
+        <texture id="inputImg" srcType="content" />
+        <color id="color" default="#FF2D1EF6" label="Color" alpha="true" />
+        <spinner id="alpha" default="1.0" min="0.0" max="1.0" step="0.01" label="Alpha" type="percent" />
+        <switch id="punchout" default="false" label="Punch Out" />
+        <switch id="screenSpace" default="false" label="Screen Space" />
+    </params>
+
+    <shader type="fragment"><![CDATA[
+
+        void main() {
+            vec4 frontColor = texture2DCv(inputImg.texture,acScreenNorm);
+            vec4 backColor = color * alpha;
+            if( !screenSpace ) {
+                float insideLayer = step(0.0,acLayerNorm.x) * step(acLayerNorm.x,1.0) * step(0.0,acLayerNorm.y) * step(acLayerNorm.y,1.0);
+                backColor *= insideLayer;
+            }
+            if( punchout ) {
+                gl_FragColor = backColor*(1.-frontColor.a);
+            } else {
+                gl_FragColor = backColor*(1.-frontColor.a)+frontColor;
+            }
+        }
+
+    ]]></shader>
+
+</effect>

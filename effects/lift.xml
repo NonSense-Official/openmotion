@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.effects.lift" name="Copy Background" desc="Copies the background into the layer, effectively turning the layer into an adjustment layer. Effects applied to the layer after this will apply to the background pixels covered by the opaque parts of the layer." thumb="thumb/liftfx.webp" tags="compositing,utility,raster">
+
+    <params>
+        <texture id="inputImg" srcType="content" />
+        <texture id="comp" srcType="comp" />
+        <tip text="This effect copies the pixels behind this layer into the current layer. Use this together with other effects to apply them to the background. For example, to use Box Blur after applying Copy Background to blur the background." />
+        <spinner id="fill" default="0.0" min="0.0" max="1.0" label="Fill" type="percent" step="0.01" ticks="0.5" />
+    </params>
+
+    <shader type="fragment" precision="high"><![CDATA[
+
+        void main() {
+            vec4 texColor = texture2DCv(inputImg.texture,acScreenNorm);
+            gl_FragColor = mix(texture2DCv(comp.texture,acScreenNorm)*texColor.a,texColor,fill);
+        }
+
+    ]]></shader>
+
+</effect>

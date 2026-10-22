@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 70" fill="none">
+  <!-- Open Motion Kinetic Ring Icon -->
+  <g transform="translate(4, 7)">
+    <circle cx="28" cy="28" r="26" fill="url(#om-grad)" />
+    <!-- Inner sleek aperture motion waves -->
+    <path d="M28 8 A20 20 0 0 1 48 28 A4 4 0 0 1 40 28 A12 12 0 0 0 28 16 A4 4 0 0 1 28 8 Z" fill="#ffffff" opacity="0.95"/>
+    <path d="M48 28 A20 20 0 0 1 28 48 A4 4 0 0 1 28 40 A12 12 0 0 0 40 28 A4 4 0 0 1 48 28 Z" fill="#ffffff" opacity="0.75"/>
+    <path d="M28 48 A20 20 0 0 1 8 28 A4 4 0 0 1 16 28 A12 12 0 0 0 28 40 A4 4 0 0 1 28 48 Z" fill="#ffffff" opacity="0.55"/>
+    <path d="M8 28 A20 20 0 0 1 28 8 A4 4 0 0 1 28 16 A12 12 0 0 0 16 28 A4 4 0 0 1 8 28 Z" fill="#ffffff" opacity="0.85"/>
+    <circle cx="28" cy="28" r="5" fill="#ffffff" />
+  </g>
+  <!-- Sleek Modern Open Motion Typography -->
+  <text x="72" y="38" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="800" letter-spacing="1.2">OPEN</text>
+  <text x="144" y="38" fill="#5fe3ff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="800" letter-spacing="1.2">MOTION</text>
+  <defs>
+    <linearGradient id="om-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="50%" stop-color="#00a8ff"/>
+      <stop offset="100%" stop-color="#7000ff"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.effects.innerblur" name="Inner Blur" desc="Blurs the opaque parts of the layer without blurring the opacity." category="blur" tags="blur,raster" thumb="thumb/innerblur4.webp" overdraw="true" max-overdraw="0.1" >
+
+    <params>
+        <texture id="inputImg" srcType="content" />
+        <texture id="hblur" srcType="buffer" />
+        <spinner id="strength" default="0.15" min="0.0" max="1.0" label="Strength" step="0.005" />
+        <slider id="iter" default="2" min="1" max="6" label="Iterations" type="integer" step="1" />
+        <tip text="More iterations give better quality, but slower preview performance. We recommend 2 iterations." />
+    </params>
+
+    <iterations param="iter" />
+
+    <passes>
+        <pass target="hblur" effect="com.alightcreative.effects.boxblur2"/>
+        <pass />
+    </passes>
+
+    <shader type="fragment"><![CDATA[
+
+        void main() {
+            vec4 baseColor = texture2DCv(inputImg.texture,acScreenNorm.st);
+            vec4 compColor =  texture2DCv(hblur.texture, acScreenNorm.st);
+            gl_FragColor = vec4(compColor.rgb / compColor.a,1.) * baseColor.a;
+        }
+
+    ]]></shader>
+
+</effect>

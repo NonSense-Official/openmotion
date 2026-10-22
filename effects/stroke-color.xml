@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.effects.drawing.strokecolor" name="Stroke Color" desc="Overrides the layer's stroke color." affinity="stroke!" category="drawing" tags="drawing,stroke,color,vector,pop" thumb="thumb/strokecolor2.webp">
+
+    <params>
+        <color id="color" default="#FF2D1EF6" label="Color" alpha="false" />
+    </params>
+
+</effect>

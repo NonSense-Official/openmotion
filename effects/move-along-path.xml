@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.effect.movealongpath" name="Move Along Path" desc="Positions the layer at a point partway way along the outline path of the layer immediately beneath." auto-transform="true" category="transform" thumb="thumb/movealongpath.webp" deprecated="true">
+
+    <params>
+        <spinner id="progress" default="0.0" min="0.0" max="1.0" type="percent"  step="0.001" label="Progress" ticks="-1.0,0.0,1.0" />
+        <spinner id="angle" default="0.0" min="-1800.0" max="1800.0" label="Orientation" ticks="-90,-45,0,45,90" snap="-90,-45,0,45,90" type="angle" step="1" />
+        <switch id="tangent" default="true" label="Tangent" />
+        <spinner id="inset" default="0.0" min="-500.0" max="500.0" step="1" label="Inset/Outset" ticks="0.0" />
+        <point id="offset" default="0.0,0.0" label="Offset" />
+    </params>
+
+    <script external="com.alightcreative.script.movealongpath" />
+
+</effect>

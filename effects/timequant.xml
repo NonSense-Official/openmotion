@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.effects.timequant" name="Time Quantization" desc="Causes time to pass in steps, but just for this layer." tags="time,membersOnly" affinity="animation!" thumb="thumb/timequant.webp">
+
+    <params>
+        <spinner id="stepsPerSecond" default="5" min="1" max="120" step="1" label="Steps/sec" />
+    </params>
+
+</effect>

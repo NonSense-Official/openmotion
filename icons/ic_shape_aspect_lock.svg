@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33.0 33.0" width="24" height="24">
+  <path d="M29,4l-25,0l0,25l25,0z" fill="#ffffff" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" fill-opacity="0.2"/>
+  <path d="M4,29m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0" fill="#00ffa8" stroke="#00ffa8" stroke-width="2.1" fill-rule="evenodd"/>
+  <path d="M18.3646,15.1085C18.3646,14.22 19.071,13.5 19.9422,13.5L23.7254,13.5C24.5966,13.5 25.303,14.22 25.303,15.1085L25.303,18.5648C25.303,19.4531 24.5966,20.1733 23.7254,20.1733L19.9422,20.1733C19.071,20.1733 18.3646,19.4531 18.3646,18.5648" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd"/>
+  <path d="M15.8487,18.5649C15.8487,19.4532 15.1423,20.1734 14.2711,20.1734L10.4879,20.1734C9.6167,20.1734 8.9103,19.4532 8.9103,18.5649L8.9103,15.1086C8.9103,14.2201 9.6167,13.5001 10.4879,13.5001L14.2711,13.5001C15.1423,13.5001 15.8487,14.2201 15.8487,15.1086" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd"/>
+  <path d="M12.9418,16.8366L21.2715,16.8366" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd"/>
+  <path d="M4,29L29,29" fill="none" stroke="#00ffa8" stroke-width="1.1" stroke-linecap="square" fill-rule="evenodd"/>
+  <path d="M4,4L4,28" fill="none" stroke="#00ffa8" stroke-width="1.1" stroke-linecap="square" fill-rule="evenodd"/>
+</svg>

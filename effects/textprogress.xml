@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect id="com.alightcreative.effects.textprogress" name="Text Progress" desc="Partially displays a text layer, character by character." affinity="text!" type="text" category="text" tags="text,progress,essentials,kinetic,propAdjust" thumb="thumb/textprogress.webp">
+
+    <!--<strings>-->
+        <!--<locale lang="en">-->
+            <!--<string name="name">Text Progress</string>-->
+            <!--<string name="desc">Displays part of the text as a string</string>-->
+            <!--<string name="rel">Relative</string>-->
+            <!--<string name="frames">Frames</string>-->
+        <!--</locale>-->
+    <!--</strings>-->
+
+    <params>
+        <spinner id="start" default="0.0" min="0.0" max="1.0" label="Start" type="percent" step="0.001" />
+        <spinner id="end" default="1.0" min="0.0" max="1.0" label="End" type="percent" step="0.001" />
+        <selector id="cursor" default="0" style="dropdown" label="Cursor" >
+            <choice label="None" value="0" />
+            <choice label="_" value="1" />
+            <choice label="█" value="2" />
+            <choice label="▌" value="3" />
+            <choice label="▁" value="4" />
+            <choice label="▏" value="5" />
+            <choice label="▕" value="6" />
+            <choice label="▯" value="7" />
+            <choice label="▎" value="8" />
+        </selector>
+        <switch id="blink" default="false" label="Blink Cursor" />
+    </params>
+
+
+    <script lang="js"><![CDATA[
+
+        function animate(env,el,p,pprev) {
+
+            let cursor = p.cursor;
+            let cursorChar = "";
+            if( cursor==0 ) {
+                cursorChar = "";
+            } else if( cursor==1 ) {
+                cursorChar = "_";
+            } else if( cursor==2 ) {
+                cursorChar = "█";
+            } else if( cursor==3 ) {
+                cursorChar = "▌";
+            } else if( cursor==4 ) {
+                cursorChar = "▁";
+            } else if( cursor==5 ) {
+                cursorChar = "▏";
+            } else if( cursor==6 ) {
+                cursorChar = "▕";
+            } else if( cursor==7 ) {
+                cursorChar = "▯";
+            } else if( cursor==8 ) {
+                cursorChar = "▎";
+            }
+
+            if( p.blink ) {
+
+                if( Math.round(el.text.length * p.start) == Math.round(el.text.length * pprev.start) &&
+                    Math.round(el.text.length * p.end) == Math.round(el.text.length * pprev.end) ) {
+
+                    if( (env.time * env.duration * 2) % 2 > 1 ) cursorChar = "";
+
+                }
+            }
+
+            el.text = el.text.slice( Math.round(el.text.length * p.start), Math.round(el.text.length * p.end)) + cursorChar;
+
+            return el;
+        }
+
+    ]]></script>
+
+</effect>

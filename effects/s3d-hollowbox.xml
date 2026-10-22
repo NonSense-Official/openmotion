@@ -1,0 +1,1085 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<effect
+    id="com.alightcreative.effects.hollowbox"
+    name="Hollow Box"
+    desc="Renders a faux-3D hollow box, using the layer as a surface texture, with sides that can be turned on or off, punched out with preset shapes, or offset outward."
+    category="3d"
+    tags="3d,shape,lighting,raster,membersOnly"
+    thumb="thumb/3dbox.webp"
+    overdraw="true"
+    max-overdraw="0.2"
+    experimental="false"
+    deprecated="false">
+
+    <params>
+        <texture id="inputImg" srcType="content" />
+        <orient id="orient" label="Orientation" invert="true" />
+        <xyz id="rotate" label="Rotation" type="rotate" />
+        <spinner id="width" default="1.0" min="0.01" max="10" label="Width" step="0.001" ticks="1" multiplier="100" />
+        <spinner id="height" default="1.0" min="0.01" max="10" label="Height" step="0.001" ticks="1" multiplier="100" />
+        <spinner id="depth" default="1.0" min="0.01" max="10" label="Depth" step="0.001" ticks="1" multiplier="100" />
+        <spinner id="thick" default=".05" min="0.0" max="10" label="Thickness" step="0.001" ticks="1" multiplier="100" />
+        <spinner id="outset" default="0" min="0.0" max="10" label="Outset" step="0.001" ticks="1" multiplier="100" />
+        <spinner id="smooth" default="0" min="0" max="5.0" label="Smoothing" step="0.001" multiplier="100" />
+        <xyz id="position" default="0.,100.,600." label="Position" step="0.01" ticks="1.0" />
+        <spinner id="scale" default="1.0" min="0" max="10.0" label="Scale" step="0.01" ticks="1.0" />
+
+
+        <section text="Front Side" />
+        <selector id="frontMode" default="0" style="dropdown" label="Style" >
+            <choice label="Normal" value="0" enableTargets="frontOutset" />
+            <choice label="Hidden" value="1" />
+            <choice label="Circular Cutout" value="3" enableTargets="frontAmount,frontOutset" />
+            <choice label="Circular Crop" value="5" enableTargets="frontAmount,frontOutset" />
+            <choice label="Square Cutout" value="2" enableTargets="frontAmount,frontOutset" />
+            <choice label="Square Crop" value="4" enableTargets="frontAmount,frontOutset" />
+        </selector>
+        <slider id="frontAmount" default="0.5" min="0" max="1." label="Progress" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+        <slider id="frontOutset" default="0.5" min="0" max="1." label="Outset" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+
+        <section text="Top Side" />
+        <selector id="topMode" default="0" style="dropdown" label="Style" >
+            <choice label="Normal" value="0" enableTargets="topOutset" />
+            <choice label="Hidden" value="1" />
+            <choice label="Circular Cutout" value="3" enableTargets="topAmount,topOutset" />
+            <choice label="Circular Crop" value="5" enableTargets="topAmount,topOutset" />
+            <choice label="Square Cutout" value="2" enableTargets="topAmount,topOutset" />
+            <choice label="Square Crop" value="4" enableTargets="topAmount,topOutset" />
+        </selector>
+        <slider id="topAmount" default="0.5" min="0" max="1." label="Progress" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+        <slider id="topOutset" default="0.5" min="0" max="1." label="Outset" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+
+        <section text="Left Side" />
+        <selector id="leftMode" default="0" style="dropdown" label="Style" >
+            <choice label="Normal" value="0" enableTargets="leftOutset" />
+            <choice label="Hidden" value="1" />
+            <choice label="Circular Cutout" value="3" enableTargets="leftAmount,leftOutset" />
+            <choice label="Circular Crop" value="5" enableTargets="leftAmount,leftOutset" />
+            <choice label="Square Cutout" value="2" enableTargets="leftAmount,leftOutset" />
+            <choice label="Square Crop" value="4" enableTargets="leftAmount,leftOutset" />
+        </selector>
+        <slider id="leftAmount" default="0.5" min="0" max="1." label="Progress" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+        <slider id="leftOutset" default="0.5" min="0" max="1." label="Outset" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+
+        <section text="Right Side" />
+        <selector id="rightMode" default="0" style="dropdown" label="Style" >
+            <choice label="Normal" value="0" enableTargets="rightOutset" />
+            <choice label="Hidden" value="1" />
+            <choice label="Circular Cutout" value="3" enableTargets="rightAmount,rightOutset" />
+            <choice label="Circular Crop" value="5" enableTargets="rightAmount,rightOutset" />
+            <choice label="Square Cutout" value="2" enableTargets="rightAmount,rightOutset" />
+            <choice label="Square Crop" value="4" enableTargets="rightAmount,rightOutset" />
+        </selector>
+        <slider id="rightAmount" default="0.5" min="0" max="1." label="Progress" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+        <slider id="rightOutset" default="0.5" min="0" max="1." label="Outset" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+
+        <section text="Back Side" />
+        <selector id="backMode" default="0" style="dropdown" label="Style" >
+            <choice label="Normal" value="0" enableTargets="backOutset" />
+            <choice label="Hidden" value="1" />
+            <choice label="Circular Cutout" value="3" enableTargets="backAmount,backOutset" />
+            <choice label="Circular Crop" value="5" enableTargets="backAmount,backOutset" />
+            <choice label="Square Cutout" value="2" enableTargets="backAmount,backOutset" />
+            <choice label="Square Crop" value="4" enableTargets="backAmount,backOutset" />
+        </selector>
+        <slider id="backAmount" default="0.5" min="0" max="1." label="Progress" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+        <slider id="backOutset" default="0.5" min="0" max="1." label="Outset" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+
+        <section text="Bottom Side" />
+        <selector id="bottomMode" default="0" style="dropdown" label="Style" >
+            <choice label="Normal" value="0" enableTargets="bottomOutset" />
+            <choice label="Hidden" value="1" />
+            <choice label="Circular Cutout" value="3" enableTargets="bottomAmount,bottomOutset" />
+            <choice label="Circular Crop" value="5" enableTargets="bottomAmount,bottomOutset" />
+            <choice label="Square Cutout" value="2" enableTargets="bottomAmount,bottomOutset" />
+            <choice label="Square Crop" value="4" enableTargets="bottomAmount,bottomOutset" />
+        </selector>
+        <slider id="bottomAmount" default="0.5" min="0" max="1." label="Progress" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+        <slider id="bottomOutset" default="0.5" min="0" max="1." label="Outset" type="percent" step="0.01" ticks="0.5" snap="0.5" enabled="false" />
+
+        <section text="Light Source" />
+        <selector id="shadingType" default="1" style="dropdown" label="Shading" >
+            <choice label="Flat" value="0" />
+            <choice label="Point Light" value="1" />
+            <choice label="Directional Light" value="2" />
+            <choice label="Depth Map" value="3" />
+            <choice label="Normal Map" value="4" />
+            <choice label="Normal &amp; Depth Map" value="5" />
+        </selector>
+        <spinner id="lightIntensity" default="1.0" min="0" max="2" step="0.001" label="Intensity" type="percent" />
+        <spinner id="shine" default="0.8" min="0.0" max="1.0" label="Shine" step="0.01" ticks="0.5" />
+        <spinner id="spec" default="30.0" min="1.0" max="150.0" label="Specularity" step="0.5" ticks="30.0" />
+        <spinner id="ambient" default="0.1" min="0.0" max="1.0" label="Ambient" step="0.01" />
+        <color id="lightColor" default="#FFFFFFFF" label="Color" alpha="false" />
+        <point id="lightDir" default="75,-75" label="Direction" />
+        <spinner id="lightDepth" default="100" min="-100" max="800" label="Elevation" step="0.5" ticks="1,100"  />
+
+        <section text="Texture Mapping" />
+        <switch id="mirror" default="false" label="Mirror" />
+        <switch id="texStretch" default="false" label="Stretch" />
+        <spinner id="texRepeatX" default="1" min="0.01" max="20.0" step="0.01" label="Repeat X" />
+        <spinner id="texRepeatY" default="1" min="0.01" max="20.0" step="0.01" label="Repeat Y" />
+        <spinner id="texAngle" default="0.0" min="-3600" max="3600" label="Angle" step="0.1" ticks="0" type="angle" />
+        <spinner id="texCrop" default="1" min="0.01" max="2.0" label="Crop" step="0.001" ticks="1.0" />
+        <spinner id="texTwirl" default="0.0" min="-3600" max="3600" label="Twirl" step="0.1" ticks="0" type="angle" />
+        <point id="texOffset" label="Offset" />
+
+        <section text="Ray Marching" />
+        <tip text="Use more iterations for better edge quality; use less iterations for faster preview performance. For best results, an iteration count between 30 and 60 is recommended." />
+        <slider id="MAX_ITER" default="30" min="10" max="200" label="Precision" type="integer" step="1" ticks="30,60,100" snap="30,60,100" />
+
+    </params>
+
+    <script lang="js"><![CDATA[
+
+        function animate(env,el,p) {
+            let groups = [];
+
+            if( p.thick < 0.0001 ) {
+                groups.push(3);
+            } else if( (p.leftMode == 0 || p.leftMode == 1) &&
+                (p.bottomMode == 0 || p.bottomMode == 1) &&
+                (p.frontMode == 0 || p.frontMode == 1) &&
+                (p.rightMode == 0 || p.rightMode == 1) &&
+                (p.topMode == 0 || p.topMode == 1) &&
+                (p.backMode == 0 || p.backMode == 1) ) {
+                if( p.shadingType == 1 ) {
+                    groups.push(2);
+                } else {
+                    groups.push(1);
+                }
+            } else {
+                groups.push(0);
+            }
+
+            el.shaderGroups = groups;
+            return el;
+        }
+
+    ]]></script>
+
+    <shader type="vertex" precision="high" group="0"><![CDATA[
+
+        varying mat4 orientAndRotate;
+
+        mat4 rotationAxisAngle( vec3 v, float angle )
+        {
+            float s = sin( angle );
+            float c = cos( angle );
+            float ic = 1.0 - c;
+
+            return mat4( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y, 0.0,
+                         v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x, 0.0,
+                         v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c,     0.0,
+                         0.0,                0.0,                0.0,                1.0 );
+        }
+
+        void main() {
+            vertShaderInit();
+            vec3 r = rotate * 0.0174533;
+            mat4 rx = rotationAxisAngle(vec3(1.,0.,0.),r.x);
+            mat4 ry = rotationAxisAngle(vec3(0.,1.,0.),r.y);
+            mat4 rz = rotationAxisAngle(vec3(0.,0.,1.),r.z);
+            orientAndRotate = orient * rz * rx * ry;
+        }
+
+    ]]></shader>
+
+    <shader type="vertex" precision="high" group="1"><![CDATA[
+
+        varying mat4 orientAndRotate;
+
+        mat4 rotationAxisAngle( vec3 v, float angle )
+        {
+            float s = sin( angle );
+            float c = cos( angle );
+            float ic = 1.0 - c;
+
+            return mat4( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y, 0.0,
+                         v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x, 0.0,
+                         v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c,     0.0,
+                         0.0,                0.0,                0.0,                1.0 );
+        }
+
+        void main() {
+            vertShaderInit();
+            vec3 r = rotate * 0.0174533;
+            mat4 rx = rotationAxisAngle(vec3(1.,0.,0.),r.x);
+            mat4 ry = rotationAxisAngle(vec3(0.,1.,0.),r.y);
+            mat4 rz = rotationAxisAngle(vec3(0.,0.,1.),r.z);
+            orientAndRotate = orient * rz * rx * ry;
+        }
+
+    ]]></shader>
+
+    <shader type="vertex" precision="high" group="2"><![CDATA[
+
+        varying mat4 orientAndRotate;
+
+        mat4 rotationAxisAngle( vec3 v, float angle )
+        {
+            float s = sin( angle );
+            float c = cos( angle );
+            float ic = 1.0 - c;
+
+            return mat4( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y, 0.0,
+                         v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x, 0.0,
+                         v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c,     0.0,
+                         0.0,                0.0,                0.0,                1.0 );
+        }
+
+        void main() {
+            vertShaderInit();
+            vec3 r = rotate * 0.0174533;
+            mat4 rx = rotationAxisAngle(vec3(1.,0.,0.),r.x);
+            mat4 ry = rotationAxisAngle(vec3(0.,1.,0.),r.y);
+            mat4 rz = rotationAxisAngle(vec3(0.,0.,1.),r.z);
+            orientAndRotate = orient * rz * rx * ry;
+        }
+
+    ]]></shader>
+
+    <shader type="fragment" precision="high" group="0"><![CDATA[
+
+        #define OBJECT_CENTER (position/100.)
+        //#define MAX_ITER 35
+        varying mat4 orientAndRotate;
+
+        float sdBox( vec3 p, vec3 b )
+        {
+          vec3 d = abs(p) - b;
+          return length(max(d,0.0))
+                 + min(max(d.x,max(d.y,d.z)),0.0); // remove this line for an only partially signed sdf
+        }
+
+        mat2 rot(float a) {
+            float c = cos(a);
+            float s = sin(a);
+            return mat2(
+                c, -s,
+                s, c
+            );
+        }
+
+        float opSmoothSubtraction(float d1, float d2, float k) {
+            float h = clamp( 0.5 - 0.5*(d2+d1)/k, 0.0, 1.0 );
+            return mix( d2, -d1, h ) + k*h*(1.0-h);
+        }
+
+        float opSmoothIntersection( float d1, float d2, float k ) {
+            float h = clamp( 0.5 - 0.5*(d2-d1)/k, 0.0, 1.0 );
+            return mix( d2, d1, h ) + k*h*(1.0-h);
+        }
+
+        mat4 rotationAxisAngle( vec3 v, float angle )
+        {
+            float s = sin( angle );
+            float c = cos( angle );
+            float ic = 1.0 - c;
+
+            return mat4( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y, 0.0,
+                         v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x, 0.0,
+                         v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c,     0.0,
+                         0.0,                0.0,                0.0,                1.0 );
+        }
+
+        float sdSide( vec3 p, vec3 b, vec3 s, float t, float o, float sm, int mode, float progress, float sideOutset ) {
+        
+            if( mode == 1 ) {           // Hidden
+                return 1000000.0;
+            }
+        
+            p += s*(b + o - t*0.5);
+            b *= 1. - abs(s);
+            b += t * abs(s) * 0.5;
+            
+            sm = min(sm,t/2.);
+            p += s*(sideOutset-0.5)*5.;
+
+            if( mode == 2 ) {       // Square cutout
+                vec3 bb = b;
+                bb *= 1. - abs(s);
+                bb *= progress;
+                bb += t * abs(s);
+                return opSmoothSubtraction(sdBox(p,bb), (sdBox(p,b-sm)-sm),sm);
+            } else if( mode == 3 ) {            // Circle Cutout
+                vec3 pp = p;
+                pp *= 1. - abs(s);
+                vec3 bb = b;
+                bb *= 1. - abs(s);
+                float cc = length(pp)/length(bb)-(progress-0.01);
+                return opSmoothSubtraction(cc, sdBox(p,b-sm)-sm, sm);
+            } else if( mode == 5 ) {            // Circle Crop
+                vec3 pp = p;
+                pp *= 1. - abs(s);
+                vec3 bb = b;
+                bb *= 1. - abs(s);
+                float cc = length(pp)/length(bb)-(progress-0.01);
+                return opSmoothIntersection(cc, sdBox(p,b-sm)-sm, sm);
+            } else if( mode == 4 ) {            // Square crop
+                vec3 bb = (b * (1. - abs(s))) * (progress) + (b * abs(s));
+                return sdBox(p,bb-sm)-sm;
+            } else {    // Normal
+                return sdBox(p,b-sm)-sm;
+            }
+        
+        }
+
+        float sdOpenBox( vec3 p, vec3 b, float t, float o, float sm)
+        {
+            float d;
+            vec3 s = vec3(1., -1., 0.);
+            
+            d =       sdSide(p,b,s.xzz,t,o,sm,leftMode,leftAmount,leftOutset);
+            d = min(d,sdSide(p,b,s.zxz,t,o,sm,bottomMode,bottomAmount,bottomOutset));
+            d = min(d,sdSide(p,b,s.zzx,t,o,sm,frontMode,frontAmount,frontOutset));
+            d = min(d,sdSide(p,b,s.yzz,t,o,sm,rightMode,rightAmount,rightOutset));
+            d = min(d,sdSide(p,b,s.zyz,t,o,sm,topMode,topAmount,topOutset));
+            d = min(d,sdSide(p,b,s.zzy,t,o,sm,backMode,backAmount,backOutset));
+
+            return d;
+        }
+
+        float dist(vec3 p) {
+            float d = 100000000.0;
+
+            p = p-OBJECT_CENTER;
+            p = (vec4(p,1.) * orientAndRotate).xyz;
+
+        	d = min(d,sdOpenBox(p,vec3(width,height,depth),thick+0.02,outset,smooth));
+            
+            return d;
+        }
+
+        float march(vec3 ro, vec3 rd) {
+            float d = 0.0;
+            for( int i=0; i<int(MAX_ITER); i++ ) {
+                vec3 p = ro + rd*d;
+                float dd = dist(p);
+                d += dd;
+                if( dd < 0.00001 || d > 1000.0 ) break;
+            }
+            return d;
+        }
+
+        mat4 vecToVec( vec3 from, vec3 to ) {
+            vec3 w = cross(normalize(from),normalize(to));
+            vec3 axis = normalize(w);
+            float angle = asin(length(w));
+            return rotationAxisAngle(axis,angle);
+        }
+
+        vec3 calcNormal(vec3 p) {
+            float d = dist(p);
+            vec2 e = vec2(.01,0.);
+            return normalize(d - vec3(
+                dist(p-e.xyy),
+                dist(p-e.yxy),
+                dist(p-e.yyx)));
+        }
+
+        float lighting(vec3 p, vec3 n) {
+            vec3 lightPos = vec3(lightDir.x/2.0, -lightDir.y/2.0, -lightDepth*2.0);
+            vec3 l = normalize(lightPos-p);
+            return dot(n,l);
+        }
+
+        float directionalLighting(vec3 p, vec3 n) {
+            vec3 lightPos = vec3(lightDir.x/2.0, -lightDir.y/2.0, -lightDepth*2.0);
+            vec3 l = normalize(lightPos);
+            return dot(n,l);
+        }
+
+        vec4 applyShading(vec4 texColor, vec3 p, vec3 n, float d ) {
+            vec4 result = vec4(0.);
+            float a = smoothstep(30.0,9.,d);
+            a *= smoothstep(0.3,0.2,n.z);
+            if( shadingType == 0 ) {                // Flat
+                result = texColor * a;
+            } else if( shadingType == 1 ) {         // Point Light
+            	float l = lighting(p,n);
+            	vec3 tc = texColor.rgb;
+            	vec3 surface = tc * ambient + tc * lightColor.rgb * l * (1.-ambient);
+            	surface *= lightIntensity;
+            	float s = pow(l,spec);
+            	surface = mix(surface*(1.-shine*0.1),vec3(1.),shine*s);
+                result = vec4(surface, texColor.a) * a;
+            } else if( shadingType == 2 ) {         // Directonal Light
+            	float l = directionalLighting(p,n);
+            	vec3 tc = texColor.rgb;
+            	vec3 surface = tc * ambient + tc * lightColor.rgb * l * (1.-ambient);
+            	surface *= lightIntensity;
+            	float s = pow(l,spec);
+            	surface = mix(surface*(1.-shine*0.1),vec3(1.),shine*s);
+                result = vec4(surface, texColor.a) * a;
+            } else if( shadingType == 3 ) {         // Depth Map
+                //float dd = clamp(1.-d/10.,0.,1.)*2.;
+                float ds = max(max(width,height),depth)*2.5;
+                float dd = 1. - ((d - OBJECT_CENTER.z + ds/2.)/ds);
+                result = vec4( dd,dd,dd, 1. ) * a;
+            } else if( shadingType == 4 ) {         // Normal Map
+                result = vec4( (n/2.)+0.5, 1. ) * a;
+            } else if( shadingType == 5 ) {         // Normal * Depth
+                float ds = max(max(width,height),depth)*2.5;
+                float dd = 1. - ((d - OBJECT_CENTER.z + ds/2.)/ds);
+                result = vec4( ((n/2.)+0.5)*dd, 1. ) * a;
+            }
+
+            return result;
+        }
+
+        vec2 mapTexture( vec2 texCoord ) {
+            float texRad = texAngle * 0.0174533;
+            float texCos = cos(texRad);
+            float texSin = sin(texRad);
+            mat2 texRot = mat2( texCos, -texSin, texSin, texCos );
+
+            float texTwirlRad = texTwirl * 0.0174533;
+            float texTwirlCos = cos(texTwirlRad);
+            float texTwirlSin = sin(texTwirlRad);
+            mat2 texTwirlRot = mat2( texTwirlCos, -texTwirlSin, texTwirlSin, texTwirlCos );
+
+            vec2 texScaleVec = vec2(1./texRepeatX,1./texRepeatY);
+
+            texCoord *= texRot;
+
+            texCoord += texOffset / 1000.0;
+            texCoord /= texScaleVec;
+            if( mirror ) {
+                texCoord = abs(mod(texCoord,2.0)-1.0);
+            } else {
+                texCoord = mod(texCoord, 1.);
+            }
+
+            texCoord -= 0.5;
+            texCoord = texCoord * (1.-5./acScreenSize);
+            texCoord *= texCrop;
+            texCoord *= texTwirlRot;
+            texCoord += 0.5;
+            return texCoord;
+        }
+
+        void main() {
+
+            vec2 st = acLayerNorm;
+            st -= 0.5;
+            st.x *= acLayerSize.x/acLayerSize.y;
+
+            st /= scale;
+
+            vec3 ro = vec3(0., 1., -1.);
+            vec3 rd = normalize(vec3(st, 1.));
+
+            float d = march(ro,rd);
+            vec3 p = ro + rd * d;
+
+            vec3 n = calcNormal(p);
+        	vec3 nn = n;
+        	float l = lighting(p,n);
+
+            vec4 localCoord = vec4(p-OBJECT_CENTER, 1.);
+            n = (vec4(n,0.) * orientAndRotate).xyz;
+            localCoord *= orientAndRotate;
+            vec4 pp = localCoord;
+	        vec4 qq = pp * (vecToVec(n,pp.xyz*vec3(0.,1.,0.)));
+
+            //vec2 texCoord = pp.xy;
+
+            //vec2 texCoordOutside = qq.zx;
+            //vec2 texCoordEnds = pp.xy;
+            //vec2 texCoord = mix(texCoordOutside,texCoordEnds,abs(n.z));
+
+            if( texStretch ) {
+                pp /= vec4(width,height,depth,1.);
+            }
+
+            vec2 texCoord;
+            float a;
+            if( n.x > 0.5 ) {
+                texCoord = ((pp.zy+1.)/2.);
+                a = height<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.x < -0.5 ) {
+                texCoord = ((pp.zy+1.)/2.);
+                texCoord.x = 1.-texCoord.x;
+                a = height<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.y > 0.5 ) {
+                texCoord = ((pp.xz+1.)/2.);
+                a = width<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.y < -0.5 ) {
+                texCoord = 1.-((pp.xz+1.)/2.);
+                texCoord.x = 1.-texCoord.x;
+                a = width<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.z > 0.5 ) {
+                texCoord = (pp.xy+1.)/2.;
+                texCoord.x = 1.-texCoord.x;
+                a = width<0.0105 || height<0.0105 ? 0.0 : 1.0;
+            } else if ( n.z < -0.5 ) {
+                texCoord = (pp.xy+1.)/2.;
+                a = width<0.0105 || height<0.0105 ? 0.0 : 1.0;
+            } else {
+                texCoord = vec2(0.,0.);
+                a = 1.0;
+            }
+
+            //vec2 texCoord = (qq.xz+1.)/2.;
+
+            //texCoord = mod(texCoord*crop, 1.);
+            texCoord = mapTexture(texCoord);
+
+        	vec4 texColor = texture2DCv( inputImg.texture, (vec4(texCoord,0.0,1.0)*acLayerToScreen).xy );
+
+            gl_FragColor = applyShading(texColor, p, nn, d) * a;
+            //gl_FragColor = vec4(n.xyz,applyShading(texColor, p, nn, d).a);
+
+            //gl_FragColor = d > 500.0 ? vec4( 0. ) : vec4(texColor.rgb * l, texColor.a);
+
+        }
+
+    ]]></shader>
+
+    <shader type="fragment" precision="high" group="1"><![CDATA[
+
+        #define OBJECT_CENTER (position/100.)
+        //#define MAX_ITER 35
+        varying mat4 orientAndRotate;
+
+        float sdBox( vec3 p, vec3 b )
+        {
+          vec3 d = abs(p) - b;
+          return length(max(d,0.0))
+                 + min(max(d.x,max(d.y,d.z)),0.0); // remove this line for an only partially signed sdf
+        }
+
+        mat2 rot(float a) {
+            float c = cos(a);
+            float s = sin(a);
+            return mat2(
+                c, -s,
+                s, c
+            );
+        }
+
+        float opSmoothSubtraction(float d1, float d2, float k) {
+            float h = clamp( 0.5 - 0.5*(d2+d1)/k, 0.0, 1.0 );
+            return mix( d2, -d1, h ) + k*h*(1.0-h);
+        }
+
+        float opSmoothIntersection( float d1, float d2, float k ) {
+            float h = clamp( 0.5 - 0.5*(d2-d1)/k, 0.0, 1.0 );
+            return mix( d2, d1, h ) + k*h*(1.0-h);
+        }
+
+        mat4 rotationAxisAngle( vec3 v, float angle )
+        {
+            float s = sin( angle );
+            float c = cos( angle );
+            float ic = 1.0 - c;
+
+            return mat4( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y, 0.0,
+                         v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x, 0.0,
+                         v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c,     0.0,
+                         0.0,                0.0,                0.0,                1.0 );
+        }
+
+        float sdSide( vec3 p, vec3 b, vec3 s, float t, float o, float sm, float progress, float sideOutset ) {
+
+            p += s*(b + o - t*0.5);
+            b *= 1. - abs(s);
+            b += t * abs(s) * 0.5;
+
+            sm = min(sm,t/2.);
+            p += s*(sideOutset-0.5)*5.;
+
+            return sdBox(p,b-sm)-sm;
+
+        }
+
+        float sdOpenBox( vec3 p, vec3 b, float t, float o, float sm)
+        {
+            float d = 10000.0;
+            vec3 s = vec3(1., -1., 0.);
+
+            if(leftMode!=1) {
+                d = min(d,sdSide(p,b,s.xzz,t,o,sm,leftAmount,leftOutset));
+            }
+            if(bottomMode!=1) {
+                d = min(d,sdSide(p,b,s.zxz,t,o,sm,bottomAmount,bottomOutset));
+            }
+            if(frontMode!=1) {
+                d = min(d,sdSide(p,b,s.zzx,t,o,sm,frontAmount,frontOutset));
+            }
+            if(rightMode!=1) {
+                d = min(d,sdSide(p,b,s.yzz,t,o,sm,rightAmount,rightOutset));
+            }
+            if(topMode!=1) {
+                d = min(d,sdSide(p,b,s.zyz,t,o,sm,topAmount,topOutset));
+            }
+            if(backMode!=1) {
+                d = min(d,sdSide(p,b,s.zzy,t,o,sm,backAmount,backOutset));
+            }
+
+            return d;
+        }
+
+        float dist(vec3 p) {
+            float d = 100000000.0;
+
+            p = p-OBJECT_CENTER;
+            p = (vec4(p,1.) * orientAndRotate).xyz;
+
+        	d = min(d,sdOpenBox(p,vec3(width,height,depth),thick+0.02,outset,smooth));
+
+            return d;
+        }
+
+        float march(vec3 ro, vec3 rd) {
+            float d = 0.0;
+            for( int i=0; i<int(MAX_ITER); i++ ) {
+                vec3 p = ro + rd*d;
+                float dd = dist(p);
+                d += dd;
+                if( dd < 0.00001 || d > 1000.0 ) break;
+            }
+            return d;
+        }
+
+        mat4 vecToVec( vec3 from, vec3 to ) {
+            vec3 w = cross(normalize(from),normalize(to));
+            vec3 axis = normalize(w);
+            float angle = asin(length(w));
+            return rotationAxisAngle(axis,angle);
+        }
+
+        vec3 calcNormal(vec3 p) {
+            float d = dist(p);
+            vec2 e = vec2(.01,0.);
+            return normalize(d - vec3(
+                dist(p-e.xyy),
+                dist(p-e.yxy),
+                dist(p-e.yyx)));
+        }
+
+        float lighting(vec3 p, vec3 n) {
+            vec3 lightPos = vec3(lightDir.x/2.0, -lightDir.y/2.0, -lightDepth*2.0);
+            vec3 l = normalize(lightPos-p);
+            return dot(n,l);
+        }
+
+        float directionalLighting(vec3 p, vec3 n) {
+            vec3 lightPos = vec3(lightDir.x/2.0, -lightDir.y/2.0, -lightDepth*2.0);
+            vec3 l = normalize(lightPos);
+            return dot(n,l);
+        }
+
+        vec4 applyShading(vec4 texColor, vec3 p, vec3 n, float d ) {
+            vec4 result = vec4(0.);
+            float a = smoothstep(30.0,9.,d);
+            a *= smoothstep(0.3,0.2,n.z);
+            if( shadingType == 0 ) {                // Flat
+                result = texColor * a;
+            } else if( shadingType == 1 ) {         // Point Light
+            	float l = lighting(p,n);
+            	vec3 tc = texColor.rgb;
+            	vec3 surface = tc * ambient + tc * lightColor.rgb * l * (1.-ambient);
+            	surface *= lightIntensity;
+            	float s = pow(l,spec);
+            	surface = mix(surface*(1.-shine*0.1),vec3(1.),shine*s);
+                result = vec4(surface, texColor.a) * a;
+            } else if( shadingType == 2 ) {         // Directonal Light
+            	float l = directionalLighting(p,n);
+            	vec3 tc = texColor.rgb;
+            	vec3 surface = tc * ambient + tc * lightColor.rgb * l * (1.-ambient);
+            	surface *= lightIntensity;
+            	float s = pow(l,spec);
+            	surface = mix(surface*(1.-shine*0.1),vec3(1.),shine*s);
+                result = vec4(surface, texColor.a) * a;
+            } else if( shadingType == 3 ) {         // Depth Map
+                //float dd = clamp(1.-d/10.,0.,1.)*2.;
+                float ds = max(max(width,height),depth)*2.5;
+                float dd = 1. - ((d - OBJECT_CENTER.z + ds/2.)/ds);
+                result = vec4( dd,dd,dd, 1. ) * a;
+            } else if( shadingType == 4 ) {         // Normal Map
+                result = vec4( (n/2.)+0.5, 1. ) * a;
+            } else if( shadingType == 5 ) {         // Normal * Depth
+                float ds = max(max(width,height),depth)*2.5;
+                float dd = 1. - ((d - OBJECT_CENTER.z + ds/2.)/ds);
+                result = vec4( ((n/2.)+0.5)*dd, 1. ) * a;
+            }
+
+            return result;
+        }
+
+        vec2 mapTexture( vec2 texCoord ) {
+            float texRad = texAngle * 0.0174533;
+            float texCos = cos(texRad);
+            float texSin = sin(texRad);
+            mat2 texRot = mat2( texCos, -texSin, texSin, texCos );
+
+            float texTwirlRad = texTwirl * 0.0174533;
+            float texTwirlCos = cos(texTwirlRad);
+            float texTwirlSin = sin(texTwirlRad);
+            mat2 texTwirlRot = mat2( texTwirlCos, -texTwirlSin, texTwirlSin, texTwirlCos );
+
+            vec2 texScaleVec = vec2(1./texRepeatX,1./texRepeatY);
+
+            texCoord *= texRot;
+
+            texCoord += texOffset / 1000.0;
+            texCoord /= texScaleVec;
+            if( mirror ) {
+                texCoord = abs(mod(texCoord,2.0)-1.0);
+            } else {
+                texCoord = mod(texCoord, 1.);
+            }
+
+            texCoord -= 0.5;
+            texCoord = texCoord * (1.-5./acScreenSize);
+            texCoord *= texCrop;
+            texCoord *= texTwirlRot;
+            texCoord += 0.5;
+            return texCoord;
+        }
+
+        void main() {
+
+            vec2 st = acLayerNorm;
+            st -= 0.5;
+            st.x *= acLayerSize.x/acLayerSize.y;
+
+            st /= scale;
+
+            vec3 ro = vec3(0., 1., -1.);
+            vec3 rd = normalize(vec3(st, 1.));
+
+            float d = march(ro,rd);
+            vec3 p = ro + rd * d;
+
+            vec3 n = calcNormal(p);
+        	vec3 nn = n;
+        	float l = lighting(p,n);
+
+            vec4 localCoord = vec4(p-OBJECT_CENTER, 1.);
+            n = (vec4(n,0.) * orientAndRotate).xyz;
+            localCoord *= orientAndRotate;
+            vec4 pp = localCoord;
+	        vec4 qq = pp * (vecToVec(n,pp.xyz*vec3(0.,1.,0.)));
+
+            //vec2 texCoord = pp.xy;
+
+            //vec2 texCoordOutside = qq.zx;
+            //vec2 texCoordEnds = pp.xy;
+            //vec2 texCoord = mix(texCoordOutside,texCoordEnds,abs(n.z));
+
+            if( texStretch ) {
+                pp /= vec4(width,height,depth,1.);
+            }
+
+            vec2 texCoord;
+            float a;
+            if( n.x > 0.5 ) {
+                texCoord = ((pp.zy+1.)/2.);
+                a = height<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.x < -0.5 ) {
+                texCoord = ((pp.zy+1.)/2.);
+                texCoord.x = 1.-texCoord.x;
+                a = height<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.y > 0.5 ) {
+                texCoord = ((pp.xz+1.)/2.);
+                a = width<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.y < -0.5 ) {
+                texCoord = 1.-((pp.xz+1.)/2.);
+                texCoord.x = 1.-texCoord.x;
+                a = width<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.z > 0.5 ) {
+                texCoord = (pp.xy+1.)/2.;
+                texCoord.x = 1.-texCoord.x;
+                a = width<0.0105 || height<0.0105 ? 0.0 : 1.0;
+            } else if ( n.z < -0.5 ) {
+                texCoord = (pp.xy+1.)/2.;
+                a = width<0.0105 || height<0.0105 ? 0.0 : 1.0;
+            } else {
+                texCoord = vec2(0.,0.);
+                a = 1.0;
+            }
+
+            //vec2 texCoord = (qq.xz+1.)/2.;
+
+            //texCoord = mod(texCoord*crop, 1.);
+            texCoord = mapTexture(texCoord);
+
+        	vec4 texColor = texture2DCv( inputImg.texture, (vec4(texCoord,0.0,1.0)*acLayerToScreen).xy );
+
+            gl_FragColor = applyShading(texColor, p, nn, d) * a;
+            //gl_FragColor = vec4(n.xyz,applyShading(texColor, p, nn, d).a);
+
+            //gl_FragColor = d > 500.0 ? vec4( 0. ) : vec4(texColor.rgb * l, texColor.a);
+
+        }
+
+    ]]></shader>
+
+    <shader type="fragment" precision="high" group="2"><![CDATA[
+
+        #define OBJECT_CENTER (position/100.)
+        //#define MAX_ITER 35
+        varying mat4 orientAndRotate;
+
+        float sdBox( vec3 p, vec3 b )
+        {
+          vec3 d = abs(p) - b;
+          return length(max(d,0.0))
+                 + min(max(d.x,max(d.y,d.z)),0.0); // remove this line for an only partially signed sdf
+        }
+
+        mat2 rot(float a) {
+            float c = cos(a);
+            float s = sin(a);
+            return mat2(
+                c, -s,
+                s, c
+            );
+        }
+
+        float opSmoothSubtraction(float d1, float d2, float k) {
+            float h = clamp( 0.5 - 0.5*(d2+d1)/k, 0.0, 1.0 );
+            return mix( d2, -d1, h ) + k*h*(1.0-h);
+        }
+
+        float opSmoothIntersection( float d1, float d2, float k ) {
+            float h = clamp( 0.5 - 0.5*(d2-d1)/k, 0.0, 1.0 );
+            return mix( d2, d1, h ) + k*h*(1.0-h);
+        }
+
+        mat4 rotationAxisAngle( vec3 v, float angle )
+        {
+            float s = sin( angle );
+            float c = cos( angle );
+            float ic = 1.0 - c;
+
+            return mat4( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y, 0.0,
+                         v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x, 0.0,
+                         v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c,     0.0,
+                         0.0,                0.0,                0.0,                1.0 );
+        }
+
+        float sdSide( vec3 p, vec3 b, vec3 s, float t, float o, float sm, float progress, float sideOutset ) {
+
+            p += s*(b + o - t*0.5);
+            b *= 1. - abs(s);
+            b += t * abs(s) * 0.5;
+
+            sm = min(sm,t/2.);
+            p += s*(sideOutset-0.5)*5.;
+
+            return sdBox(p,b-sm)-sm;
+
+        }
+
+        float sdOpenBox( vec3 p, vec3 b, float t, float o, float sm)
+        {
+            float d = 10000.0;
+            vec3 s = vec3(1., -1., 0.);
+
+            if(leftMode!=1) {
+                d = min(d,sdSide(p,b,s.xzz,t,o,sm,leftAmount,leftOutset));
+            }
+            if(bottomMode!=1) {
+                d = min(d,sdSide(p,b,s.zxz,t,o,sm,bottomAmount,bottomOutset));
+            }
+            if(frontMode!=1) {
+                d = min(d,sdSide(p,b,s.zzx,t,o,sm,frontAmount,frontOutset));
+            }
+            if(rightMode!=1) {
+                d = min(d,sdSide(p,b,s.yzz,t,o,sm,rightAmount,rightOutset));
+            }
+            if(topMode!=1) {
+                d = min(d,sdSide(p,b,s.zyz,t,o,sm,topAmount,topOutset));
+            }
+            if(backMode!=1) {
+                d = min(d,sdSide(p,b,s.zzy,t,o,sm,backAmount,backOutset));
+            }
+
+            return d;
+        }
+
+        float dist(vec3 p) {
+            float d = 100000000.0;
+
+            p = p-OBJECT_CENTER;
+            p = (vec4(p,1.) * orientAndRotate).xyz;
+
+        	d = min(d,sdOpenBox(p,vec3(width,height,depth),thick+0.02,outset,smooth));
+
+            return d;
+        }
+
+        float march(vec3 ro, vec3 rd) {
+            float d = 0.0;
+            for( int i=0; i<int(MAX_ITER); i++ ) {
+                vec3 p = ro + rd*d;
+                float dd = dist(p);
+                d += dd;
+                if( dd < 0.00001 || d > 1000.0 ) break;
+            }
+            return d;
+        }
+
+        mat4 vecToVec( vec3 from, vec3 to ) {
+            vec3 w = cross(normalize(from),normalize(to));
+            vec3 axis = normalize(w);
+            float angle = asin(length(w));
+            return rotationAxisAngle(axis,angle);
+        }
+
+        vec3 calcNormal(vec3 p) {
+            float d = dist(p);
+            vec2 e = vec2(.01,0.);
+            return normalize(d - vec3(
+                dist(p-e.xyy),
+                dist(p-e.yxy),
+                dist(p-e.yyx)));
+        }
+
+        float lighting(vec3 p, vec3 n) {
+            vec3 lightPos = vec3(lightDir.x/2.0, -lightDir.y/2.0, -lightDepth*2.0);
+            vec3 l = normalize(lightPos-p);
+            return dot(n,l);
+        }
+
+        float directionalLighting(vec3 p, vec3 n) {
+            vec3 lightPos = vec3(lightDir.x/2.0, -lightDir.y/2.0, -lightDepth*2.0);
+            vec3 l = normalize(lightPos);
+            return dot(n,l);
+        }
+
+        vec4 applyShading(vec4 texColor, vec3 p, vec3 n, float d ) {
+            vec4 result = vec4(0.);
+            float a = smoothstep(30.0,9.,d);
+            a *= smoothstep(0.3,0.2,n.z);
+            float l = lighting(p,n);
+            vec3 tc = texColor.rgb;
+            vec3 surface = tc * ambient + tc * lightColor.rgb * l * (1.-ambient);
+            surface *= lightIntensity;
+            float s = pow(l,spec);
+            surface = mix(surface*(1.-shine*0.1),vec3(1.),shine*s);
+            result = vec4(surface, texColor.a) * a;
+
+            return result;
+        }
+
+        vec2 mapTexture( vec2 texCoord ) {
+            float texRad = texAngle * 0.0174533;
+            float texCos = cos(texRad);
+            float texSin = sin(texRad);
+            mat2 texRot = mat2( texCos, -texSin, texSin, texCos );
+
+            float texTwirlRad = texTwirl * 0.0174533;
+            float texTwirlCos = cos(texTwirlRad);
+            float texTwirlSin = sin(texTwirlRad);
+            mat2 texTwirlRot = mat2( texTwirlCos, -texTwirlSin, texTwirlSin, texTwirlCos );
+
+            vec2 texScaleVec = vec2(1./texRepeatX,1./texRepeatY);
+
+            texCoord *= texRot;
+
+            texCoord += texOffset / 1000.0;
+            texCoord /= texScaleVec;
+            if( mirror ) {
+                texCoord = abs(mod(texCoord,2.0)-1.0);
+            } else {
+                texCoord = mod(texCoord, 1.);
+            }
+
+            texCoord -= 0.5;
+            texCoord = texCoord * (1.-5./acScreenSize);
+            texCoord *= texCrop;
+            texCoord *= texTwirlRot;
+            texCoord += 0.5;
+            return texCoord;
+        }
+
+        void main() {
+
+            vec2 st = acLayerNorm;
+            st -= 0.5;
+            st.x *= acLayerSize.x/acLayerSize.y;
+
+            st /= scale;
+
+            vec3 ro = vec3(0., 1., -1.);
+            vec3 rd = normalize(vec3(st, 1.));
+
+            float d = march(ro,rd);
+            vec3 p = ro + rd * d;
+
+            vec3 n = calcNormal(p);
+        	vec3 nn = n;
+        	float l = lighting(p,n);
+
+            vec4 localCoord = vec4(p-OBJECT_CENTER, 1.);
+            n = (vec4(n,0.) * orientAndRotate).xyz;
+            localCoord *= orientAndRotate;
+            vec4 pp = localCoord;
+	        vec4 qq = pp * (vecToVec(n,pp.xyz*vec3(0.,1.,0.)));
+
+            //vec2 texCoord = pp.xy;
+
+            //vec2 texCoordOutside = qq.zx;
+            //vec2 texCoordEnds = pp.xy;
+            //vec2 texCoord = mix(texCoordOutside,texCoordEnds,abs(n.z));
+
+            if( texStretch ) {
+                pp /= vec4(width,height,depth,1.);
+            }
+
+            vec2 texCoord;
+            float a;
+            if( n.x > 0.5 ) {
+                texCoord = ((pp.zy+1.)/2.);
+                a = height<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.x < -0.5 ) {
+                texCoord = ((pp.zy+1.)/2.);
+                texCoord.x = 1.-texCoord.x;
+                a = height<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.y > 0.5 ) {
+                texCoord = ((pp.xz+1.)/2.);
+                a = width<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.y < -0.5 ) {
+                texCoord = 1.-((pp.xz+1.)/2.);
+                texCoord.x = 1.-texCoord.x;
+                a = width<0.0105 || depth<0.0105 ? 0.0 : 1.0;
+            } else if ( n.z > 0.5 ) {
+                texCoord = (pp.xy+1.)/2.;
+                texCoord.x = 1.-texCoord.x;
+                a = width<0.0105 || height<0.0105 ? 0.0 : 1.0;
+            } else if ( n.z < -0.5 ) {
+                texCoord = (pp.xy+1.)/2.;
+                a = width<0.0105 || height<0.0105 ? 0.0 : 1.0;
+            } else {
+                texCoord = vec2(0.,0.);
+                a = 1.0;
+            }
+
+            //vec2 texCoord = (qq.xz+1.)/2.;
+
+            //texCoord = mod(texCoord*crop, 1.);
+            texCoord = mapTexture(texCoord);
+
+        	vec4 texColor = texture2DCv( inputImg.texture, (vec4(texCoord,0.0,1.0)*acLayerToScreen).xy );
+
+            gl_FragColor = applyShading(texColor, p, nn, d) * a;
+            //gl_FragColor = vec4(n.xyz,applyShading(texColor, p, nn, d).a);
+
+            //gl_FragColor = d > 500.0 ? vec4( 0. ) : vec4(texColor.rgb * l, texColor.a);
+
+        }
+
+    ]]></shader>
+
+    <shader type="fragment" precision="high" group="3"><![CDATA[
+        void main() {
+            gl_FragColor = vec4(0.);
+        }
+    ]]></shader>
+
+</effect>
