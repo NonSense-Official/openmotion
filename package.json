@@ -1,3 +1,21 @@
 {
-  "type": "module"
+  "name": "openmotion-alpha",
+  "version": "0.1.0",
+  "description": "OpenMotion - Alight Motion engine and UI port for Web/Desktop",
+  "type": "module",
+  "main": "server.cjs",
+  "scripts": {
+    "start": "node server.cjs",
+    "dev": "node server.cjs",
+    "preview": "node server.cjs"
+  },
+  "keywords": [
+    "openmotion",
+    "alight-motion",
+    "motion-graphics",
+    "webgl",
+    "video-editor"
+  ],
+  "author": "",
+  "license": "ISC"
 }

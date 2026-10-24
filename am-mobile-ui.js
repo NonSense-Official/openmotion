@@ -10116,8 +10116,34 @@
     { name: "Cinzel", family: "Cinzel", popular: false },
     { name: "Permanent Marker", family: "Permanent Marker", popular: false },
     { name: "Raleway", family: "Raleway", popular: false },
-    { name: "Merriweather", family: "Merriweather", popular: false }
+    { name: "Merriweather", family: "Merriweather", popular: false },
+    { name: "Comic Neue", family: "Comic Neue", popular: false },
+    { name: "Fredoka", family: "Fredoka", popular: true },
+    { name: "Kanit", family: "Kanit", popular: true },
+    { name: "Outfit", family: "Outfit", popular: true },
+    { name: "Comfortaa", family: "Comfortaa", popular: false },
+    { name: "Rubik", family: "Rubik", popular: true },
+    { name: "Righteous", family: "Righteous", popular: true },
+    { name: "Bungee", family: "Bungee", popular: false },
+    { name: "Abril Fatface", family: "Abril Fatface", popular: false },
+    { name: "Titan One", family: "Titan One", popular: false },
+    { name: "Alfa Slab One", family: "Alfa Slab One", popular: false },
+    { name: "Archivo Black", family: "Archivo Black", popular: true },
+    { name: "Syne", family: "Syne", popular: true },
+    { name: "Work Sans", family: "Work Sans", popular: false },
+    { name: "Plus Jakarta Sans", family: "Plus Jakarta Sans", popular: true },
+    { name: "DM Sans", family: "DM Sans", popular: true },
+    { name: "Urbanist", family: "Urbanist", popular: true },
+    { name: "Cormorant Garamond", family: "Cormorant Garamond", popular: false },
+    { name: "Prata", family: "Prata", popular: false },
+    { name: "Bodoni Moda", family: "Bodoni Moda", popular: false },
+    { name: "Great Vibes", family: "Great Vibes", popular: false },
+    { name: "Sacramento", family: "Sacramento", popular: false },
+    { name: "Satisfy", family: "Satisfy", popular: false },
+    { name: "Space Mono", family: "Space Mono", popular: false },
+    { name: "JetBrains Mono", family: "JetBrains Mono", popular: false }
   ];
+  window.AM_FONTS = AM_FONTS;
 
   let activeTextEditorLayer = null;
   let textEditSnapBefore = null;
@@ -10144,6 +10170,9 @@
       return;
     }
     closeTextPopups();
+    if (type === "font") {
+      populateMiniFontList();
+    }
     const popupMap = {
       font: document.getElementById("am-text-font-popup"),
       size: document.getElementById("am-text-size-popup"),
@@ -11055,22 +11084,45 @@
         modalImpBtn.addEventListener("click", async () => {
           const link = modalImpInput.value.trim();
           if (!link) return;
-          backdrop.classList.remove("open");
-          const home = document.getElementById("am-home-screen");
-          const root = document.getElementById("am-mobile-root");
-          if (home) home.classList.add("hidden");
-          if (root) root.style.display = "flex";
-          if (window.AM && window.AM.loadPreset) {
-            const newId = (I.omNewId ? I.omNewId() : generateOmId());
-            I.omProjectId = newId;
-            if (history.pushState) {
-              history.pushState({ projectId: newId }, "", "/proyek/" + newId);
+
+          let errBox = document.getElementById("am-modal-import-error");
+          if (!errBox) {
+            errBox = document.createElement("div");
+            errBox.id = "am-modal-import-error";
+            errBox.style.cssText = "color:#ff6b6b;font-size:11px;line-height:1.4;margin-top:8px;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.25);border-radius:6px;padding:8px 10px;white-space:pre-wrap;display:none;";
+            modalImpInput.parentElement.parentElement.appendChild(errBox);
+          }
+          errBox.style.display = "none";
+          errBox.textContent = "";
+
+          const prevBtnText = modalImpBtn.textContent;
+          modalImpBtn.disabled = true;
+          modalImpBtn.textContent = "Memuat...";
+
+          try {
+            if (window.AM && window.AM.loadPreset) {
+              const newId = (I.omNewId ? I.omNewId() : generateOmId());
+              I.omProjectId = newId;
+              if (history.pushState) {
+                history.pushState({ projectId: newId }, "", "/proyek/" + newId);
+              }
+              await window.AM.loadPreset(link);
+              backdrop.classList.remove("open");
+              const home = document.getElementById("am-home-screen");
+              const root = document.getElementById("am-mobile-root");
+              if (home) home.classList.add("hidden");
+              if (root) root.style.display = "flex";
+              const topTitle = document.getElementById("am-project-title");
+              if (topTitle && I.val) topTitle.value = I.val.title || "Preset Impor";
+              if (I.fitCanvas) I.fitCanvas();
+              if (I.omScheduleSave) I.omScheduleSave();
             }
-            await window.AM.loadPreset(link);
-            const topTitle = document.getElementById("am-project-title");
-            if (topTitle && I.val) topTitle.value = I.val.title || "Preset Impor";
-            if (I.fitCanvas) I.fitCanvas();
-            if (I.omScheduleSave) I.omScheduleSave();
+          } catch (err) {
+            errBox.textContent = err.message || "Gagal membuka link Alight Motion.";
+            errBox.style.display = "block";
+          } finally {
+            modalImpBtn.disabled = false;
+            modalImpBtn.textContent = prevBtnText;
           }
         });
       }

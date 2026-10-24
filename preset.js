@@ -2309,7 +2309,19 @@ var Lt = class {
           animator: val4
         };
       }
-      throw new Error("efek native (tanpa shader/script) belum bisa dipreview.");
+      // Efek native bawaan Alight Motion (mis. text-transform, drawing-progress, timequant, repeat, text-spacing)
+      let k = this.K(this.de(), this.Ne());
+      return {
+        program: k,
+        uniforms: this.J(k),
+        attribs: this.Z(k),
+        uniformNames: new Map(),
+        programsByGroup: null,
+        groupOrder: [],
+        animator: null,
+        isNative: true,
+        definition: a
+      };
     }
     ['_t'](a, b, c, d, arg, arg2, arg3, arg4) {
       if (!b) {
@@ -7596,7 +7608,8 @@ async function ref21(a, b, c = null) {
   try {
     val4 = await val3.json();
   } catch {}
-  if (!val3.ok) throw new Error(val4 && val4.error || "HTTP " + val3.status);
+  if (!val3.ok) throw new Error(val4 && (val4.error || val4.message) || "HTTP " + val3.status);
+  if (!val4) throw new Error("Respons server kosong atau bukan JSON");
   return val4;
 }
 async function render17() {
@@ -7615,49 +7628,69 @@ async function render17() {
     va.disabled = false;
   }
 }
-async function apply19(a = null) {
-  let trim = xa.value.trim();
+async function apply19(a = null, directUrl = null) {
+  let trim = directUrl ? directUrl.trim() : (xa ? xa.value.trim() : "");
   if (!trim) {
-    Jn.textContent = "isi link Alight Motion dulu";
-    return;
+    if (Jn) Jn.textContent = "isi link Alight Motion dulu";
+    throw new Error("Link Alight Motion kosong");
   }
-  wa.disabled = true, Jn.textContent = "mengambil XML + media...", compute7("xml", "Mengambil XML + media dari link share…");
+  if (wa) wa.disabled = true;
+  if (Jn) Jn.textContent = "mengambil XML + media...";
+  compute7("xml", "Mengambil XML + media dari link share…");
   try {
     let val3 = await ref21("/api/project-xml", trim, a ? {
         project: a
-      } : null),
-      val4 = val3.xml;
+      } : null);
+    if (!val3 || !val3.xml) {
+      throw new Error((val3 && val3.error) || "Format respon proyek tidak valid");
+    }
+    let val4 = val3.xml;
     render6("xml", "Mendaftarkan media package…", (val3.media || []).length + " file");
     let res5 = build10(val3.media);
     Array.isArray(val3.projects) && val3.projects.length > 1 ? (nt.innerHTML = '', val3.projects.forEach(a2 => {
       let optionEl = document.createElement("option");
       optionEl.value = a2.name, optionEl.textContent = a2.title || a2.name, a2.name === val3.xmlName && (optionEl.selected = true), nt.appendChild(optionEl);
-    }), fo.style.display = '') : fo.style.display = "none", Jn.textContent = "XML " + val3.xmlName + '\x20(' + val4.length.toLocaleString("id-ID") + " karakter) + " + res5 + " media", handle9("[URL] XML \"" + val3.xmlName + "\" dari link Alight Motion didapat (" + val4.length + " karakter, " + res5 + " media)."), await apply18([new File([val4], val3.xmlName || "alight-url.xml", {
+    }), fo && (fo.style.display = '')) : (fo && (fo.style.display = "none")), Jn && (Jn.textContent = "XML " + val3.xmlName + '\x20(' + val4.length.toLocaleString("id-ID") + " karakter) + " + res5 + " media"), handle9("[URL] XML \"" + val3.xmlName + "\" dari link Alight Motion didapat (" + val4.length + " karakter, " + res5 + " media)."), await apply18([new File([val4], val3.xmlName || "alight-url.xml", {
       type: "application/xml"
     })]);
   } catch (val3) {
-    Jn.textContent = "gagal: " + val3.message, handle9("[URL] Alight Motion gagal: " + val3.message), get7("Gagal mengambil link Alight Motion: " + val3.message);
+    if (Jn) Jn.textContent = "gagal: " + val3.message;
+    handle9("[URL] Alight Motion gagal: " + val3.message);
+    get7("Gagal mengambil link Alight Motion: " + val3.message);
+    throw val3;
   } finally {
-    wa.disabled = false, apply7("xml");
+    if (wa) wa.disabled = false;
+    apply7("xml");
   }
 }
-async function get18() {
-  let trim = Do.value.trim();
+async function get18(directUrl = null) {
+  let trim = directUrl ? directUrl.trim() : (Do ? Do.value.trim() : "");
   if (!trim) {
-    ei.textContent = "isi link Google Drive dulu";
-    return;
+    if (ei) ei.textContent = "isi link Google Drive dulu";
+    throw new Error("Link Google Drive kosong");
   }
-  Ma.disabled = true, ei.textContent = "mengambil XML dari Drive...", compute7("xml", "Mengambil XML dari Google Drive…");
+  if (Ma) Ma.disabled = true;
+  if (ei) ei.textContent = "mengambil XML dari Drive...";
+  compute7("xml", "Mengambil XML dari Google Drive…");
   try {
-    let val3 = await ref21("/api/drive-xml", trim),
-      val4 = val3.xml;
-    ei.textContent = "XML " + val3.name + '\x20(' + val4.length.toLocaleString("id-ID") + " karakter)", handle9("[DRIVE] XML \"" + val3.name + "\" dari Google Drive didapat (" + val4.length + " karakter)."), await apply18([new File([val4], val3.name || "drive.xml", {
+    let val3 = await ref21("/api/drive-xml", trim);
+    if (!val3 || !val3.xml) {
+      throw new Error((val3 && val3.error) || "Gagal mengambil XML dari Google Drive");
+    }
+    let val4 = val3.xml;
+    if (ei) ei.textContent = "XML " + val3.name + '\x20(' + val4.length.toLocaleString("id-ID") + " karakter)";
+    handle9("[DRIVE] XML \"" + val3.name + "\" dari Google Drive didapat (" + val4.length + " karakter).");
+    await apply18([new File([val4], val3.name || "drive.xml", {
       type: "application/xml"
     })]);
   } catch (val3) {
-    ei.textContent = "gagal: " + val3.message, handle9("[DRIVE] gagal: " + val3.message), get7("Gagal mengambil XML dari Google Drive: " + val3.message);
+    if (ei) ei.textContent = "gagal: " + val3.message;
+    handle9("[DRIVE] gagal: " + val3.message);
+    get7("Gagal mengambil XML dari Google Drive: " + val3.message);
+    throw val3;
   } finally {
-    Ma.disabled = false, apply7("xml");
+    if (Ma) Ma.disabled = false;
+    apply7("xml");
   }
 }
 function update21(a) {
@@ -10318,6 +10351,53 @@ function omSetKeyable(prop, v) {
     prop.kfs.sort((x, y) => x.t - y.t);
   }
 }
+const OM_DEFAULT_FONTS = [
+  "Roboto", "Space Grotesk", "Montserrat", "Poppins", "Oswald", "Bebas Neue",
+  "Inter", "Playfair Display", "Anton", "Pacifico", "Caveat", "Dancing Script",
+  "Cinzel", "Permanent Marker", "Raleway", "Merriweather", "Lobster", "Roboto Mono",
+  "Comic Neue", "Fredoka", "Kanit", "Outfit", "Comfortaa", "Rubik", "Righteous",
+  "Bungee", "Abril Fatface", "Titan One", "Alfa Slab One", "Archivo Black",
+  "Syne", "Work Sans", "Plus Jakarta Sans", "DM Sans", "Urbanist"
+];
+
+function omGetFontList() {
+  const custom = (val2 && val2.customFonts ? Array.from(val2.customFonts.keys()) : []).filter(f => !f.includes("/"));
+  const extra = (typeof window !== "undefined" && window.AM_FONTS ? window.AM_FONTS.map(f => f.name) : []);
+  const set = new Set([...custom, ...extra, ...OM_DEFAULT_FONTS]);
+  return Array.from(set);
+}
+
+function omEnsureGoogleFont(fontName) {
+  if (!fontName || fontName === "Roboto" || fontName === "sans-serif") return;
+  if (val2 && val2.customFonts && val2.customFonts.has(fontName)) return;
+  if (typeof document !== "undefined" && document.querySelector(`link[data-font="${fontName}"]`)) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.dataset.font = fontName;
+  link.href = "https://fonts.googleapis.com/css2?family=" + encodeURIComponent(fontName).replace(/%20/g, "+") + ":wght@300;400;500;600;700;800;900&display=swap";
+  document.head.appendChild(link);
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load(`16px "${fontName}"`).then(() => {
+      V = true;
+      try { val2 && val2.renderAt(H); } catch (e) {}
+    }).catch(() => {});
+  }
+}
+
+async function omImportFontFile(file) {
+  if (!file) return null;
+  const fontName = file.name.replace(/\.[^/.]+$/, "");
+  await window.AM.loadFont(fontName, file);
+  if (val2) {
+    val2.customFonts.set(fontName, fontName);
+  }
+  if (typeof window !== "undefined" && window.AM_FONTS) {
+    window.AM_FONTS.unshift({ name: fontName, family: fontName, popular: true });
+  }
+  omEnsureGoogleFont(fontName);
+  return fontName;
+}
+
 function omPropsRefresh() {
   const panel = document.getElementById("om-props");
   if (!panel) return;
@@ -10373,6 +10453,39 @@ function omPropsRefresh() {
   panel.querySelector("#om-propOp").value = Math.round(opv * 100);
   panel.querySelector("#om-propOpv").textContent = Math.round(opv * 100) + "%";
   panel.querySelector("#om-propBlend").value = process5(layer.blendMode);
+
+  // Teks & Tipografi
+  const isText = layer.tag === "text";
+  const secText = panel.querySelector("#om-sec-text");
+  const rowText = panel.querySelector("#om-propTextRow");
+  if (secText) secText.style.display = isText ? "" : "none";
+  if (rowText) rowText.style.display = isText ? "" : "none";
+  if (isText) {
+    const pt = panel.querySelector("#om-propText");
+    if (pt) pt.value = layer.textContent || "";
+    const ps = panel.querySelector("#om-propFontSize");
+    if (ps) ps.value = layer.fontSize || 28;
+    const pa = panel.querySelector("#om-propTextAlign");
+    if (pa) pa.value = layer.align || "center";
+    const pl = panel.querySelector("#om-propLetterSpacing");
+    if (pl) pl.value = layer.letterSpacing !== undefined ? layer.letterSpacing : 0;
+    const pm = panel.querySelector("#om-propLineSpacing");
+    if (pm) pm.value = layer.lineSpacing !== undefined ? layer.lineSpacing : 1;
+
+    let curFont = layer.font || "Roboto";
+    if (curFont.includes("name=")) {
+      const m = curFont.match(/name=([^&]+)/);
+      if (m) curFont = decodeURIComponent(m[1]).replace(/\.[^/.]+$/, "");
+    }
+    const fontSel = panel.querySelector("#om-propFont");
+    if (fontSel) {
+      const fonts = omGetFontList();
+      if (!fonts.includes(curFont)) fonts.unshift(curFont);
+      fontSel.innerHTML = fonts.map(f => '<option value="' + f + '"' + (f === curFont ? ' selected' : '') + '>' + f + '</option>').join("");
+    }
+    omEnsureGoogleFont(curFont);
+  }
+
   const noFill = layer.tag === "audio" || layer.fillType === "media";
   panel.querySelector("#om-propFillRow").style.display = noFill ? "none" : "";
   if (!noFill) {
@@ -10390,7 +10503,15 @@ function omInitPropsPanel() {
   const panel = document.createElement("div");
   panel.id = "om-props";
   const blendOpts = OM_BLENDS.map(([g, list]) => '<optgroup label="' + g + '">' + list.map(v => '<option value="' + v + '">' + v + "</option>").join("") + "</optgroup>").join("");
-  panel.innerHTML = '<div class="om-props-head"><strong id="om-pname2">-</strong><span id="om-ptype2"></span><button class="iconbtn" type="button" id="om-pclose" style="width:28px;height:28px">✕</button></div>' + '<div class="om-props-sec" id="om-sec-blend">Blending &amp; Opacity</div>' + '<label class="field om-props-row"><span style="width:56px">Opacity</span><input type="range" id="om-propOp" min="0" max="100" step="1" value="100"><span id="om-propOpv">100%</span></label>' + '<label class="field">Blend mode<select id="om-propBlend">' + blendOpts + '</select></label>' + '<div class="om-props-sec" id="om-sec-fill">Color &amp; Fill</div>' + '<div id="om-propFillRow"><div class="om-props-row"><input type="color" id="om-propColor" title="Pilih warna"><input type="text" id="om-propFill" placeholder="#ff000000" spellcheck="false"></div><div id="om-propSw"></div></div>' + '<div class="om-props-sec" id="om-sec-xf">Move &amp; Transform</div>' + '<div class="om-props-row"><label class="field" style="flex:1">X<input type="number" id="om-propX" step="1"></label><label class="field" style="flex:1">Y<input type="number" id="om-propY" step="1"></label></div>' + '<div class="om-props-row"><label class="field" style="flex:1">Rot °<input type="number" id="om-propR" step="0.1"></label><label class="field" style="flex:1">Skala X %<input type="number" id="om-propSX" step="0.1"></label></div>' + '<div class="om-props-row"><label class="field" style="flex:1">Skala Y %<input type="number" id="om-propSY" step="0.1"></label><button class="iconbtn on" type="button" id="om-propLink" title="Kunci skala X &amp; Y biar selaras" style="width:44px;height:34px">🔗</button></div>' + '<div class="om-props-sec" id="om-sec-bord">Border &amp; Shadow</div>' + '<label class="check"><input type="checkbox" id="om-propBord"><span>Border (stroke)</span></label>' + '<div class="om-props-row" id="om-propBordRow"><label class="field" style="flex:1">Lebar<input type="number" id="om-propBordSize" min="0" step="1"></label><input type="color" id="om-propBordColor" title="Warna border"><select id="om-propBordDir" style="width:92px"><option value="outside">Luar</option><option value="center">Tengah</option><option value="inside">Dalam</option></select></div>' + '<label class="check"><input type="checkbox" id="om-propShad"><span>Bayangan</span></label>' + '<div class="om-props-row" id="om-propShadRow"><label class="field" style="flex:1">Size<input type="number" id="om-propShadSize" min="0" step="1"></label><input type="color" id="om-propShadColor" title="Warna bayangan"><label class="field" style="flex:1">X<input type="number" id="om-propShadX" step="1"></label><label class="field" style="flex:1">Y<input type="number" id="om-propShadY" step="1"></label></div>';
+  panel.innerHTML = '<div class="om-props-head"><strong id="om-pname2">-</strong><span id="om-ptype2"></span><button class="iconbtn" type="button" id="om-pclose" style="width:28px;height:28px">✕</button></div>' +
+    '<div class="om-props-sec" id="om-sec-text" style="display:none">Teks &amp; Tipografi</div>' +
+    '<div id="om-propTextRow" style="display:none">' +
+      '<label class="field">Isi Teks<textarea id="om-propText" rows="2" style="width:100%;background:var(--card);border:1px solid var(--line2);border-radius:8px;color:var(--text);padding:6px 8px;font-size:.82rem" spellcheck="false"></textarea></label>' +
+      '<label class="field" style="margin-top:6px">Pilihan Fon<div style="display:flex;gap:6px"><select id="om-propFont" style="flex:1"></select><input type="file" id="om-propFontFile" accept=".ttf,.otf,.woff,.woff2" style="display:none"><button type="button" class="btn sm" id="om-propFontImport" title="Impor file fon (.ttf, .otf, .woff)" style="white-space:nowrap">+ Impor</button></div></label>' +
+      '<div class="om-props-row" style="margin-top:6px"><label class="field" style="flex:1">Ukuran<input type="number" id="om-propFontSize" min="6" max="600" step="1"></label><label class="field" style="flex:1">Align<select id="om-propTextAlign"><option value="left">Kiri</option><option value="center">Tengah</option><option value="right">Kanan</option><option value="justify">Rata Kiri-Kanan</option></select></label></div>' +
+      '<div class="om-props-row" style="margin-top:6px"><label class="field" style="flex:1">Spasi Huruf<input type="number" id="om-propLetterSpacing" step="0.05" value="0"></label><label class="field" style="flex:1">Spasi Baris<input type="number" id="om-propLineSpacing" step="0.05" value="1"></label></div>' +
+    '</div>' +
+    '<div class="om-props-sec" id="om-sec-blend">Blending &amp; Opacity</div>' + '<label class="field om-props-row"><span style="width:56px">Opacity</span><input type="range" id="om-propOp" min="0" max="100" step="1" value="100"><span id="om-propOpv">100%</span></label>' + '<label class="field">Blend mode<select id="om-propBlend">' + blendOpts + '</select></label>' + '<div class="om-props-sec" id="om-sec-fill">Color &amp; Fill</div>' + '<div id="om-propFillRow"><div class="om-props-row"><input type="color" id="om-propColor" title="Pilih warna"><input type="text" id="om-propFill" placeholder="#ff000000" spellcheck="false"></div><div id="om-propSw"></div></div>' + '<div class="om-props-sec" id="om-sec-xf">Move &amp; Transform</div>' + '<div class="om-props-row"><label class="field" style="flex:1">X<input type="number" id="om-propX" step="1"></label><label class="field" style="flex:1">Y<input type="number" id="om-propY" step="1"></label></div>' + '<div class="om-props-row"><label class="field" style="flex:1">Rot °<input type="number" id="om-propR" step="0.1"></label><label class="field" style="flex:1">Skala X %<input type="number" id="om-propSX" step="0.1"></label></div>' + '<div class="om-props-row"><label class="field" style="flex:1">Skala Y %<input type="number" id="om-propSY" step="0.1"></label><button class="iconbtn on" type="button" id="om-propLink" title="Kunci skala X &amp; Y biar selaras" style="width:44px;height:34px">🔗</button></div>' + '<div class="om-props-sec" id="om-sec-bord">Border &amp; Shadow</div>' + '<label class="check"><input type="checkbox" id="om-propBord"><span>Border (stroke)</span></label>' + '<div class="om-props-row" id="om-propBordRow"><label class="field" style="flex:1">Lebar<input type="number" id="om-propBordSize" min="0" step="1"></label><input type="color" id="om-propBordColor" title="Warna border"><select id="om-propBordDir" style="width:92px"><option value="outside">Luar</option><option value="center">Tengah</option><option value="inside">Dalam</option></select></div>' + '<label class="check"><input type="checkbox" id="om-propShad"><span>Bayangan</span></label>' + '<div class="om-props-row" id="om-propShadRow"><label class="field" style="flex:1">Size<input type="number" id="om-propShadSize" min="0" step="1"></label><input type="color" id="om-propShadColor" title="Warna bayangan"><label class="field" style="flex:1">X<input type="number" id="om-propShadX" step="1"></label><label class="field" style="flex:1">Y<input type="number" id="om-propShadY" step="1"></label></div>';
   document.body.appendChild(panel);
   const sw = panel.querySelector("#om-propSw");
   OM_PALETTE.forEach(c => {
@@ -10548,6 +10669,111 @@ function omInitPropsPanel() {
   num("#om-propShadY").addEventListener("change", () => applyShad(true));
   num("#om-propShadColor").addEventListener("input", () => applyShad(false));
   num("#om-propShadColor").addEventListener("change", () => omPropsCommit());
+
+  // ---- Text & Typography event listeners ----
+  const txtContent = num("#om-propText");
+  if (txtContent) {
+    txtContent.addEventListener("input", () => {
+      const l = omResolveLayer(omPropsLayerId);
+      if (!l || l.tag !== "text") return;
+      omPropsBegin();
+      l.textContent = txtContent.value;
+      V = true;
+      try { val2 && val2.renderAt(H); } catch (e) {}
+    });
+    txtContent.addEventListener("change", () => omPropsCommit());
+  }
+
+  const txtFont = num("#om-propFont");
+  if (txtFont) {
+    txtFont.addEventListener("change", () => {
+      const l = omResolveLayer(omPropsLayerId);
+      if (!l || l.tag !== "text") return;
+      omPropsBegin();
+      const sel = txtFont.value;
+      omEnsureGoogleFont(sel);
+      l.font = (val2 && val2.customFonts && val2.customFonts.has(sel)) ? sel : "googlefonts?name=" + encodeURIComponent(sel);
+      V = true;
+      try { val2 && val2.renderAt(H); } catch (e) {}
+      omPropsCommit();
+    });
+  }
+
+  const txtFontImport = num("#om-propFontImport");
+  const txtFontFile = num("#om-propFontFile");
+  if (txtFontImport && txtFontFile) {
+    txtFontImport.addEventListener("click", () => txtFontFile.click());
+    txtFontFile.addEventListener("change", async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      try {
+        const fontName = await omImportFontFile(file);
+        if (fontName) {
+          const l = omResolveLayer(omPropsLayerId);
+          if (l && l.tag === "text") {
+            omPropsBegin();
+            l.font = "imported?name=" + encodeURIComponent(file.name);
+            omPropsCommit();
+          }
+          omPropsRefresh();
+          handle9("[FONT] Font " + fontName + " berhasil diimpor.");
+        }
+      } catch (err) {
+        alert("Gagal impor font: " + err.message);
+      }
+    });
+  }
+
+  const txtFontSize = num("#om-propFontSize");
+  if (txtFontSize) {
+    txtFontSize.addEventListener("input", () => {
+      const l = omResolveLayer(omPropsLayerId);
+      if (!l || l.tag !== "text") return;
+      omPropsBegin();
+      l.fontSize = Math.max(1, Number(txtFontSize.value) || 28);
+      V = true;
+      try { val2 && val2.renderAt(H); } catch (e) {}
+    });
+    txtFontSize.addEventListener("change", () => omPropsCommit());
+  }
+
+  const txtAlign = num("#om-propTextAlign");
+  if (txtAlign) {
+    txtAlign.addEventListener("change", () => {
+      const l = omResolveLayer(omPropsLayerId);
+      if (!l || l.tag !== "text") return;
+      omPropsBegin();
+      l.align = txtAlign.value;
+      omPropsCommit();
+    });
+  }
+
+  const txtLetSp = num("#om-propLetterSpacing");
+  if (txtLetSp) {
+    txtLetSp.addEventListener("input", () => {
+      const l = omResolveLayer(omPropsLayerId);
+      if (!l || l.tag !== "text") return;
+      omPropsBegin();
+      l.letterSpacing = Number(txtLetSp.value) || 0;
+      V = true;
+      try { val2 && val2.renderAt(H); } catch (e) {}
+    });
+    txtLetSp.addEventListener("change", () => omPropsCommit());
+  }
+
+  const txtLineSp = num("#om-propLineSpacing");
+  if (txtLineSp) {
+    txtLineSp.addEventListener("input", () => {
+      const l = omResolveLayer(omPropsLayerId);
+      if (!l || l.tag !== "text") return;
+      omPropsBegin();
+      l.lineSpacing = Math.max(0.1, Number(txtLineSp.value) || 1);
+      V = true;
+      try { val2 && val2.renderAt(H); } catch (e) {}
+    });
+    txtLineSp.addEventListener("change", () => omPropsCommit());
+  }
+
   const kfSec = document.createElement("div");
   kfSec.className = "om-props-sec", kfSec.id = "om-sec-kf", kfSec.textContent = "Keyframe";
   const kfRow = document.createElement("div");
@@ -10791,17 +11017,76 @@ function omSetSpeedCurve(layer, curveType) {
 function omOpenTextDlg(layer) {
   const l = layer || omLayerCur();
   if (!l || l.tag !== "text") return;
-  if (typeof window.omOpenTextEditor === "function") {
+  if (typeof window.omOpenTextEditor === "function" && document.getElementById("am-navbar-textedit") && document.getElementById("am-navbar-textedit").offsetParent !== null) {
     return window.omOpenTextEditor(l);
   }
   if (document.getElementById("om-txt-back")) return;
   const back = document.createElement("div");
   back.id = "om-txt-back";
   back.style.cssText = "position:fixed;inset:0;z-index:100003;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px";
-  back.innerHTML = '<div class="om-dialog" style="max-width:380px"><h2>Edit Text</h2><div class="om-field"><label>Teks</label><textarea id="om-txt" rows="4" style="width:100%;background:var(--card);border:1px solid var(--line2);border-radius:8px;color:var(--text);padding:8px"></textarea></div><div class="om-row"><label class="field" style="flex:1">Ukuran<input type="number" id="om-txtsize" min="1" max="600" step="1"></label><label class="field" style="flex:1">Align<select id="om-txtalign"><option value="left">Kiri</option><option value="center">Tengah</option><option value="right">Kanan</option></select></label></div><button class="om-btn primary" type="button" id="om-txtok">Terapkan</button><button class="om-btn" type="button" id="om-txtcancel" style="margin-top:8px;background:var(--card);color:var(--text)">Batal</button></div>';
+
+  let curFont = l.font || "Roboto";
+  if (curFont.includes("name=")) {
+    const m = curFont.match(/name=([^&]+)/);
+    if (m) curFont = decodeURIComponent(m[1]).replace(/\.[^/.]+$/, "");
+  }
+  const fontList = omGetFontList();
+  if (!fontList.includes(curFont)) fontList.unshift(curFont);
+  const fontOptions = fontList.map(f => '<option value="' + f + '"' + (f === curFont ? ' selected' : '') + '>' + f + '</option>').join("");
+
+  back.innerHTML = '<div class="om-dialog" style="max-width:400px;width:100%">' +
+    '<h2>Edit Teks</h2>' +
+    '<div class="om-field" style="margin-bottom:8px">' +
+      '<label>Teks</label>' +
+      '<textarea id="om-txt" rows="3" style="width:100%;background:var(--card);border:1px solid var(--line2);border-radius:8px;color:var(--text);padding:8px;font-size:.9rem" spellcheck="false"></textarea>' +
+    '</div>' +
+    '<div class="om-field" style="margin-bottom:8px">' +
+      '<label>Pilihan Fon</label>' +
+      '<div style="display:flex;gap:6px">' +
+        '<select id="om-txtfont" style="flex:1;background:var(--card);border:1px solid var(--line2);border-radius:8px;color:var(--text);padding:6px 8px">' + fontOptions + '</select>' +
+        '<input type="file" id="om-txtfile" accept=".ttf,.otf,.woff,.woff2" style="display:none">' +
+        '<button type="button" class="btn sm" id="om-txtimport" title="Impor file fon (.ttf, .otf, .woff)">+ Impor</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="om-row" style="margin-bottom:8px">' +
+      '<label class="field" style="flex:1">Ukuran<input type="number" id="om-txtsize" min="1" max="600" step="1"></label>' +
+      '<label class="field" style="flex:1">Align<select id="om-txtalign"><option value="left">Kiri</option><option value="center">Tengah</option><option value="right">Kanan</option><option value="justify">Rata Kiri-Kanan</option></select></label>' +
+    '</div>' +
+    '<div class="om-row" style="margin-bottom:12px">' +
+      '<label class="field" style="flex:1">Spasi Huruf<input type="number" id="om-txtletsp" step="0.05" value="0"></label>' +
+      '<label class="field" style="flex:1">Spasi Baris<input type="number" id="om-txtlinesp" step="0.05" value="1"></label>' +
+    '</div>' +
+    '<button class="om-btn primary" type="button" id="om-txtok">Terapkan</button>' +
+    '<button class="om-btn" type="button" id="om-txtcancel" style="margin-top:8px;background:var(--card);color:var(--text)">Batal</button>' +
+  '</div>';
   document.body.appendChild(back);
   const ta = back.querySelector("#om-txt");
-  ta.value = l.textContent || "", back.querySelector("#om-txtsize").value = l.fontSize || 48, back.querySelector("#om-txtalign").value = l.align || "center";
+  ta.value = l.textContent || "";
+  back.querySelector("#om-txtsize").value = l.fontSize || 48;
+  back.querySelector("#om-txtalign").value = l.align || "center";
+  back.querySelector("#om-txtletsp").value = l.letterSpacing !== undefined ? l.letterSpacing : 0;
+  back.querySelector("#om-txtlinesp").value = l.lineSpacing !== undefined ? l.lineSpacing : 1;
+
+  const txtFontSel = back.querySelector("#om-txtfont");
+  const txtImportBtn = back.querySelector("#om-txtimport");
+  const txtFileInput = back.querySelector("#om-txtfile");
+
+  txtImportBtn.addEventListener("click", () => txtFileInput.click());
+  txtFileInput.addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      const fontName = await omImportFontFile(file);
+      if (fontName) {
+        const fonts = omGetFontList();
+        if (!fonts.includes(fontName)) fonts.unshift(fontName);
+        txtFontSel.innerHTML = fonts.map(f => '<option value="' + f + '"' + (f === fontName ? ' selected' : '') + '>' + f + '</option>').join("");
+      }
+    } catch (err) {
+      alert("Gagal impor font: " + err.message);
+    }
+  });
+
   const close = () => back.remove();
   back.querySelector("#om-txtcancel").addEventListener("click", close);
   back.addEventListener("pointerdown", e => {
@@ -10814,6 +11099,11 @@ function omOpenTextDlg(layer) {
     layer.textContent = ta.value;
     layer.fontSize = Math.max(1, Number(back.querySelector("#om-txtsize").value) || layer.fontSize || 48);
     layer.align = back.querySelector("#om-txtalign").value;
+    layer.letterSpacing = Number(back.querySelector("#om-txtletsp").value) || 0;
+    layer.lineSpacing = Math.max(0.1, Number(back.querySelector("#om-txtlinesp").value) || 1);
+    const selF = txtFontSel.value;
+    omEnsureGoogleFont(selF);
+    layer.font = (val2 && val2.customFonts && val2.customFonts.has(selF)) ? selF : "googlefonts?name=" + encodeURIComponent(selF);
     pushUndo(snap), V = true, handle9("[EDIT] Teks layer \"" + (layer.label || layer.id) + "\" diperbarui");
     try {
       val2 && val2.renderAt(H);
@@ -11688,7 +11978,7 @@ ui.addEventListener("change", build7), build7(), _a("proyek"), window.addEventLi
             type: "text/xml"
           });
         await apply18([file]);
-      } else trim.includes("drive.google.com") || trim.includes("/api/drive-xml") || /^[a-zA-Z0-9_-]{25,50}$/.test(trim) ? await get18(trim) : (xa.value = trim, await apply19(b));
+      } else trim.includes("drive.google.com") || trim.includes("/api/drive-xml") || /^[a-zA-Z0-9_-]{25,50}$/.test(trim) ? await get18(trim) : (xa && (xa.value = trim), await apply19(b, trim));
     } else {
       if (a instanceof File) await apply18([a]);else throw new Error("Invalid preset source: must be URL string or File object");
     }

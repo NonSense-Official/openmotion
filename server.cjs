@@ -145,6 +145,100 @@ function loadEffectIndex() {
   return effectIndex;
 }
 
+function fetchRemoteProjectXml(targetUrl, project = null) {
+  return new Promise((resolve, reject) => {
+    let p = `/api/project-xml?url=${encodeURIComponent(targetUrl)}`;
+    if (project) p += `&project=${encodeURIComponent(project)}`;
+    const req = https.request({
+      hostname: REMOTE_HOST,
+      port: 443,
+      path: p,
+      method: "GET",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Referer": `https://${REMOTE_HOST}/runtime/preset.html`,
+        "Accept": "application/json, text/plain, */*"
+      }
+    }, res => {
+      let body = "";
+      res.on("data", c => body += c);
+      res.on("end", () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            const data = JSON.parse(body);
+            if (data && (data.xml || data.success || data.projects)) {
+              return resolve(data);
+            }
+          } catch (e) {}
+        }
+        reject(new Error(`Server preset mengembalikan HTTP ${res.statusCode}`));
+      });
+    });
+    req.on("error", reject);
+    req.setTimeout(60000, () => {
+      req.destroy();
+      reject(new Error("Timeout saat menghubungi server preset"));
+    });
+    req.end();
+  });
+}
+
+async function resolveProjectXml(targetUrl, project = null) {
+  if (!targetUrl) throw new Error("URL tidak boleh kosong");
+  targetUrl = targetUrl.trim();
+
+  // Alight Creative share link / shortlink -> gunakan backend extractor (bisa semua ukuran file, >5 MB bebas)
+  if (targetUrl.includes("alightcreative.com/") || targetUrl.includes("alight.link/") || targetUrl.includes("alightcreative.page.link/")) {
+    return await fetchRemoteProjectXml(targetUrl, project);
+  }
+
+  // Google Drive
+  const driveMatch = targetUrl.match(/(?:\/file\/d\/|id=|\/open\?id=)([a-zA-Z0-9_-]{25,})/);
+  if (driveMatch) {
+    const fileId = driveMatch[1];
+    const downloadUrl = `https://docs.google.com/uc?export=download&id=${fileId}`;
+    const xml = await fetchUrlText(downloadUrl);
+    if (!/<scene[\s>]|<element[\s>]/i.test(xml)) {
+      throw new Error("File Google Drive bukan merupakan file XML Alight Motion yang valid");
+    }
+    return {
+      xml,
+      xmlName: "drive-" + fileId + ".xml",
+      media: []
+    };
+  }
+
+  // Direct XML URL
+  const text = await fetchUrlText(targetUrl);
+  if (/<scene[\s>]|<element[\s>]/i.test(text)) {
+    let name = "preset.xml";
+    try { name = path.basename(new URL(targetUrl).pathname) || name; } catch (e) {}
+    return {
+      xml: text,
+      xmlName: name,
+      media: []
+    };
+  }
+
+  // Fallback coba ke backend preset
+  return await fetchRemoteProjectXml(targetUrl);
+}
+
+function fetchUrlText(u) {
+  return new Promise((resolve, reject) => {
+    const isHttps = u.startsWith("https:");
+    const mod = isHttps ? https : http;
+    mod.get(u, { headers: { "User-Agent": "Mozilla/5.0" } }, res => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return resolve(fetchUrlText(res.headers.location));
+      }
+      let d = "";
+      res.on("data", c => d += c);
+      res.on("end", () => resolve(d));
+    }).on("error", reject);
+  });
+}
+
 async function handleApi(req, res, pathname, query) {
   const uid = uidOf(req);
   res.setHeader("Set-Cookie", newUidCookie(uid));
@@ -398,6 +492,9 @@ const server = http.createServer(async (req, res) => {
           }
         }
       }
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "effect_xml_not_found" }));
+      return;
     }
 
     // effect binary cache lokal
@@ -406,11 +503,45 @@ const server = http.createServer(async (req, res) => {
       if (effectId) {
         const cachedBin = path.join(PUBLIC_DIR, "effects", `${effectId}.bin`);
         if (fs.existsSync(cachedBin) && fs.statSync(cachedBin).isFile()) {
-          res.writeHead(200, { "Content-Type": "application/octet-stream" });
+          res.writeHead(200, {
+            "Content-Type": "application/octet-stream",
+            "Cache-Control": "no-store",
+            "X-Effect-File": `${effectId}.bin`
+          });
           fs.createReadStream(cachedBin).pipe(res);
           return;
         }
       }
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "effect_bin_not_found" }));
+      return;
+    }
+
+    // Alight Creative & Google Drive link resolver
+    if (pathname === "/api/project-xml") {
+      const targetUrl = query.url;
+      try {
+        const result = await resolveProjectXml(targetUrl, query.project);
+        res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+        res.end(JSON.stringify({ error: err.message || "Gagal memproses link project" }));
+      }
+      return;
+    }
+
+    if (pathname === "/api/drive-xml") {
+      const targetUrl = query.url;
+      try {
+        const result = await resolveProjectXml(targetUrl);
+        res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+        res.end(JSON.stringify({ name: result.xmlName, xml: result.xml }));
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+        res.end(JSON.stringify({ error: err.message || "Gagal mengambil XML dari Google Drive" }));
+      }
+      return;
     }
 
     const localPath = path.join(PUBLIC_DIR, pathname);
