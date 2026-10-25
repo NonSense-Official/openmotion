@@ -84,11 +84,14 @@ function parseEffectXml(a, b = '') {
     };
   }
   let querySelector5 = parseFromString.querySelector("shader[type=\"vertex\"]");
-  if (querySelector5 && (obj.vertexShader = {
-    type: "vertex",
-    precision: querySelector5.getAttribute("precision") || obj.shader && obj.shader.precision || "mediump",
-    code: querySelector5.textContent.trim()
-  }), !obj.shader && !obj.script) throw new Error("Efek " + b + " tidak punya fragment shader maupun script.");
+  if (querySelector5) {
+    obj.vertexShader = {
+      type: "vertex",
+      precision: querySelector5.getAttribute("precision") || (obj.shader && obj.shader.precision) || "mediump",
+      code: querySelector5.textContent.trim()
+    };
+  }
+  obj.isNative = !obj.shader && !obj.script;
   return obj;
 }
 function resolveDefaultValue(a, b) {
@@ -478,10 +481,10 @@ function buildBlitVertexSource(a = 1, b = "highp") {
 var BLIT_VERTEX_SOURCE = buildBlitVertexSource(1);
 function buildVertexShaderSource(a, b = console.log, c = {}) {
   let val = c.webglVersion || 1,
-    res = pickPrecision(a.shader.precision);
+    res = pickPrecision(a.shader && a.shader.precision);
   if (!a.vertexShader || !a.vertexShader.code) return buildBlitVertexSource(val, res);
   let res2 = buildUniformDecls(a, b),
-    res3 = collectShaderReserved(a.params, a.shader.code, a.vertexShader.code),
+    res3 = collectShaderReserved(a.params, a.shader && a.shader.code, a.vertexShader && a.vertexShader.code),
     replace = a.vertexShader.code.replace(/^\s*(?:lowp|mediump|highp)?\s*vec2\s+v_texCoord\s*;\s*$/gm, '').replace(/^\s*attribute\s+vec2\s+a_(position|texCoord)\s*;\s*$/gm, '').replace(/^\s*(?:varying|in|out)\s+vec2\s+v_texCoord\s*;\s*$/gm, ''),
     val2 = val >= 2 ? "#version 300 es\n" : '',
     val3 = val >= 2 ? 'in' : "attribute";
