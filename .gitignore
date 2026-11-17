@@ -16,5 +16,6 @@ Thumbs.db
 *.log
 
 # Temp / build artifacts
+dist/
 *.tmp
 *.bak

@@ -7,9 +7,10 @@ const crypto = require("crypto");
 
 const PORT = Number(process.env.OM_PORT) || 3000;
 const PUBLIC_DIR = __dirname;
-const REMOTE_HOST = "am.zervida.my.id";
+const { processAlightProject, getProjectZipBuffer, parseZipFromCentralDirectory } = require("./alightConverter.cjs");
 const ROOT = process.env.OM_STORAGE || path.join(__dirname, "storage");
 const PROJECTS_DIR = path.join(ROOT, "projects");
+const CACHE_DIR = path.join(ROOT, "cache");
 const DAY_MS = 24 * 3600 * 1000;
 
 const MIME_TYPES = {
@@ -33,6 +34,7 @@ const MIME_TYPES = {
 };
 
 fs.mkdirSync(PROJECTS_DIR, { recursive: true });
+ensureDir(CACHE_DIR);
 process.on("uncaughtException", e => console.error("[uncaught]", e && e.message));
 process.on("unhandledRejection", e => console.error("[unhandled]", e && e.message));
 
@@ -145,51 +147,13 @@ function loadEffectIndex() {
   return effectIndex;
 }
 
-function fetchRemoteProjectXml(targetUrl, project = null) {
-  return new Promise((resolve, reject) => {
-    let p = `/api/project-xml?url=${encodeURIComponent(targetUrl)}`;
-    if (project) p += `&project=${encodeURIComponent(project)}`;
-    const req = https.request({
-      hostname: REMOTE_HOST,
-      port: 443,
-      path: p,
-      method: "GET",
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Referer": `https://${REMOTE_HOST}/runtime/preset.html`,
-        "Accept": "application/json, text/plain, */*"
-      }
-    }, res => {
-      let body = "";
-      res.on("data", c => body += c);
-      res.on("end", () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          try {
-            const data = JSON.parse(body);
-            if (data && (data.xml || data.success || data.projects)) {
-              return resolve(data);
-            }
-          } catch (e) {}
-        }
-        reject(new Error(`Server preset mengembalikan HTTP ${res.statusCode}`));
-      });
-    });
-    req.on("error", reject);
-    req.setTimeout(60000, () => {
-      req.destroy();
-      reject(new Error("Timeout saat menghubungi server preset"));
-    });
-    req.end();
-  });
-}
-
 async function resolveProjectXml(targetUrl, project = null) {
   if (!targetUrl) throw new Error("URL tidak boleh kosong");
   targetUrl = targetUrl.trim();
 
-  // Alight Creative share link / shortlink -> gunakan backend extractor (bisa semua ukuran file, >5 MB bebas)
+  // Alight Creative share link / shortlink -> native amconverter extractor
   if (targetUrl.includes("alightcreative.com/") || targetUrl.includes("alight.link/") || targetUrl.includes("alightcreative.page.link/")) {
-    return await fetchRemoteProjectXml(targetUrl, project);
+    return await processAlightProject(targetUrl, project, CACHE_DIR);
   }
 
   // Google Drive
@@ -220,8 +184,7 @@ async function resolveProjectXml(targetUrl, project = null) {
     };
   }
 
-  // Fallback coba ke backend preset
-  return await fetchRemoteProjectXml(targetUrl);
+  throw new Error("Format tautan proyek tidak didukung atau XML tidak valid");
 }
 
 function fetchUrlText(u) {
@@ -544,6 +507,78 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (pathname === "/api/media") {
+      const pidParam = query.pid || "";
+      const name = query.name || "";
+      if (!pidParam || !name) {
+        res.writeHead(400, { "Content-Type": "text/plain" });
+        res.end("Parameter pid dan name wajib diisi");
+        return;
+      }
+      let uid = "";
+      let pid = "";
+      if (pidParam.includes(":")) {
+        const parts = pidParam.split(":");
+        uid = parts[0];
+        pid = parts[1];
+      } else {
+        const meta = readMeta(pidParam);
+        if (meta && meta.packageId && meta.packageId.includes(":")) {
+          const parts = meta.packageId.split(":");
+          uid = parts[0];
+          pid = parts[1];
+        } else {
+          const uploadPath = path.join(projDir(pidParam), "uploads", safeName(name));
+          if (fs.existsSync(uploadPath) && fs.statSync(uploadPath).isFile()) {
+            const ext = path.extname(uploadPath).toLowerCase();
+            res.writeHead(200, {
+              "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
+              "Cache-Control": "public, max-age=86400"
+            });
+            fs.createReadStream(uploadPath).pipe(res);
+            return;
+          }
+          const presetPath = path.join(PUBLIC_DIR, "preset", safeName(name));
+          if (fs.existsSync(presetPath) && fs.statSync(presetPath).isFile()) {
+            const ext = path.extname(presetPath).toLowerCase();
+            res.writeHead(200, {
+              "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
+              "Cache-Control": "public, max-age=86400"
+            });
+            fs.createReadStream(presetPath).pipe(res);
+            return;
+          }
+        }
+      }
+      if (!uid || !pid) {
+        res.writeHead(404, { "Content-Type": "text/plain" });
+        res.end("File media tidak ditemukan");
+        return;
+      }
+      try {
+        const zipBuf = await getProjectZipBuffer(uid, pid, CACHE_DIR);
+        const files = parseZipFromCentralDirectory(zipBuf);
+        const fileBuf = files[name];
+        if (!fileBuf) {
+          res.writeHead(404, { "Content-Type": "text/plain" });
+          res.end("File media tidak ditemukan dalam paket");
+          return;
+        }
+        const ext = path.extname(name).toLowerCase();
+        const contentType = MIME_TYPES[ext] || "application/octet-stream";
+        res.writeHead(200, {
+          "Content-Type": contentType,
+          "Content-Disposition": `inline; filename="${encodeURIComponent(name)}"`,
+          "Cache-Control": "public, max-age=86400"
+        });
+        res.end(fileBuf);
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        res.end(err.message || "Gagal mengunduh media");
+      }
+      return;
+    }
+
     const localPath = path.join(PUBLIC_DIR, pathname);
     if (fs.existsSync(localPath) && fs.statSync(localPath).isFile()) {
       const ext = path.extname(localPath).toLowerCase();
@@ -555,32 +590,8 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // proxy ke server asset AM
-    const remoteOptions = {
-      hostname: REMOTE_HOST,
-      port: 443,
-      path: req.url,
-      method: req.method,
-      headers: {
-        ...req.headers,
-        host: REMOTE_HOST,
-        referer: `https://${REMOTE_HOST}/runtime/preset.html`
-      }
-    };
-    const proxyReq = https.request(remoteOptions, (proxyRes) => {
-      if (res.headersSent || res.writableEnded) {
-        proxyRes.resume();
-        return;
-      }
-      if (req.url.match(/\.(html|js|json|css|xml)(\?|$)/)) proxyRes.headers["cache-control"] = "no-store";
-      res.writeHead(proxyRes.statusCode, proxyRes.headers);
-      proxyRes.pipe(res);
-    });
-    proxyReq.on("error", (err) => {
-      res.writeHead(502, { "Content-Type": "text/plain" });
-      res.end("Proxy Error: " + err.message);
-    });
-    req.pipe(proxyReq);
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    res.end("Not Found");
   } catch (e) {
     try {
       json(res, 500, { error: "server_error", message: e.message });

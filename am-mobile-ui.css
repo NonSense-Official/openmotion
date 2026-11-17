@@ -49,6 +49,7 @@
 #am-top-container,
 #am-preview-stage,
 #am-playbar,
+#am-playbar-container,
 #am-bottom-container {
   width: 100%;
   max-width: 100%;
@@ -459,7 +460,8 @@ body.om-in-multiselect .tl-label {
 }
 
 /* ── 3. Play Bar (activity_edit_playbar.xml) ── */
-#am-playbar {
+#am-playbar,
+#am-playbar-container {
   height: var(--am-playbar-height);
   flex: none;
   background: var(--am-a10);
@@ -7789,4 +7791,339 @@ body.om-in-multiselect .tl-label {
   .am-dock-body {
     display: contents !important;
   }
+}
+
+
+/* ── Authentic OpenMotion / Alight Motion Timeline Styles (from index.html at d51fabd) ── */
+:root {
+  --tl-label: 112px;
+}
+
+#timeline-wrap {
+  position: relative;
+  background: #08090d;
+  border: 1px solid var(--line, #252a36);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+#timeline-body {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: 96px;
+  max-height: none;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+#timeline-body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+#timeline-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 3px;
+}
+
+#timeline-inner {
+  position: relative;
+  min-width: 100%;
+}
+
+#timeline-ruler {
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  display: flex;
+  height: 26px;
+  background: #0f1117;
+  border-bottom: 1px solid var(--line, #252a36);
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tl-corner {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  flex: none;
+  width: var(--tl-label);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background: #0c0e13;
+  border-right: 1px solid var(--line, #252a36);
+  font-size: 0.66rem;
+  color: var(--muted, #8c93a7);
+}
+
+#timeline-ruler-canvas {
+  display: block;
+  flex: none;
+  height: 26px;
+}
+
+#tl-cap {
+  position: absolute;
+  top: 0;
+  height: 26px;
+  width: 2px;
+  background: #ff4b6e;
+  z-index: 12;
+  pointer-events: auto;
+  transform: translateX(-1px);
+  cursor: pointer;
+}
+
+#tl-cap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -4px;
+  border: 5px solid transparent;
+  border-top-color: #ff4b6e;
+}
+
+#tl-playhead {
+  position: absolute;
+  top: 26px;
+  bottom: 0;
+  width: 2px;
+  background: #ff4b6e;
+  z-index: 6;
+  pointer-events: none;
+  transform: translateX(-1px);
+}
+
+.tl-track {
+  display: flex;
+  height: 34px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.tl-track.tl-drop {
+  outline: 2px dashed var(--accent, #1fc8ee);
+  outline-offset: -2px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 999px rgba(31, 200, 238, 0.08);
+}
+
+.tl-sub-track {
+  height: 26px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.tl-label {
+  position: sticky;
+  left: 0;
+  z-index: 8;
+  flex: none;
+  width: var(--tl-label);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 6px 0 2px;
+  background: #0c0e13;
+  border-right: 1px solid var(--line, #252a36);
+  cursor: pointer;
+  overflow: hidden;
+  font-size: 0.66rem;
+  color: #aab1c4;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tl-label.sel {
+  color: #fff;
+  background: #171b26;
+}
+
+.tl-label.tl-hidden {
+  opacity: 0.5;
+}
+
+.tl-label span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tl-chev {
+  flex: none;
+  width: 16px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 0;
+  color: var(--accent, #1fc8ee);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.tl-chev.closed {
+  color: #5a6380;
+}
+
+.tl-eye {
+  flex: none;
+  width: 26px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 0;
+  color: var(--accent, #1fc8ee);
+  cursor: pointer;
+}
+
+.tl-eye.off {
+  color: #6a7085;
+}
+
+.tl-eye svg, .tl-eye img {
+  width: 14px;
+  height: 14px;
+}
+
+.tl-canvas-area {
+  position: relative;
+  flex: none;
+  height: 100%;
+}
+
+.tl-block {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  min-width: 4px;
+  padding: 0 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0.64rem;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tl-block.tl-selected {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+.tl-block.tl-hidden-block {
+  opacity: 0.3;
+}
+
+.tl-sub-label {
+  font-size: 0.6rem;
+  color: #7e8499;
+  background: #090b10;
+}
+
+.tl-sub-label.sel {
+  color: #cdd1e0;
+  background: #111520;
+}
+
+.tl-sub-block {
+  top: 4px;
+  bottom: 4px;
+  font-size: 0.58rem;
+  font-weight: 500;
+  opacity: 0.82;
+  border-radius: 3px;
+}
+
+.tl-thumb {
+  flex: none;
+  width: 26px;
+  height: 24px;
+  margin-right: 3px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #12151d;
+  border: 1px solid var(--line, #252a36);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  color: #6f7893;
+  cursor: zoom-in;
+}
+
+.tl-thumb img, .tl-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.tl-kf {
+  position: absolute;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -3px 0 0 -3px;
+  padding: 0;
+  background: #ffd75e;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.tl-kf.tl-kf-edge {
+  opacity: 0.45;
+}
+
+.tl-bookmark {
+  position: absolute;
+  top: 0;
+  height: 10px;
+  width: 2px;
+  margin-left: -1px;
+  background: #ff4b6e;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.tl-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 9px;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 3;
+}
+
+.tl-edge-l {
+  left: 0;
+}
+
+.tl-edge-r {
+  right: 0;
+}
+
+.tl-edge:hover, .tl-edge:active {
+  background: rgba(31, 200, 238, 0.4);
 }
