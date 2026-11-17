@@ -7545,3 +7545,248 @@ body.om-in-multiselect .tl-label {
 
 
 
+
+
+/* ── Modern Web Dock Layout (egui_dock style) ── */
+@media (min-width: 768px) {
+  #am-bottom-container {
+    flex-direction: row !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+  }
+
+  #am-timeline-view {
+    flex: 1 1 0 !important;
+    min-width: 300px !important;
+    height: 100% !important;
+    display: flex !important;
+    position: relative !important;
+    border-right: none !important;
+  }
+
+  #am-dock-splitter {
+    display: flex !important;
+    width: 6px;
+    flex: 0 0 6px;
+    background: #141722;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: col-resize;
+    position: relative;
+    user-select: none;
+    z-index: 60;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+  }
+
+  #am-dock-splitter:hover,
+  #am-dock-splitter.dragging {
+    background: #00ffa8 !important;
+  }
+
+  .am-dock-splitter-handle {
+    width: 2px;
+    height: 28px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+  }
+
+  #am-dock-splitter:hover .am-dock-splitter-handle,
+  #am-dock-splitter.dragging .am-dock-splitter-handle {
+    background: #000;
+  }
+
+  #am-dock-inspector {
+    display: flex !important;
+    flex: 0 0 var(--am-dock-width, 380px) !important;
+    width: var(--am-dock-width, 380px) !important;
+    min-width: 280px !important;
+    max-width: min(850px, 60vw) !important;
+    height: 100% !important;
+    background: #131520;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    flex-direction: column !important;
+    position: relative !important;
+    overflow: hidden !important;
+    z-index: 40;
+  }
+
+  .am-dock-header {
+    height: 38px;
+    flex: 0 0 38px;
+    background: #0e1017;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    user-select: none;
+    box-sizing: border-box;
+  }
+
+  .am-dock-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .am-dock-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px 6px 0 0;
+    background: #191c28;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: none;
+    font-size: 11px;
+    font-weight: 600;
+    color: #00ffa8;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 170px;
+  }
+
+  .am-dock-tab img {
+    width: 13px;
+    height: 13px;
+    filter: brightness(0) invert(1);
+    opacity: 0.85;
+  }
+
+  .am-dock-badge {
+    font-size: 11px;
+    color: #8c93a7;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+
+  .am-dock-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .am-dock-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #cbd1e1;
+    padding: 4px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+  }
+
+  .am-dock-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .am-dock-body {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    background: #131520;
+  }
+
+  .am-dock-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+    text-align: center;
+    color: #8c93a7;
+    gap: 10px;
+    user-select: none;
+  }
+
+  .am-dock-empty-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+  }
+
+  .am-dock-empty-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e1e4ed;
+  }
+
+  .am-dock-empty-desc {
+    font-size: 11px;
+    line-height: 1.5;
+    color: #6b7280;
+    max-width: 220px;
+  }
+
+  #am-dock-inspector #am-element-edit-panel {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 10px 12px !important;
+    flex: 1 !important;
+    height: 100% !important;
+  }
+
+  #am-dock-inspector #am-subpanel-container {
+    background: transparent !important;
+    box-shadow: none !important;
+    flex: 1 !important;
+    height: 100% !important;
+  }
+
+  #am-dock-inspector .am-panel-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  #am-dock-inspector .am-grid-btn {
+    min-height: 50px !important;
+    padding: 6px 2px !important;
+  }
+
+  #am-dock-inspector .am-grid-btn span {
+    font-size: 9.5px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  #am-dock-splitter {
+    display: none !important;
+  }
+  .am-dock-header {
+    display: none !important;
+  }
+  .am-dock-empty {
+    display: none !important;
+  }
+  #am-dock-inspector {
+    display: contents !important;
+  }
+  .am-dock-body {
+    display: contents !important;
+  }
+}

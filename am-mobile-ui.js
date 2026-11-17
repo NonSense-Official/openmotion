@@ -380,6 +380,44 @@
           </div>
         </div>
 
+        <!-- Dock Resizer Splitter (egui_dock style) -->
+        <div id="am-dock-splitter" class="am-dock-splitter" title="Geser untuk mengubah ukuran panel">
+          <div id="am-dock-splitter-handle" class="am-dock-splitter-handle"></div>
+        </div>
+
+        <!-- Right Dock: Inspector / Element Edit -->
+        <div id="am-dock-inspector" class="am-dock-inspector">
+          <!-- Dock Tab Bar -->
+          <div class="am-dock-header">
+            <div class="am-dock-tabs">
+              <div id="am-dock-tab-inspector" class="am-dock-tab active">
+                <img src="./icons/ac_ic_effects.svg" alt="Inspector">
+                <span id="am-dock-tab-title">Inspector</span>
+              </div>
+              <div id="am-dock-subpanel-badge" class="am-dock-badge" style="display:none;"></div>
+            </div>
+            <div class="am-dock-actions">
+              <button type="button" id="am-dock-btn-back" class="am-dock-btn" title="Kembali ke menu utama" style="display:none;">
+                <img src="./icons/ac_ic_back.svg" alt="Back" style="width:12px;height:12px;filter:invert(1);">
+                <span>Kembali</span>
+              </button>
+              <button type="button" id="am-dock-btn-close" class="am-dock-btn" title="Tutup / Lepas Pilihan Layer" style="display:none;">
+                <span style="font-size:14px;line-height:1;">&times;</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dock Content Body -->
+          <div class="am-dock-body">
+            <!-- Empty state when no layer is selected -->
+            <div id="am-dock-empty-state" class="am-dock-empty">
+              <div class="am-dock-empty-icon">
+                <img src="./icons/open_motion_logo.svg" alt="OpenMotion" style="width:36px;height:36px;opacity:0.4;">
+              </div>
+              <div class="am-dock-empty-title">Tidak ada layer terpilih</div>
+              <div class="am-dock-empty-desc">Pilih layer di timeline untuk melihat dan mengedit properti objek.</div>
+            </div>
+
         <!-- 2. Selected State: fragment_element_edit.xml -->
         <div id="am-element-edit-panel">
           <!-- Row 1: Speed, Trim Left, Split, Trim Right, Audio -->
@@ -550,6 +588,8 @@
                 <img src="./icons/ic_eraser.svg" alt="Eraser">
               </button>
             </div>
+          </div>
+        </div>
           </div>
         </div>
 
@@ -833,6 +873,7 @@
 
     // Render Shape Tab Content by default
     renderAddShapes();
+    initDockSystem();
 
     setTimeout(() => {
       console.log("AM_DEBUG_LAYOUT:", JSON.stringify({
@@ -845,6 +886,154 @@
         bottomWidth: document.getElementById("am-bottom-container")?.offsetWidth
       }));
     }, 100);
+  }
+
+  function isDockMode() {
+    return window.innerWidth >= 768;
+  }
+
+  function updateDockLayout() {
+    const isDock = isDockMode();
+    const bottom = document.getElementById("am-bottom-container");
+    const tlView = document.getElementById("am-timeline-view");
+    const elemPanel = document.getElementById("am-element-edit-panel");
+    const subpanel = document.getElementById("am-subpanel-container");
+    const emptyState = document.getElementById("am-dock-empty-state");
+    const dockTabTitle = document.getElementById("am-dock-tab-title");
+    const dockBadge = document.getElementById("am-dock-subpanel-badge");
+    const dockBtnBack = document.getElementById("am-dock-btn-back");
+    const dockBtnClose = document.getElementById("am-dock-btn-close");
+
+    if (!bottom) return;
+
+    if (isDock) {
+      bottom.classList.add("am-dock-active");
+      if (tlView) tlView.style.display = "flex";
+
+      const hasLayer = !!currentSelectedLayer;
+      const isSubpanelOpen = subpanel && subpanel.classList.contains("open");
+      const isLiveShapeOpen = document.getElementById("am-liveshape-panel")?.classList.contains("open");
+      const isEditPointsOpen = document.getElementById("am-editpoints-panel")?.classList.contains("open");
+      const isDrawingOpen = document.getElementById("am-drawing-panel")?.style.display === "flex";
+
+      if (hasLayer) {
+        if (emptyState) emptyState.style.display = "none";
+        if (dockBtnClose) dockBtnClose.style.display = "flex";
+        if (dockTabTitle) dockTabTitle.textContent = currentSelectedLayer.label || currentSelectedLayer.id || "Layer";
+
+        if (isSubpanelOpen || isLiveShapeOpen || isEditPointsOpen || isDrawingOpen) {
+          if (elemPanel) elemPanel.style.display = "none";
+          if (dockBtnBack) dockBtnBack.style.display = "flex";
+        } else {
+          if (elemPanel) elemPanel.style.display = "flex";
+          if (dockBtnBack) dockBtnBack.style.display = "none";
+          if (dockBadge) dockBadge.style.display = "none";
+        }
+      } else {
+        if (emptyState) emptyState.style.display = "flex";
+        if (elemPanel) elemPanel.style.display = "none";
+        if (dockBtnBack) dockBtnBack.style.display = "none";
+        if (dockBtnClose) dockBtnClose.style.display = "none";
+        if (dockBadge) dockBadge.style.display = "none";
+        if (dockTabTitle) dockTabTitle.textContent = "Inspector";
+      }
+    } else {
+      bottom.classList.remove("am-dock-active");
+      if (emptyState) emptyState.style.display = "none";
+      if (dockBtnBack) dockBtnBack.style.display = "none";
+      if (dockBtnClose) dockBtnClose.style.display = "none";
+      if (dockBadge) dockBadge.style.display = "none";
+    }
+  }
+
+  function initDockSystem() {
+    const splitter = document.getElementById("am-dock-splitter");
+    const bottom = document.getElementById("am-bottom-container");
+    const inspector = document.getElementById("am-dock-inspector");
+    const btnBack = document.getElementById("am-dock-btn-back");
+    const btnClose = document.getElementById("am-dock-btn-close");
+
+    if (btnBack) {
+      btnBack.addEventListener("click", () => {
+        if (window.omCloseSubpanel) window.omCloseSubpanel();
+        if (typeof closeLiveShape === "function") closeLiveShape();
+        if (typeof closeEditPoints === "function") closeEditPoints();
+        updateDockLayout();
+      });
+    }
+
+    if (btnClose) {
+      btnClose.addEventListener("click", () => {
+        const I = window.__AM_INTERNAL || {};
+        if (I.deselectLayer) I.deselectLayer();
+        currentSelectedLayer = null;
+        if (typeof origOnLayerSelected === "function") origOnLayerSelected(null);
+        const navDefault = document.getElementById("am-navbar-default");
+        const navElem = document.getElementById("am-navbar-element");
+        if (navDefault) navDefault.style.display = "flex";
+        if (navElem) navElem.style.display = "none";
+        updateDockLayout();
+      });
+    }
+
+    if (splitter && bottom && inspector) {
+      const savedWidth = localStorage.getItem("om_dock_inspector_width");
+      if (savedWidth) {
+        const w = parseInt(savedWidth, 10);
+        if (w >= 260 && w <= 850) {
+          inspector.style.width = w + "px";
+          bottom.style.setProperty("--am-dock-width", w + "px");
+        }
+      }
+
+      let isDragging = false;
+      let startX = 0;
+      let startWidth = 0;
+
+      splitter.addEventListener("pointerdown", (e) => {
+        if (window.innerWidth < 768) return;
+        isDragging = true;
+        startX = e.clientX;
+        startWidth = inspector.offsetWidth;
+        splitter.classList.add("dragging");
+        try { splitter.setPointerCapture(e.pointerId); } catch (_) {}
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+        e.preventDefault();
+      });
+
+      splitter.addEventListener("pointermove", (e) => {
+        if (!isDragging) return;
+        const dx = startX - e.clientX;
+        const containerWidth = bottom.offsetWidth;
+        const minWidth = 260;
+        const maxWidth = Math.min(containerWidth - 300, Math.floor(containerWidth * 0.65));
+        const newWidth = Math.max(minWidth, Math.min(maxWidth, startWidth + dx));
+        inspector.style.width = newWidth + "px";
+        bottom.style.setProperty("--am-dock-width", newWidth + "px");
+      });
+
+      const stopDrag = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        splitter.classList.remove("dragging");
+        try { splitter.releasePointerCapture(e.pointerId); } catch (_) {}
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        localStorage.setItem("om_dock_inspector_width", inspector.offsetWidth);
+        const I = window.__AM_INTERNAL || {};
+        if (I.fitCanvas) I.fitCanvas();
+      };
+
+      splitter.addEventListener("pointerup", stopDrag);
+      splitter.addEventListener("pointercancel", stopDrag);
+    }
+
+    window.addEventListener("resize", () => {
+      updateDockLayout();
+    });
+
+    updateDockLayout();
   }
 
   function renderAddShapes() {
@@ -2103,11 +2292,12 @@
         if (currentSelectedLayer) {
           if (navElem) navElem.style.display = "flex";
           if (elemPanel) elemPanel.style.display = "flex";
-          if (tlView) tlView.style.display = "none";
+          if (tlView) tlView.style.display = isDockMode() ? "flex" : "none";
         } else {
           if (navDefault) navDefault.style.display = "flex";
           if (tlView) tlView.style.display = "flex";
         }
+        if (typeof updateDockLayout === "function") updateDockLayout();
       }
     };
 
@@ -2640,6 +2830,14 @@
           renderFn(subpanelContent, currentSelectedLayer);
         }
       }
+      if (typeof updateDockLayout === "function") {
+        const badge = document.getElementById("am-dock-subpanel-badge");
+        if (badge) {
+          badge.textContent = " › " + title;
+          badge.style.display = "inline-block";
+        }
+        updateDockLayout();
+      }
     }
 
     function closeSubpanel() {
@@ -2650,6 +2848,11 @@
         if (elemPanel) elemPanel.style.display = "flex";
       } else {
         if (navDefault) navDefault.style.display = "flex";
+      }
+      if (typeof updateDockLayout === "function") {
+        const badge = document.getElementById("am-dock-subpanel-badge");
+        if (badge) badge.style.display = "none";
+        updateDockLayout();
       }
     }
 
@@ -4248,6 +4451,7 @@
     if (btnLsBack) btnLsBack.onclick = () => closeLiveShape(true);
 
     renderLiveShapeSettings(liveShapeList, layer);
+    if (typeof updateDockLayout === "function") updateDockLayout();
   }
 
   function closeLiveShape(commit) {
@@ -4271,6 +4475,7 @@
     activeLiveShapeLayer = null;
     liveShapeSnapBefore = null;
     selectedLiveShapeParamId = null;
+    if (typeof updateDockLayout === "function") updateDockLayout();
   }
 
   function getShapeParam(layer, paramId, defVal) {
@@ -5049,6 +5254,7 @@
 
     updateEditPointsUI();
     initEditPointsCanvasOverlay();
+    if (typeof updateDockLayout === "function") updateDockLayout();
   }
 
   function applyPointsToLayer() {
@@ -5091,6 +5297,7 @@
     activeEditPointsLayer = null;
     editPointsSnapBefore = null;
     epPoints = [];
+    if (typeof updateDockLayout === "function") updateDockLayout();
   }
 
   function updateEditPointsUI() {
@@ -8796,7 +9003,7 @@
       updateParentButtonState(l);
 
       // Show Element Edit Panel
-      if (tlView) tlView.style.display = "none";
+      if (tlView) tlView.style.display = isDockMode() ? "flex" : "none";
       if (elemPanel) elemPanel.style.display = "flex";
 
       // Context button label & icon
@@ -8816,6 +9023,7 @@
           ctxIcon.src = "./icons/ac_add_shape.svg";
         }
       }
+      if (typeof updateDockLayout === "function") updateDockLayout();
     } else {
       // Restore buttons state
       if (btnCam) btnCam.style.display = "none";
@@ -8846,6 +9054,7 @@
       if (textEditBar) textEditBar.style.display = "none";
       if (typeof closeTextPopups === "function") closeTextPopups();
       removeEditPointsCanvasOverlay();
+      if (typeof updateDockLayout === "function") updateDockLayout();
     }
   };
 
@@ -11947,7 +12156,7 @@
     if (liveShapePanel) liveShapePanel.classList.remove("open");
     if (editPointsPanel) editPointsPanel.classList.remove("open");
     if (drawingPanel) drawingPanel.style.display = "none";
-    if (tlView) tlView.style.display = "none";
+    if (tlView) tlView.style.display = isDockMode() ? "flex" : "none";
 
     const isMobileMode = root && root.offsetWidth <= 920;
     if (isMobileMode) {
@@ -11958,6 +12167,7 @@
 
     panel.classList.add("open");
     updateCurvePanelUI();
+    if (typeof updateDockLayout === "function") updateDockLayout();
     setTimeout(() => {
       updateCurvePanelUI();
     }, 30);
@@ -11974,6 +12184,7 @@
       const cb = cvOnBackCallback;
       cvOnBackCallback = null;
       cb();
+      if (typeof updateDockLayout === "function") updateDockLayout();
       return;
     }
 
@@ -11984,6 +12195,7 @@
     } else if (tlView) {
       tlView.style.display = "flex";
     }
+    if (typeof updateDockLayout === "function") updateDockLayout();
   }
 
   window.omOpenCurveEditor = openAnimationCurvePanel;
