@@ -1,5 +1,5 @@
 (function initAmMoveTransform() {
-  const I = window.__AM_INTERNAL || {};
+  const initAmMoveTransfValue = window.__AM_INTERNAL || {};
   let curTab = "pos";
   let linkAspect = true;
   let activeGizmoDrag = null;
@@ -475,33 +475,33 @@
   }
 
   function getCurLayer() {
-    if (I.omLayerCur) return I.omLayerCur();
+    if (initAmMoveTransfValue.omLayerCur) return initAmMoveTransfValue.omLayerCur();
     if (typeof window.omPropsLayerId !== "undefined" && typeof window.omResolveLayer === "function") {
       return window.omResolveLayer(window.omPropsLayerId);
     }
     return null;
   }
 
-  function ensureTransform(l) {
-    if (!l) return null;
-    l.transform = l.transform || {};
-    if (!l.transform.location) l.transform.location = { value: [0, 0, 0], kfs: [] };
-    if (!l.transform.scale) l.transform.scale = { value: [1, 1], kfs: [] };
-    if (!l.transform.rotation) l.transform.rotation = { value: [0], kfs: [] };
-    if (!l.transform.pivot) l.transform.pivot = { value: [0, 0], kfs: [] };
-    if (!l.transform.skew) l.transform.skew = { value: [0, 0], kfs: [] };
-    return l.transform;
+  function ensureTransform(ensureTransformResult) {
+    if (!ensureTransformResult) return null;
+    ensureTransformResult.transform = ensureTransformResult.transform || {};
+    if (!ensureTransformResult.transform.location) ensureTransformResult.transform.location = { value: [0, 0, 0], kfs: [] };
+    if (!ensureTransformResult.transform.scale) ensureTransformResult.transform.scale = { value: [1, 1], kfs: [] };
+    if (!ensureTransformResult.transform.rotation) ensureTransformResult.transform.rotation = { value: [0], kfs: [] };
+    if (!ensureTransformResult.transform.pivot) ensureTransformResult.transform.pivot = { value: [0, 0], kfs: [] };
+    if (!ensureTransformResult.transform.skew) ensureTransformResult.transform.skew = { value: [0, 0], kfs: [] };
+    return ensureTransformResult.transform;
   }
 
   function getActiveProp() {
     const layer = getCurLayer();
     if (!layer || !layer.transform) return null;
-    const tr = layer.transform;
-    if (curTab === "rot") return tr.rotation;
-    if (curTab === "scale") return tr.scale;
-    if (curTab === "pivot") return tr.pivot;
-    if (curTab === "skew") return tr.skew;
-    return tr.location;
+    const transform = layer.transform;
+    if (curTab === "rot") return transform.rotation;
+    if (curTab === "scale") return transform.scale;
+    if (curTab === "pivot") return transform.pivot;
+    if (curTab === "skew") return transform.skew;
+    return transform.location;
   }
 
   function getActivePropKey() {
@@ -513,20 +513,20 @@
   }
 
   function setPropValue(layer, propName, valArr) {
-    const tr = ensureTransform(layer);
-    const prop = tr[propName];
+    const setPropValueEnsureTransform = ensureTransform(layer);
+    const prop = setPropValueEnsureTransform[propName];
     if (!prop) return;
-    const tt = (I.H || 0) / 1000;
-    if (prop.kfs && prop.kfs.length && I.omSetKeyable) {
-      I.omSetKeyable(prop, valArr);
+    const setPropValueResult = (initAmMoveTransfValue.H || 0) / 1000;
+    if (prop.kfs && prop.kfs.length && initAmMoveTransfValue.omSetKeyable) {
+      initAmMoveTransfValue.omSetKeyable(prop, valArr);
     } else if (prop.kfs && prop.kfs.length) {
-      let kf = prop.kfs.find(k => Math.abs(Number(k.t) - tt) < 0.002);
-      const arr = Array.isArray(valArr) ? [...valArr] : [valArr];
-      if (kf) {
-        kf.v = arr;
+      let setPropValueFlag = prop.kfs.find(setPropValueT => Math.abs(Number(setPropValueT.t) - setPropValueResult) < 0.002);
+      const setPropValueV = Array.isArray(valArr) ? [...valArr] : [valArr];
+      if (setPropValueFlag) {
+        setPropValueFlag.v = setPropValueV;
       } else {
-        prop.kfs.push({ t: tt, v: arr, e: null, easing: null });
-        prop.kfs.sort((a, b) => Number(a.t) - Number(b.t));
+        prop.kfs.push({ t: setPropValueResult, v: setPropValueV, e: null, easing: null });
+        prop.kfs.sort((setPropValueArg, setPropValueArgValue) => Number(setPropValueArg.t) - Number(setPropValueArgValue.t));
       }
       prop.value = valArr;
     } else {
@@ -537,59 +537,59 @@
   function commitTransformChange(layer, snap) {
     if (!layer) return;
     layer.userTouched = true;
-    if (snap && I.pushUndo) I.pushUndo(snap);
-    if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H || 0);
-    if (I.omScheduleSave) I.omScheduleSave();
+    if (snap && initAmMoveTransfValue.pushUndo) initAmMoveTransfValue.pushUndo(snap);
+    if (initAmMoveTransfValue.val2 && initAmMoveTransfValue.val2.renderAt) initAmMoveTransfValue.val2.renderAt(initAmMoveTransfValue.H || 0);
+    if (initAmMoveTransfValue.omScheduleSave) initAmMoveTransfValue.omScheduleSave();
     updateMtReadouts();
     drawGizmo();
   }
 
   function getLayerMatrix(layer) {
-    const val2 = I.val2;
-    if (!val2 || !val2.scene || !val2.canvas) return null;
-    const viewRect = val2.canvas.getBoundingClientRect();
-    if (!viewRect.width || !val2.scene.height) return null;
-    const scaleFactor = viewRect.height / val2.scene.height;
+    const getLayerMatrixVal = initAmMoveTransfValue.val2;
+    if (!getLayerMatrixVal || !getLayerMatrixVal.scene || !getLayerMatrixVal.canvas) return null;
+    const viewRect = getLayerMatrixVal.canvas.getBoundingClientRect();
+    if (!viewRect.width || !getLayerMatrixVal.scene.height) return null;
+    const scaleFactor = viewRect.height / getLayerMatrixVal.scene.height;
 
-    const tSec = (I.H || 0) / 1000;
-    const localTime = Math.max(0, (I.H || 0) - (layer.startTime || 0)) / 1000;
-    const xVal = val2.X ? val2.X(layer, (I.H || 0) - (layer.startTime || 0)) : 0;
-    const te2 = val2.te ? val2.te(layer, xVal !== null ? xVal : 0, localTime) : null;
-    if (!te2) return null;
+    const tSec = (initAmMoveTransfValue.H || 0) / 1000;
+    const localTime = Math.max(0, (initAmMoveTransfValue.H || 0) - (layer.startTime || 0)) / 1000;
+    const xVal = getLayerMatrixVal.X ? getLayerMatrixVal.X(layer, (initAmMoveTransfValue.H || 0) - (layer.startTime || 0)) : 0;
+    const getLayerMatrixValue = getLayerMatrixVal.te ? getLayerMatrixVal.te(layer, xVal !== null ? xVal : 0, localTime) : null;
+    if (!getLayerMatrixValue) return null;
 
     const dummyCtx = {
       matrix: [1, 0, 0, 1, 0, 0],
-      translate(x, y) { applyMat(this.matrix, [1, 0, 0, 1, x, y]); },
-      rotate(rad) {
-        const c = Math.cos(rad), s = Math.sin(rad);
-        applyMat(this.matrix, [c, s, -s, c, 0, 0]);
+      translate(getLayerMatrixArg, getLayerMatrixArgValue) { applyMat(this.matrix, [1, 0, 0, 1, getLayerMatrixArg, getLayerMatrixArgValue]); },
+      rotate(dummyCtxValue) {
+        const getLayerMatrixCos = Math.cos(dummyCtxValue), getLayerMatrixSin = Math.sin(dummyCtxValue);
+        applyMat(this.matrix, [getLayerMatrixCos, getLayerMatrixSin, -getLayerMatrixSin, getLayerMatrixCos, 0, 0]);
       },
-      scale(sx, sy) { applyMat(this.matrix, [sx, 0, 0, sy, 0, 0]); },
-      transform(a, b, c, d, e, f) { applyMat(this.matrix, [a, b, c, d, e, f]); }
+      scale(getLayerMatrixArgRaw, argRaw) { applyMat(this.matrix, [getLayerMatrixArgRaw, 0, 0, argRaw, 0, 0]); },
+      transform(getLayerMatrixRaw, getLayerMatrixArgParsed, argParsed, getLayerMatrixParsed, getLayerMatrixArgClamped, argClamped) { applyMat(this.matrix, [getLayerMatrixRaw, getLayerMatrixArgParsed, argParsed, getLayerMatrixParsed, getLayerMatrixArgClamped, argClamped]); }
     };
 
-    function applyMat(m, n) {
-      const a = m[0]*n[0] + m[2]*n[1];
-      const b = m[1]*n[0] + m[3]*n[1];
-      const c = m[0]*n[2] + m[2]*n[3];
-      const d = m[1]*n[2] + m[3]*n[3];
-      const e = m[0]*n[4] + m[2]*n[5] + m[4];
-      const f = m[1]*n[4] + m[3]*n[5] + m[5];
-      m[0]=a; m[1]=b; m[2]=c; m[3]=d; m[4]=e; m[5]=f;
+    function applyMat(applyMatArg, applyMatArgValue) {
+      const applyMatValue = applyMatArg[0]*applyMatArgValue[0] + applyMatArg[2]*applyMatArgValue[1];
+      const applyMatResult = applyMatArg[1]*applyMatArgValue[0] + applyMatArg[3]*applyMatArgValue[1];
+      const applyMatValueRaw = applyMatArg[0]*applyMatArgValue[2] + applyMatArg[2]*applyMatArgValue[3];
+      const applyMatRaw = applyMatArg[1]*applyMatArgValue[2] + applyMatArg[3]*applyMatArgValue[3];
+      const applyMatValueParsed = applyMatArg[0]*applyMatArgValue[4] + applyMatArg[2]*applyMatArgValue[5] + applyMatArg[4];
+      const valueParsed = applyMatArg[1]*applyMatArgValue[4] + applyMatArg[3]*applyMatArgValue[5] + applyMatArg[5];
+      applyMatArg[0]=applyMatValue; applyMatArg[1]=applyMatResult; applyMatArg[2]=applyMatValueRaw; applyMatArg[3]=applyMatRaw; applyMatArg[4]=applyMatValueParsed; applyMatArg[5]=valueParsed;
     }
 
-    val2.Ce(dummyCtx, layer, te2, scaleFactor, localTime);
-    const size = val2.se ? val2.se(layer, val2.scene) : [100, 100];
-    const w = size[0] * scaleFactor;
-    const h = size[1] * scaleFactor;
+    getLayerMatrixVal.Ce(dummyCtx, layer, getLayerMatrixValue, scaleFactor, localTime);
+    const size = getLayerMatrixVal.se ? getLayerMatrixVal.se(layer, getLayerMatrixVal.scene) : [100, 100];
+    const getLayerMatrixResult = size[0] * scaleFactor;
+    const getLayerMatrixValueRaw = size[1] * scaleFactor;
 
-    return { m: dummyCtx.matrix, w, h, viewRect, scaleFactor };
+    return { m: dummyCtx.matrix, w: getLayerMatrixResult, h: getLayerMatrixValueRaw, viewRect, scaleFactor };
   }
 
-  function transformPoint(m, x, y) {
+  function transformPoint(transformPointArg, transformPointArgValue, argValue) {
     return {
-      x: m[0] * x + m[2] * y + m[4],
-      y: m[1] * x + m[3] * y + m[5]
+      x: transformPointArg[0] * transformPointArgValue + transformPointArg[2] * argValue + transformPointArg[4],
+      y: transformPointArg[1] * transformPointArgValue + transformPointArg[3] * argValue + transformPointArg[5]
     };
   }
 
@@ -599,16 +599,16 @@
     if (!ctx) return;
 
     const stageRect = stageEl.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    const rw = Math.round(stageRect.width * dpr);
-    const rh = Math.round(stageRect.height * dpr);
-    if (gizmoCanvas.width !== rw || gizmoCanvas.height !== rh) {
-      gizmoCanvas.width = rw;
-      gizmoCanvas.height = rh;
+    const drawGizmoValue = window.devicePixelRatio || 1;
+    const round = Math.round(stageRect.width * drawGizmoValue);
+    const drawGizmoRound = Math.round(stageRect.height * drawGizmoValue);
+    if (gizmoCanvas.width !== round || gizmoCanvas.height !== drawGizmoRound) {
+      gizmoCanvas.width = round;
+      gizmoCanvas.height = drawGizmoRound;
     }
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, rw, rh);
+    ctx.clearRect(0, 0, round, drawGizmoRound);
 
     const layer = getCurLayer();
     if (!layer || layer.hidden) return;
@@ -617,37 +617,37 @@
     if (!geom) return;
 
     ctx.save();
-    ctx.scale(dpr, dpr);
+    ctx.scale(drawGizmoValue, drawGizmoValue);
 
-    const { m, w, h, viewRect } = geom;
+    const { m: drawGizmoResult, w: valueRaw, h: drawGizmoValueRaw, viewRect } = geom;
     const offsetX = viewRect.left - stageRect.left;
     const offsetY = viewRect.top - stageRect.top;
     ctx.translate(offsetX, offsetY);
 
-    const nw = transformPoint(m, -w/2, -h/2);
-    const ne = transformPoint(m, w/2, -h/2);
-    const se = transformPoint(m, w/2, h/2);
-    const sw = transformPoint(m, -w/2, h/2);
-    const pivot = transformPoint(m, 0, 0);
+    const drawGizmoTransformPoint = transformPoint(drawGizmoResult, -valueRaw/2, -drawGizmoValueRaw/2);
+    const transformPointValue = transformPoint(drawGizmoResult, valueRaw/2, -drawGizmoValueRaw/2);
+    const drawGizmoX = transformPoint(drawGizmoResult, valueRaw/2, drawGizmoValueRaw/2);
+    const xValue = transformPoint(drawGizmoResult, -valueRaw/2, drawGizmoValueRaw/2);
+    const pivot = transformPoint(drawGizmoResult, 0, 0);
 
-    const topMid = transformPoint(m, 0, -h/2);
-    const rotNorm = { x: -m[2], y: -m[3] };
+    const topMid = transformPoint(drawGizmoResult, 0, -drawGizmoValueRaw/2);
+    const rotNorm = { x: -drawGizmoResult[2], y: -drawGizmoResult[3] };
     const rotLen = Math.hypot(rotNorm.x, rotNorm.y) || 1;
     const rotKnob = {
       x: topMid.x + (rotNorm.x / rotLen) * 24,
       y: topMid.y + (rotNorm.y / rotLen) * 24
     };
 
-    layer.__gizmoBounds = { nw, ne, se, sw, pivot, rotKnob, offsetX, offsetY, geom };
+    layer.__gizmoBounds = { nw: drawGizmoTransformPoint, ne: transformPointValue, se: drawGizmoX, sw: xValue, pivot, rotKnob, offsetX, offsetY, geom };
 
     ctx.strokeStyle = "#00ffa8";
     ctx.lineWidth = 1.8;
     ctx.setLineDash([]);
     ctx.beginPath();
-    ctx.moveTo(nw.x, nw.y);
-    ctx.lineTo(ne.x, ne.y);
-    ctx.lineTo(se.x, se.y);
-    ctx.lineTo(sw.x, sw.y);
+    ctx.moveTo(drawGizmoTransformPoint.x, drawGizmoTransformPoint.y);
+    ctx.lineTo(transformPointValue.x, transformPointValue.y);
+    ctx.lineTo(drawGizmoX.x, drawGizmoX.y);
+    ctx.lineTo(xValue.x, xValue.y);
     ctx.closePath();
     ctx.stroke();
 
@@ -666,11 +666,11 @@
     ctx.fill();
     ctx.stroke();
 
-    const corners = [nw, ne, se, sw];
+    const corners = [drawGizmoTransformPoint, transformPointValue, drawGizmoX, xValue];
     ctx.fillStyle = "#00ffa8";
-    corners.forEach(pt => {
+    corners.forEach(drawGizmoY => {
       ctx.beginPath();
-      ctx.arc(pt.x, pt.y, 4.5, 0, Math.PI * 2);
+      ctx.arc(drawGizmoY.x, drawGizmoY.y, 4.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = "#141620";
       ctx.lineWidth = 1.5;
@@ -698,99 +698,99 @@
   }
 
   if (gizmoCanvas) {
-    gizmoCanvas.addEventListener("pointerdown", e => {
+    gizmoCanvas.addEventListener("pointerdown", clientX => {
       const layer = getCurLayer();
       if (!layer || !layer.__gizmoBounds) return;
-      const b = layer.__gizmoBounds;
+      const gizmoBounds = layer.__gizmoBounds;
       const stageRect = stageEl.getBoundingClientRect();
-      const px = e.clientX - stageRect.left - b.offsetX;
-      const py = e.clientY - stageRect.top - b.offsetY;
+      const initAmMoveTransformValue = clientX.clientX - stageRect.left - gizmoBounds.offsetX;
+      const initAmMoveTransformValueRaw = clientX.clientY - stageRect.top - gizmoBounds.offsetY;
 
-      if (Math.hypot(px - b.rotKnob.x, py - b.rotKnob.y) < 14) {
-        startGizmoDrag(e, "rot", layer);
+      if (Math.hypot(initAmMoveTransformValue - gizmoBounds.rotKnob.x, initAmMoveTransformValueRaw - gizmoBounds.rotKnob.y) < 14) {
+        startGizmoDrag(clientX, "rot", layer);
         return;
       }
-      if (Math.hypot(px - b.pivot.x, py - b.pivot.y) < 12) {
-        startGizmoDrag(e, "pivot", layer);
+      if (Math.hypot(initAmMoveTransformValue - gizmoBounds.pivot.x, initAmMoveTransformValueRaw - gizmoBounds.pivot.y) < 12) {
+        startGizmoDrag(clientX, "pivot", layer);
         return;
       }
-      if (Math.hypot(px - b.nw.x, py - b.nw.y) < 12 || Math.hypot(px - b.ne.x, py - b.ne.y) < 12 ||
-          Math.hypot(px - b.se.x, py - b.se.y) < 12 || Math.hypot(px - b.sw.x, py - b.sw.y) < 12) {
-        startGizmoDrag(e, "scale", layer);
+      if (Math.hypot(initAmMoveTransformValue - gizmoBounds.nw.x, initAmMoveTransformValueRaw - gizmoBounds.nw.y) < 12 || Math.hypot(initAmMoveTransformValue - gizmoBounds.ne.x, initAmMoveTransformValueRaw - gizmoBounds.ne.y) < 12 ||
+          Math.hypot(initAmMoveTransformValue - gizmoBounds.se.x, initAmMoveTransformValueRaw - gizmoBounds.se.y) < 12 || Math.hypot(initAmMoveTransformValue - gizmoBounds.sw.x, initAmMoveTransformValueRaw - gizmoBounds.sw.y) < 12) {
+        startGizmoDrag(clientX, "scale", layer);
         return;
       }
-      if (pointInQuad(px, py, b.nw, b.ne, b.se, b.sw)) {
-        startGizmoDrag(e, "pos", layer);
+      if (pointInQuad(initAmMoveTransformValue, initAmMoveTransformValueRaw, gizmoBounds.nw, gizmoBounds.ne, gizmoBounds.se, gizmoBounds.sw)) {
+        startGizmoDrag(clientX, "pos", layer);
         return;
       }
     });
   }
 
-  function pointInQuad(px, py, p1, p2, p3, p4) {
-    function sign(x1, y1, x2, y2, x3, y3) {
-      return (x1 - x3) * (y2 - y3) - (x2 - x3) * (y1 - y3);
+  function pointInQuad(pointInQuadValue, pointInQuadArg, pointInQuadX, xArg, pointInQuadY, yArg) {
+    function sign(signValue, signArgRaw, signRaw, signArgParsed, signArg, signArgValue) {
+      return (signValue - signArg) * (signArgParsed - signArgValue) - (signRaw - signArg) * (signArgRaw - signArgValue);
     }
-    const b1 = sign(px, py, p1.x, p1.y, p2.x, p2.y) < 0.0;
-    const b2 = sign(px, py, p2.x, p2.y, p3.x, p3.y) < 0.0;
-    const b3 = sign(px, py, p3.x, p3.y, p4.x, p4.y) < 0.0;
-    const b4 = sign(px, py, p4.x, p4.y, p1.x, p1.y) < 0.0;
-    return ((b1 === b2) && (b2 === b3) && (b3 === b4));
+    const pointInQuadRaw = sign(pointInQuadValue, pointInQuadArg, pointInQuadX.x, pointInQuadX.y, xArg.x, xArg.y) < 0.0;
+    const pointInQuadResult = sign(pointInQuadValue, pointInQuadArg, xArg.x, xArg.y, pointInQuadY.x, pointInQuadY.y) < 0.0;
+    const pointInQuadValueRaw = sign(pointInQuadValue, pointInQuadArg, pointInQuadY.x, pointInQuadY.y, yArg.x, yArg.y) < 0.0;
+    const pointInQuadValueParsed = sign(pointInQuadValue, pointInQuadArg, yArg.x, yArg.y, pointInQuadX.x, pointInQuadX.y) < 0.0;
+    return ((pointInQuadRaw === pointInQuadResult) && (pointInQuadResult === pointInQuadValueRaw) && (pointInQuadValueRaw === pointInQuadValueParsed));
   }
 
-  function startGizmoDrag(e, mode, layer) {
-    e.stopPropagation();
-    e.preventDefault();
-    gizmoCanvas.setPointerCapture(e.pointerId);
+  function startGizmoDrag(stopPropagation, mode, layer) {
+    stopPropagation.stopPropagation();
+    stopPropagation.preventDefault();
+    gizmoCanvas.setPointerCapture(stopPropagation.pointerId);
 
-    const tr = ensureTransform(layer);
-    const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
+    const startGizmoDragEnsureTransform = ensureTransform(layer);
+    const snap = initAmMoveTransfValue.sceneSnapshot ? initAmMoveTransfValue.sceneSnapshot() : null;
     const scaleFactor = layer.__gizmoBounds.geom.scaleFactor || 1;
 
     activeGizmoDrag = {
       mode,
       layer,
       snap,
-      startX: e.clientX,
-      startY: e.clientY,
-      initLoc: [...(tr.location.value || [0, 0, 0])],
-      initScale: [...(tr.scale.value || [1, 1])],
-      initRot: Number(tr.rotation.value ? tr.rotation.value[0] : 0),
-      initPivot: [...(tr.pivot.value || [0, 0])],
+      startX: stopPropagation.clientX,
+      startY: stopPropagation.clientY,
+      initLoc: [...(startGizmoDragEnsureTransform.location.value || [0, 0, 0])],
+      initScale: [...(startGizmoDragEnsureTransform.scale.value || [1, 1])],
+      initRot: Number(startGizmoDragEnsureTransform.rotation.value ? startGizmoDragEnsureTransform.rotation.value[0] : 0),
+      initPivot: [...(startGizmoDragEnsureTransform.pivot.value || [0, 0])],
       scaleFactor,
       pivotScreen: layer.__gizmoBounds.pivot
     };
 
     const onMove = ev => {
       if (!activeGizmoDrag) return;
-      const d = activeGizmoDrag;
-      const dx = (ev.clientX - d.startX) / d.scaleFactor;
-      const dy = (ev.clientY - d.startY) / d.scaleFactor;
+      const startX = activeGizmoDrag;
+      const onMoveValue = (ev.clientX - startX.startX) / startX.scaleFactor;
+      const startGizmoDragValue = (ev.clientY - startX.startY) / startX.scaleFactor;
 
-      if (d.mode === "pos") {
-        const nx = Math.round(d.initLoc[0] + dx);
-        const ny = Math.round(d.initLoc[1] + dy);
-        setPropValue(d.layer, "location", [nx, ny, d.initLoc[2] || 0]);
-      } else if (d.mode === "pivot") {
-        const npx = Math.round(d.initPivot[0] + dx);
-        const npy = Math.round(d.initPivot[1] + dy);
-        setPropValue(d.layer, "pivot", [npx, npy]);
-      } else if (d.mode === "rot") {
+      if (startX.mode === "pos") {
+        const startGizmoDragRound = Math.round(startX.initLoc[0] + onMoveValue);
+        const roundValue = Math.round(startX.initLoc[1] + startGizmoDragValue);
+        setPropValue(startX.layer, "location", [startGizmoDragRound, roundValue, startX.initLoc[2] || 0]);
+      } else if (startX.mode === "pivot") {
+        const startGizmoDragResult = Math.round(startX.initPivot[0] + onMoveValue);
+        const startGizmoDragValueRaw = Math.round(startX.initPivot[1] + startGizmoDragValue);
+        setPropValue(startX.layer, "pivot", [startGizmoDragResult, startGizmoDragValueRaw]);
+      } else if (startX.mode === "rot") {
         const stageRect = stageEl.getBoundingClientRect();
-        const b = d.layer.__gizmoBounds;
-        const curPx = ev.clientX - stageRect.left - b.offsetX;
-        const curPy = ev.clientY - stageRect.top - b.offsetY;
-        const angle = Math.atan2(curPy - d.pivotScreen.y, curPx - d.pivotScreen.x) * (180 / Math.PI) + 90;
-        setPropValue(d.layer, "rotation", [Math.round(angle * 10) / 10]);
-      } else if (d.mode === "scale") {
-        const factorX = 1 + dx / 150;
-        const factorY = 1 + dy / 150;
+        const startGizmoDragGizmoBounds = startX.layer.__gizmoBounds;
+        const curPx = ev.clientX - stageRect.left - startGizmoDragGizmoBounds.offsetX;
+        const curPy = ev.clientY - stageRect.top - startGizmoDragGizmoBounds.offsetY;
+        const angle = Math.atan2(curPy - startX.pivotScreen.y, curPx - startX.pivotScreen.x) * (180 / Math.PI) + 90;
+        setPropValue(startX.layer, "rotation", [Math.round(angle * 10) / 10]);
+      } else if (startX.mode === "scale") {
+        const factorX = 1 + onMoveValue / 150;
+        const factorY = 1 + startGizmoDragValue / 150;
         const factor = Math.max(0.05, linkAspect ? (factorX + factorY) / 2 : factorX);
-        const nsx = Math.round(d.initScale[0] * factor * 100) / 100;
-        const nsy = Math.round(d.initScale[1] * (linkAspect ? factor : factorY) * 100) / 100;
-        setPropValue(d.layer, "scale", [nsx, nsy]);
+        const startGizmoDragRaw = Math.round(startX.initScale[0] * factor * 100) / 100;
+        const startGizmoDragValueParsed = Math.round(startX.initScale[1] * (linkAspect ? factor : factorY) * 100) / 100;
+        setPropValue(startX.layer, "scale", [startGizmoDragRaw, startGizmoDragValueParsed]);
       }
 
-      if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H || 0);
+      if (initAmMoveTransfValue.val2 && initAmMoveTransfValue.val2.renderAt) initAmMoveTransfValue.val2.renderAt(initAmMoveTransfValue.H || 0);
       updateMtReadouts();
       drawGizmo();
     };
@@ -799,8 +799,8 @@
       try { gizmoCanvas.releasePointerCapture(ev.pointerId); } catch {}
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
-      if (activeGizmoDrag && activeGizmoDrag.snap && I.pushUndo) {
-        I.pushUndo(activeGizmoDrag.snap);
+      if (activeGizmoDrag && activeGizmoDrag.snap && initAmMoveTransfValue.pushUndo) {
+        initAmMoveTransfValue.pushUndo(activeGizmoDrag.snap);
       }
       activeGizmoDrag = null;
       drawGizmo();
@@ -811,12 +811,12 @@
   }
 
   function openMoveTransform(layer) {
-    let l = layer || getCurLayer();
-    if (!l) {
-      if (I.handle9) I.handle9("[EDIT] Pilih layer terlebih dahulu");
+    let openMoveTransformValue = layer || getCurLayer();
+    if (!openMoveTransformValue) {
+      if (initAmMoveTransfValue.handle9) initAmMoveTransfValue.handle9("[EDIT] Pilih layer terlebih dahulu");
       return;
     }
-    ensureTransform(l);
+    ensureTransform(openMoveTransformValue);
     mtPanel.classList.add("on");
     const propsPanel = document.getElementById("om-props");
     if (propsPanel) propsPanel.classList.remove("on");
@@ -825,7 +825,7 @@
     const simpleHint = document.getElementById("simpleHint");
     if (simpleHint) simpleHint.remove();
 
-    document.getElementById("omMtLayerName").textContent = l.label || l.id;
+    document.getElementById("omMtLayerName").textContent = openMoveTransformValue.label || openMoveTransformValue.id;
     updateMtCenter();
     updateMtReadouts();
     updateMtKfButton();
@@ -846,13 +846,13 @@
 
     const layer = getCurLayer();
     if (!layer) return;
-    const tr = ensureTransform(layer);
+    const updateMtCenterEnsureTransform = ensureTransform(layer);
 
     if (curTab === "pos" || curTab === "pivot") {
       const isPivot = curTab === "pivot";
-      const pad = document.createElement("div");
-      pad.className = "om-mt-pad";
-      pad.innerHTML = `
+      const updateMtCenterDivEl = document.createElement("div");
+      updateMtCenterDivEl.className = "om-mt-pad";
+      updateMtCenterDivEl.innerHTML = `
         <div class="om-mt-corner nw"><img src="./icons/ic_transform_guide_topleft.svg" alt=""></div>
         <div class="om-mt-corner ne"><img src="./icons/ic_transform_guide_topright.svg" alt=""></div>
         <div class="om-mt-corner sw"><img src="./icons/ic_transform_guide_bottomleft.svg" alt=""></div>
@@ -866,26 +866,26 @@
           <span>${isPivot ? "Geser untuk memindahkan titik jangkar (pivot)" : "Geser ke mana saja untuk memindahkan layer"}</span>
         </div>
       `;
-      setupPadDrag(pad, (dx, dy) => {
-        const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
+      setupPadDrag(updateMtCenterDivEl, (updateMtCenterText, updateMtCenterArg) => {
+        const snap = initAmMoveTransfValue.sceneSnapshot ? initAmMoveTransfValue.sceneSnapshot() : null;
         if (isPivot) {
-          const p = tr.pivot.value || [0, 0];
-          setPropValue(layer, "pivot", [Math.round(p[0] + dx), Math.round(p[1] + dy)]);
+          const updateMtCenterValue = updateMtCenterEnsureTransform.pivot.value || [0, 0];
+          setPropValue(layer, "pivot", [Math.round(updateMtCenterValue[0] + updateMtCenterText), Math.round(updateMtCenterValue[1] + updateMtCenterArg)]);
         } else {
-          const l = tr.location.value || [0, 0, 0];
-          setPropValue(layer, "location", [Math.round(l[0] + dx), Math.round(l[1] + dy), l[2] || 0]);
+          const updateMtCenterResult = updateMtCenterEnsureTransform.location.value || [0, 0, 0];
+          setPropValue(layer, "location", [Math.round(updateMtCenterResult[0] + updateMtCenterText), Math.round(updateMtCenterResult[1] + updateMtCenterArg), updateMtCenterResult[2] || 0]);
         }
         commitTransformChange(layer, snap);
       });
-      center.appendChild(pad);
+      center.appendChild(updateMtCenterDivEl);
     } else if (curTab === "rot") {
       const wrap = document.createElement("div");
       wrap.className = "om-mt-wheel-wrap";
-      const deg = Number(tr.rotation.value ? tr.rotation.value[0] : 0);
+      const updateMtCenterNumber = Number(updateMtCenterEnsureTransform.rotation.value ? updateMtCenterEnsureTransform.rotation.value[0] : 0);
       wrap.innerHTML = `
-        <div class="om-mt-wheel-val" id="omMtWheelVal">${deg.toFixed(1)}°</div>
+        <div class="om-mt-wheel-val" id="omMtWheelVal">${updateMtCenterNumber.toFixed(1)}°</div>
         <div class="om-mt-wheel" id="omMtWheel">
-          <div class="om-mt-needle" id="omMtNeedle" style="transform: rotate(${deg}deg)"></div>
+          <div class="om-mt-needle" id="omMtNeedle" style="transform: rotate(${updateMtCenterNumber}deg)"></div>
           <div class="om-mt-wheel-center"></div>
           <svg viewBox="0 0 100 100" width="100%" height="100%" style="position:absolute;inset:0;pointer-events:none">
             <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
@@ -899,15 +899,15 @@
       `;
       const wheel = wrap.querySelector("#omMtWheel");
       setupWheelDrag(wheel, angle => {
-        const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
+        const snap = initAmMoveTransfValue.sceneSnapshot ? initAmMoveTransfValue.sceneSnapshot() : null;
         setPropValue(layer, "rotation", [Math.round(angle * 10) / 10]);
         commitTransformChange(layer, snap);
       });
       center.appendChild(wrap);
     } else if (curTab === "scale") {
-      const pad = document.createElement("div");
-      pad.className = "om-mt-pad";
-      pad.innerHTML = `
+      const divEl = document.createElement("div");
+      divEl.className = "om-mt-pad";
+      divEl.innerHTML = `
         <div class="om-mt-corner nw"><img src="./icons/ic_transform_guide_topleft.svg" alt=""></div>
         <div class="om-mt-corner ne"><img src="./icons/ic_transform_guide_topright.svg" alt=""></div>
         <div class="om-mt-corner sw"><img src="./icons/ic_transform_guide_bottomleft.svg" alt=""></div>
@@ -921,20 +921,20 @@
           <span>Geser ke atas/kanan untuk memperbesar, ke bawah/kiri untuk memperkecil</span>
         </div>
       `;
-      setupPadDrag(pad, (dx, dy) => {
-        const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
-        const cur = tr.scale.value || [1, 1];
-        const factor = (dx - dy) / 120;
-        const nsx = Math.max(0.01, Math.round((cur[0] + factor) * 100) / 100);
-        const nsy = Math.max(0.01, Math.round((cur[1] + (linkAspect ? factor : -dy / 120)) * 100) / 100);
-        setPropValue(layer, "scale", [nsx, nsy]);
+      setupPadDrag(divEl, (updateMtCenterArgRaw, updateMtCenterArgValue) => {
+        const snap = initAmMoveTransfValue.sceneSnapshot ? initAmMoveTransfValue.sceneSnapshot() : null;
+        const updateMtCenterValueRaw = updateMtCenterEnsureTransform.scale.value || [1, 1];
+        const factor = (updateMtCenterArgRaw - updateMtCenterArgValue) / 120;
+        const maxValue = Math.max(0.01, Math.round((updateMtCenterValueRaw[0] + factor) * 100) / 100);
+        const updateMtCenterMax = Math.max(0.01, Math.round((updateMtCenterValueRaw[1] + (linkAspect ? factor : -updateMtCenterArgValue / 120)) * 100) / 100);
+        setPropValue(layer, "scale", [maxValue, updateMtCenterMax]);
         commitTransformChange(layer, snap);
       });
-      center.appendChild(pad);
+      center.appendChild(divEl);
     } else if (curTab === "skew") {
-      const pad = document.createElement("div");
-      pad.className = "om-mt-pad";
-      pad.innerHTML = `
+      const divElValue = document.createElement("div");
+      divElValue.className = "om-mt-pad";
+      divElValue.innerHTML = `
         <div class="om-mt-corner nw"><img src="./icons/ic_transform_guide_topleft.svg" alt=""></div>
         <div class="om-mt-corner ne"><img src="./icons/ic_transform_guide_topright.svg" alt=""></div>
         <div class="om-mt-corner sw"><img src="./icons/ic_transform_guide_bottomleft.svg" alt=""></div>
@@ -948,173 +948,173 @@
           <span>Geser horizontal untuk Skew X, vertikal untuk Skew Y</span>
         </div>
       `;
-      setupPadDrag(pad, (dx, dy) => {
-        const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
-        const cur = tr.skew.value || [0, 0];
-        const nx = Math.round((cur[0] + dx * 0.2) * 10) / 10;
-        const ny = Math.round((cur[1] + dy * 0.2) * 10) / 10;
-        setPropValue(layer, "skew", [nx, ny]);
+      setupPadDrag(divElValue, (updateMtCenterArgParsed, updateMtCenterArgClamped) => {
+        const snap = initAmMoveTransfValue.sceneSnapshot ? initAmMoveTransfValue.sceneSnapshot() : null;
+        const updateMtCenterRaw = updateMtCenterEnsureTransform.skew.value || [0, 0];
+        const updateMtCenterValueParsed = Math.round((updateMtCenterRaw[0] + updateMtCenterArgParsed * 0.2) * 10) / 10;
+        const updateMtCenterParsed = Math.round((updateMtCenterRaw[1] + updateMtCenterArgClamped * 0.2) * 10) / 10;
+        setPropValue(layer, "skew", [updateMtCenterValueParsed, updateMtCenterParsed]);
         commitTransformChange(layer, snap);
       });
-      center.appendChild(pad);
+      center.appendChild(divElValue);
     }
   }
 
   function setupPadDrag(el, onDelta) {
     let lastX = 0, lastY = 0, isDragging = false;
-    el.addEventListener("pointerdown", e => {
+    el.addEventListener("pointerdown", clientXArg => {
       isDragging = true;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      el.setPointerCapture(e.pointerId);
+      lastX = clientXArg.clientX;
+      lastY = clientXArg.clientY;
+      el.setPointerCapture(clientXArg.pointerId);
     });
-    el.addEventListener("pointermove", e => {
+    el.addEventListener("pointermove", setupPadDragClientX => {
       if (!isDragging) return;
-      const dx = e.clientX - lastX;
-      const dy = e.clientY - lastY;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      onDelta(dx, dy);
+      const setupPadDragValue = setupPadDragClientX.clientX - lastX;
+      const setupPadDragResult = setupPadDragClientX.clientY - lastY;
+      lastX = setupPadDragClientX.clientX;
+      lastY = setupPadDragClientX.clientY;
+      onDelta(setupPadDragValue, setupPadDragResult);
     });
-    const end = e => {
+    const setupPadDragCallback = pointerId => {
       isDragging = false;
-      try { el.releasePointerCapture(e.pointerId); } catch {}
+      try { el.releasePointerCapture(pointerId.pointerId); } catch {}
     };
-    el.addEventListener("pointerup", end);
-    el.addEventListener("pointercancel", end);
+    el.addEventListener("pointerup", setupPadDragCallback);
+    el.addEventListener("pointercancel", setupPadDragCallback);
   }
 
   function setupWheelDrag(el, onAngle) {
     let isDragging = false;
-    const compute = e => {
+    const setupWheelDragValueRaw = clientY => {
       const rect = el.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const rad = Math.atan2(e.clientY - cy, e.clientX - cx);
-      let deg = rad * (180 / Math.PI) + 90;
-      if (deg < 0) deg += 360;
-      onAngle(deg);
+      const computeValue = rect.left + rect.width / 2;
+      const setupWheelDragRaw = rect.top + rect.height / 2;
+      const atan = Math.atan2(clientY.clientY - setupWheelDragRaw, clientY.clientX - computeValue);
+      let setupWheelDragResult = atan * (180 / Math.PI) + 90;
+      if (setupWheelDragResult < 0) setupWheelDragResult += 360;
+      onAngle(setupWheelDragResult);
       const needle = el.querySelector("#omMtNeedle");
-      if (needle) needle.style.transform = `rotate(${deg}deg)`;
+      if (needle) needle.style.transform = `rotate(${setupWheelDragResult}deg)`;
       const valEl = document.getElementById("omMtWheelVal");
-      if (valEl) valEl.textContent = `${deg.toFixed(1)}°`;
+      if (valEl) valEl.textContent = `${setupWheelDragResult.toFixed(1)}°`;
     };
-    el.addEventListener("pointerdown", e => {
+    el.addEventListener("pointerdown", setupWheelDragPointerId => {
       isDragging = true;
-      el.setPointerCapture(e.pointerId);
-      compute(e);
+      el.setPointerCapture(setupWheelDragPointerId.pointerId);
+      setupWheelDragValueRaw(setupWheelDragPointerId);
     });
-    el.addEventListener("pointermove", e => {
+    el.addEventListener("pointermove", setupWheelDragValue => {
       if (!isDragging) return;
-      compute(e);
+      setupWheelDragValueRaw(setupWheelDragValue);
     });
-    const end = e => {
+    const setupWheelDragCallback = pointerIdArg => {
       isDragging = false;
-      try { el.releasePointerCapture(e.pointerId); } catch {}
+      try { el.releasePointerCapture(pointerIdArg.pointerId); } catch {}
     };
-    el.addEventListener("pointerup", end);
-    el.addEventListener("pointercancel", end);
+    el.addEventListener("pointerup", setupWheelDragCallback);
+    el.addEventListener("pointercancel", setupWheelDragCallback);
   }
 
   function updateMtReadouts() {
-    const r = document.getElementById("omMtReadout");
-    if (!r) return;
+    const updateMtReadoutsOmMtReadoutEl = document.getElementById("omMtReadout");
+    if (!updateMtReadoutsOmMtReadoutEl) return;
     const layer = getCurLayer();
     if (!layer) return;
-    const tr = ensureTransform(layer);
+    const updateMtReadoutsEnsureTransform = ensureTransform(layer);
 
     if (curTab === "pos") {
-      const loc = tr.location.value || [0, 0, 0];
-      r.innerHTML = `
-        <label class="om-mt-pill"><span>X</span><input type="number" id="omMtInpX" value="${Math.round(loc[0])}">px</label>
-        <label class="om-mt-pill"><span>Y</span><input type="number" id="omMtInpY" value="${Math.round(loc[1])}">px</label>
-        <label class="om-mt-pill"><span>Z</span><input type="number" id="omMtInpZ" value="${Math.round(loc[2] || 0)}"></label>
+      const updateMtReadoutsValue = updateMtReadoutsEnsureTransform.location.value || [0, 0, 0];
+      updateMtReadoutsOmMtReadoutEl.innerHTML = `
+        <label class="om-mt-pill"><span>X</span><input type="number" id="omMtInpX" value="${Math.round(updateMtReadoutsValue[0])}">px</label>
+        <label class="om-mt-pill"><span>Y</span><input type="number" id="omMtInpY" value="${Math.round(updateMtReadoutsValue[1])}">px</label>
+        <label class="om-mt-pill"><span>Z</span><input type="number" id="omMtInpZ" value="${Math.round(updateMtReadoutsValue[2] || 0)}"></label>
         <button type="button" class="om-mt-btn-toggle" id="omMtTogglePivotBtn">Titik Jangkar (Pivot)</button>
       `;
-      bindPillInput("omMtInpX", v => setPropValue(layer, "location", [v, loc[1], loc[2] || 0]));
-      bindPillInput("omMtInpY", v => setPropValue(layer, "location", [loc[0], v, loc[2] || 0]));
-      bindPillInput("omMtInpZ", v => setPropValue(layer, "location", [loc[0], loc[1], v]));
-      r.querySelector("#omMtTogglePivotBtn").addEventListener("click", () => switchTab("pivot"));
+      bindPillInput("omMtInpX", updateMtReadoutsArg => setPropValue(layer, "location", [updateMtReadoutsArg, updateMtReadoutsValue[1], updateMtReadoutsValue[2] || 0]));
+      bindPillInput("omMtInpY", updateMtReadoutsArgValue => setPropValue(layer, "location", [updateMtReadoutsValue[0], updateMtReadoutsArgValue, updateMtReadoutsValue[2] || 0]));
+      bindPillInput("omMtInpZ", updateMtReadoutsArgRaw => setPropValue(layer, "location", [updateMtReadoutsValue[0], updateMtReadoutsValue[1], updateMtReadoutsArgRaw]));
+      updateMtReadoutsOmMtReadoutEl.querySelector("#omMtTogglePivotBtn").addEventListener("click", () => switchTab("pivot"));
     } else if (curTab === "pivot") {
-      const p = tr.pivot.value || [0, 0];
-      r.innerHTML = `
-        <label class="om-mt-pill"><span>Jangkar X</span><input type="number" id="omMtInpPX" value="${Math.round(p[0])}">px</label>
-        <label class="om-mt-pill"><span>Jangkar Y</span><input type="number" id="omMtInpPY" value="${Math.round(p[1])}">px</label>
+      const updateMtReadoutsResult = updateMtReadoutsEnsureTransform.pivot.value || [0, 0];
+      updateMtReadoutsOmMtReadoutEl.innerHTML = `
+        <label class="om-mt-pill"><span>Jangkar X</span><input type="number" id="omMtInpPX" value="${Math.round(updateMtReadoutsResult[0])}">px</label>
+        <label class="om-mt-pill"><span>Jangkar Y</span><input type="number" id="omMtInpPY" value="${Math.round(updateMtReadoutsResult[1])}">px</label>
         <button type="button" class="om-mt-btn-toggle active" id="omMtBackPosBtn">Kembali ke Posisi</button>
       `;
-      bindPillInput("omMtInpPX", v => setPropValue(layer, "pivot", [v, p[1]]));
-      bindPillInput("omMtInpPY", v => setPropValue(layer, "pivot", [p[0], v]));
-      r.querySelector("#omMtBackPosBtn").addEventListener("click", () => switchTab("pos"));
+      bindPillInput("omMtInpPX", updateMtReadoutsArgParsed => setPropValue(layer, "pivot", [updateMtReadoutsArgParsed, updateMtReadoutsResult[1]]));
+      bindPillInput("omMtInpPY", updateMtReadoutsArgClamped => setPropValue(layer, "pivot", [updateMtReadoutsResult[0], updateMtReadoutsArgClamped]));
+      updateMtReadoutsOmMtReadoutEl.querySelector("#omMtBackPosBtn").addEventListener("click", () => switchTab("pos"));
     } else if (curTab === "rot") {
-      const deg = Number(tr.rotation.value ? tr.rotation.value[0] : 0);
-      r.innerHTML = `
-        <label class="om-mt-pill"><span>Sudut</span><input type="number" step="0.5" id="omMtInpRot" value="${deg}">°</label>
+      const updateMtReadoutsNumber = Number(updateMtReadoutsEnsureTransform.rotation.value ? updateMtReadoutsEnsureTransform.rotation.value[0] : 0);
+      updateMtReadoutsOmMtReadoutEl.innerHTML = `
+        <label class="om-mt-pill"><span>Sudut</span><input type="number" step="0.5" id="omMtInpRot" value="${updateMtReadoutsNumber}">°</label>
         <button type="button" class="om-mt-btn-toggle" id="omMtResetRot">Reset 0°</button>
       `;
-      bindPillInput("omMtInpRot", v => setPropValue(layer, "rotation", [v]));
-      r.querySelector("#omMtResetRot").addEventListener("click", () => {
+      bindPillInput("omMtInpRot", updateMtReadoutsClamped => setPropValue(layer, "rotation", [updateMtReadoutsClamped]));
+      updateMtReadoutsOmMtReadoutEl.querySelector("#omMtResetRot").addEventListener("click", () => {
         setPropValue(layer, "rotation", [0]);
-        commitTransformChange(layer, I.sceneSnapshot ? I.sceneSnapshot() : null);
+        commitTransformChange(layer, initAmMoveTransfValue.sceneSnapshot ? initAmMoveTransfValue.sceneSnapshot() : null);
         updateMtCenter();
       });
     } else if (curTab === "scale") {
-      const sc = tr.scale.value || [1, 1];
-      r.innerHTML = `
-        <label class="om-mt-pill"><span>Skala X</span><input type="number" step="0.1" id="omMtInpSX" value="${sc[0]}"></label>
+      const updateMtReadoutsValueRaw = updateMtReadoutsEnsureTransform.scale.value || [1, 1];
+      updateMtReadoutsOmMtReadoutEl.innerHTML = `
+        <label class="om-mt-pill"><span>Skala X</span><input type="number" step="0.1" id="omMtInpSX" value="${updateMtReadoutsValueRaw[0]}"></label>
         <button type="button" class="om-mt-btn-toggle ${linkAspect ? "active" : ""}" id="omMtLinkAspect" title="Kunci perbandingan aspek">
           ${linkAspect ? "🔗 Terkunci" : "🔓 Bebas"}
         </button>
-        <label class="om-mt-pill"><span>Skala Y</span><input type="number" step="0.1" id="omMtInpSY" value="${sc[1]}"></label>
+        <label class="om-mt-pill"><span>Skala Y</span><input type="number" step="0.1" id="omMtInpSY" value="${updateMtReadoutsValueRaw[1]}"></label>
       `;
-      bindPillInput("omMtInpSX", v => {
-        const ny = linkAspect ? v : sc[1];
-        setPropValue(layer, "scale", [v, ny]);
+      bindPillInput("omMtInpSX", updateMtReadoutsCondition => {
+        const updateMtReadoutsValueParsed = linkAspect ? updateMtReadoutsCondition : updateMtReadoutsValueRaw[1];
+        setPropValue(layer, "scale", [updateMtReadoutsCondition, updateMtReadoutsValueParsed]);
       });
-      bindPillInput("omMtInpSY", v => {
-        const nx = linkAspect ? v : sc[0];
-        setPropValue(layer, "scale", [nx, v]);
+      bindPillInput("omMtInpSY", updateMtReadoutsFlag => {
+        const updateMtReadoutsParsed = linkAspect ? updateMtReadoutsFlag : updateMtReadoutsValueRaw[0];
+        setPropValue(layer, "scale", [updateMtReadoutsParsed, updateMtReadoutsFlag]);
       });
-      r.querySelector("#omMtLinkAspect").addEventListener("click", () => {
+      updateMtReadoutsOmMtReadoutEl.querySelector("#omMtLinkAspect").addEventListener("click", () => {
         linkAspect = !linkAspect;
         updateMtReadouts();
       });
     } else if (curTab === "skew") {
-      const sk = tr.skew.value || [0, 0];
-      r.innerHTML = `
-        <label class="om-mt-pill"><span>Skew X</span><input type="number" step="0.5" id="omMtInpSKX" value="${sk[0]}">°</label>
-        <label class="om-mt-pill"><span>Skew Y</span><input type="number" step="0.5" id="omMtInpSKY" value="${sk[1]}">°</label>
+      const updateMtReadoutsRaw = updateMtReadoutsEnsureTransform.skew.value || [0, 0];
+      updateMtReadoutsOmMtReadoutEl.innerHTML = `
+        <label class="om-mt-pill"><span>Skew X</span><input type="number" step="0.5" id="omMtInpSKX" value="${updateMtReadoutsRaw[0]}">°</label>
+        <label class="om-mt-pill"><span>Skew Y</span><input type="number" step="0.5" id="omMtInpSKY" value="${updateMtReadoutsRaw[1]}">°</label>
         <button type="button" class="om-mt-btn-toggle" id="omMtResetSkew">Reset 0°</button>
       `;
-      bindPillInput("omMtInpSKX", v => setPropValue(layer, "skew", [v, sk[1]]));
-      bindPillInput("omMtInpSKY", v => setPropValue(layer, "skew", [sk[0], v]));
-      r.querySelector("#omMtResetSkew").addEventListener("click", () => {
+      bindPillInput("omMtInpSKX", updateMtReadoutsArgScoped => setPropValue(layer, "skew", [updateMtReadoutsArgScoped, updateMtReadoutsRaw[1]]));
+      bindPillInput("omMtInpSKY", argScoped => setPropValue(layer, "skew", [updateMtReadoutsRaw[0], argScoped]));
+      updateMtReadoutsOmMtReadoutEl.querySelector("#omMtResetSkew").addEventListener("click", () => {
         setPropValue(layer, "skew", [0, 0]);
-        commitTransformChange(layer, I.sceneSnapshot ? I.sceneSnapshot() : null);
+        commitTransformChange(layer, initAmMoveTransfValue.sceneSnapshot ? initAmMoveTransfValue.sceneSnapshot() : null);
         updateMtCenter();
       });
     }
   }
 
   function bindPillInput(id, onChange) {
-    const inp = document.getElementById(id);
-    if (!inp) return;
-    inp.addEventListener("change", () => {
-      const v = Number(inp.value) || 0;
-      const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
-      onChange(v);
+    const bindPillInputElement = document.getElementById(id);
+    if (!bindPillInputElement) return;
+    bindPillInputElement.addEventListener("change", () => {
+      const bindPillInputValue = Number(bindPillInputElement.value) || 0;
+      const snap = initAmMoveTransfValue.sceneSnapshot ? initAmMoveTransfValue.sceneSnapshot() : null;
+      onChange(bindPillInputValue);
       commitTransformChange(getCurLayer(), snap);
     });
   }
 
-  function switchTab(tab) {
-    if (tab === "pos" && curTab === "pos") curTab = "pivot";
-    else if (tab === "pos" && curTab === "pivot") curTab = "pos";
-    else curTab = tab;
+  function switchTab(switchTabArg) {
+    if (switchTabArg === "pos" && curTab === "pos") curTab = "pivot";
+    else if (switchTabArg === "pos" && curTab === "pivot") curTab = "pos";
+    else curTab = switchTabArg;
 
-    document.querySelectorAll("#omMtTabs .om-mt-tab-btn").forEach(btn => {
-      const t = btn.dataset.tab;
-      btn.classList.toggle("active", t === (curTab === "pivot" ? "pos" : curTab));
-      btn.classList.toggle("pivot-mode", curTab === "pivot" && t === "pos");
+    document.querySelectorAll("#omMtTabs .om-mt-tab-btn").forEach(dataset => {
+      const switchTabResult = dataset.dataset.tab;
+      dataset.classList.toggle("active", switchTabResult === (curTab === "pivot" ? "pos" : curTab));
+      dataset.classList.toggle("pivot-mode", curTab === "pivot" && switchTabResult === "pos");
     });
     const posLabel = document.getElementById("omMtPosLabel");
     if (posLabel) posLabel.textContent = curTab === "pivot" ? "Jangkar" : "Posisi";
@@ -1130,39 +1130,39 @@
     const kfBtn = document.getElementById("omMtKfBtn");
     if (!kfBtn) return;
     const prop = getActiveProp();
-    const tt = (I.H || 0) / 1000;
-    const hasKfAtPlayhead = prop && prop.kfs && prop.kfs.some(k => Math.abs(Number(k.t) - tt) < 0.002);
+    const updateMtKfButtonValue = (initAmMoveTransfValue.H || 0) / 1000;
+    const hasKfAtPlayhead = prop && prop.kfs && prop.kfs.some(updateMtKfButtonT => Math.abs(Number(updateMtKfButtonT.t) - updateMtKfButtonValue) < 0.002);
     kfBtn.classList.toggle("active", !!hasKfAtPlayhead);
-    const img = kfBtn.querySelector("img");
-    if (img) {
-      img.src = hasKfAtPlayhead ? "./icons/ic_keyframe_delete_big.svg" : "./icons/ic_keyframe_add_big.svg";
+    const updateMtKfButtonImgEl = kfBtn.querySelector("img");
+    if (updateMtKfButtonImgEl) {
+      updateMtKfButtonImgEl.src = hasKfAtPlayhead ? "./icons/ic_keyframe_delete_big.svg" : "./icons/ic_keyframe_add_big.svg";
     }
   }
 
   function stepToKeyframe(direction) {
     const prop = getActiveProp();
     if (!prop || !prop.kfs || !prop.kfs.length) {
-      if (I.handle9) I.handle9("[KEYFRAME] Tidak ada keyframe pada properti aktif");
+      if (initAmMoveTransfValue.handle9) initAmMoveTransfValue.handle9("[KEYFRAME] Tidak ada keyframe pada properti aktif");
       return;
     }
-    const curT = (I.H || 0) / 1000;
+    const curT = (initAmMoveTransfValue.H || 0) / 1000;
     let targetKf = null;
     if (direction < 0) {
-      const prevs = prop.kfs.filter(k => Number(k.t) < curT - 0.005);
+      const prevs = prop.kfs.filter(stepToKeyframeArg => Number(stepToKeyframeArg.t) < curT - 0.005);
       if (!prevs.length) return;
-      targetKf = prevs.reduce((p, c) => (Number(c.t) > Number(p.t) ? c : p));
+      targetKf = prevs.reduce((stepToKeyframeCondition, stepToKeyframeT) => (Number(stepToKeyframeT.t) > Number(stepToKeyframeCondition.t) ? stepToKeyframeT : stepToKeyframeCondition));
     } else {
-      const nexts = prop.kfs.filter(k => Number(k.t) > curT + 0.005);
+      const nexts = prop.kfs.filter(stepToKeyframeArgValue => Number(stepToKeyframeArgValue.t) > curT + 0.005);
       if (!nexts.length) return;
-      targetKf = nexts.reduce((p, c) => (Number(c.t) < Number(p.t) ? c : p));
+      targetKf = nexts.reduce((tArg, stepToKeyframeFlag) => (Number(stepToKeyframeFlag.t) < Number(tArg.t) ? stepToKeyframeFlag : tArg));
     }
     if (!targetKf) return;
     const targetMs = Math.round(Number(targetKf.t) * 1000);
-    if (I.seek) {
-      I.seek(targetMs);
+    if (initAmMoveTransfValue.seek) {
+      initAmMoveTransfValue.seek(targetMs);
     } else {
-      I.H = targetMs;
-      if (I.val2 && I.val2.renderAt) I.val2.renderAt(targetMs);
+      initAmMoveTransfValue.H = targetMs;
+      if (initAmMoveTransfValue.val2 && initAmMoveTransfValue.val2.renderAt) initAmMoveTransfValue.val2.renderAt(targetMs);
     }
     updateMtKfButton();
     updateMtReadouts();
@@ -1172,7 +1172,7 @@
   function resetCurrentTransform() {
     const layer = getCurLayer();
     if (!layer || !layer.transform) return;
-    const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
+    const snap = initAmMoveTransfValue.sceneSnapshot ? initAmMoveTransfValue.sceneSnapshot() : null;
 
     if (curTab === "pos") {
       setPropValue(layer, "location", [0, 0, 0]);
@@ -1190,22 +1190,22 @@
     updateMtReadouts();
     updateMtKfButton();
     drawGizmo();
-    if (I.handle9) I.handle9("[TRANSFORM] Properti di-reset");
+    if (initAmMoveTransfValue.handle9) initAmMoveTransfValue.handle9("[TRANSFORM] Properti di-reset");
   }
 
   function upgradeMultiSelectBar() {
-    let bar = document.getElementById("omMultiBar");
-    if (!I.omMulti || !I.omMulti.size) {
-      if (bar) bar.remove();
+    let upgradeMultiSeleOmMultiBarEl = document.getElementById("omMultiBar");
+    if (!initAmMoveTransfValue.omMulti || !initAmMoveTransfValue.omMulti.size) {
+      if (upgradeMultiSeleOmMultiBarEl) upgradeMultiSeleOmMultiBarEl.remove();
       return;
     }
-    if (!bar) {
-      bar = document.createElement("div");
-      bar.id = "omMultiBar";
-      document.body.appendChild(bar);
+    if (!upgradeMultiSeleOmMultiBarEl) {
+      upgradeMultiSeleOmMultiBarEl = document.createElement("div");
+      upgradeMultiSeleOmMultiBarEl.id = "omMultiBar";
+      document.body.appendChild(upgradeMultiSeleOmMultiBarEl);
     }
-    const count = I.omMulti.size;
-    bar.innerHTML = `
+    const count = initAmMoveTransfValue.omMulti.size;
+    upgradeMultiSeleOmMultiBarEl.innerHTML = `
       <span id="omMultiCount">${count} dipilih</span>
       <button type="button" id="omMGroup" title="Gabung jadi Grup biasa">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg>
@@ -1228,59 +1228,59 @@
       </button>
     `;
 
-    bar.querySelector("#omMGroup").addEventListener("click", () => executeGroup("group"));
-    bar.querySelector("#omMMask").addEventListener("click", () => executeGroup("mask"));
-    bar.querySelector("#omMExclude").addEventListener("click", () => executeGroup("exclude"));
-    bar.querySelector("#omMDelete").addEventListener("click", () => {
+    upgradeMultiSeleOmMultiBarEl.querySelector("#omMGroup").addEventListener("click", () => executeGroup("group"));
+    upgradeMultiSeleOmMultiBarEl.querySelector("#omMMask").addEventListener("click", () => executeGroup("mask"));
+    upgradeMultiSeleOmMultiBarEl.querySelector("#omMExclude").addEventListener("click", () => executeGroup("exclude"));
+    upgradeMultiSeleOmMultiBarEl.querySelector("#omMDelete").addEventListener("click", () => {
       if (typeof window.omMultiDelete === "function") window.omMultiDelete();
     });
-    bar.querySelector("#omMClear").addEventListener("click", () => {
+    upgradeMultiSeleOmMultiBarEl.querySelector("#omMClear").addEventListener("click", () => {
       if (typeof window.omMultiClear === "function") window.omMultiClear();
     });
   }
 
   function executeGroup(type) {
-    if (!I.val || !I.omMulti || !I.omMulti.size) return;
-    const ids = [...I.omMulti];
-    const layers = ids.map(id => typeof window.omResolveLayer === "function" ? window.omResolveLayer(id) : null).filter(Boolean);
+    if (!initAmMoveTransfValue.val || !initAmMoveTransfValue.omMulti || !initAmMoveTransfValue.omMulti.size) return;
+    const executeGroupItems = [...initAmMoveTransfValue.omMulti];
+    const layers = executeGroupItems.map(id => typeof window.omResolveLayer === "function" ? window.omResolveLayer(id) : null).filter(Boolean);
     if (!layers.length) return;
 
-    const m = I.omMeta ? I.omMeta() : { w: 720, h: 1280, total: 10000, fps: 30 };
-    const parents = new Set(layers.map(l => I.findParentArray ? I.findParentArray(l) : null));
+    const executeGroupW = initAmMoveTransfValue.omMeta ? initAmMoveTransfValue.omMeta() : { w: 720, h: 1280, total: 10000, fps: 30 };
+    const parents = new Set(layers.map(executeGroupArgValue => initAmMoveTransfValue.findParentArray ? initAmMoveTransfValue.findParentArray(executeGroupArgValue) : null));
     if (parents.size > 1) {
-      if (I.handle9) I.handle9("[GRUP] Pilih layer dari level grup yang sama");
+      if (initAmMoveTransfValue.handle9) initAmMoveTransfValue.handle9("[GRUP] Pilih layer dari level grup yang sama");
       return;
     }
-    const par = parents.values().next().value;
-    if (!par) return;
+    const executeGroupValue = parents.values().next().value;
+    if (!executeGroupValue) return;
 
-    const xmls = layers.map(l => l.sourceXml || "").filter(Boolean);
+    const xmls = layers.map(sourceXml => sourceXml.sourceXml || "").filter(Boolean);
     if (!xmls.length) return;
 
-    const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
+    const snap = initAmMoveTransfValue.sceneSnapshot ? initAmMoveTransfValue.sceneSnapshot() : null;
     const title = type === "mask" ? "Grup Masker" : (type === "exclude" ? "Grup Exclude" : "Grup");
     const maskAttr = type === "mask" ? ' mask="alpha"' : (type === "exclude" ? ' blendMode="exclude"' : "");
 
-    const inner = `<scene title="${title}" width="${m.w}" height="${m.h}" exportWidth="${m.w}" exportHeight="${m.h}" precompose="dynamicResolution" bgcolor="#ff000000" totalTime="${m.total}" fps="${m.fps}">${xmls.join('')}</scene>`;
-    const gXml = `<embedScene id="${I.omId()}" label="${title}" startTime="0" endTime="${m.total}"${maskAttr}>${inner}${I.omTransformXml(Math.round(m.w / 2), Math.round(m.h / 2), 1)}</embedScene>`;
+    const inner = `<scene title="${title}" width="${executeGroupW.w}" height="${executeGroupW.h}" exportWidth="${executeGroupW.w}" exportHeight="${executeGroupW.h}" precompose="dynamicResolution" bgcolor="#ff000000" totalTime="${executeGroupW.total}" fps="${executeGroupW.fps}">${xmls.join('')}</scene>`;
+    const gXml = `<embedScene id="${initAmMoveTransfValue.omId()}" label="${title}" startTime="0" endTime="${executeGroupW.total}"${maskAttr}>${inner}${initAmMoveTransfValue.omTransformXml(Math.round(executeGroupW.w / 2), Math.round(executeGroupW.h / 2), 1)}</embedScene>`;
 
-    const g = I.omParseLayer(gXml);
-    if (!g) return;
+    const omParseLayer = initAmMoveTransfValue.omParseLayer(gXml);
+    if (!omParseLayer) return;
 
-    layers.forEach(l => {
-      const p = I.findParentArray ? I.findParentArray(l) : null;
-      if (p) p.splice(p.indexOf(l), 1);
+    layers.forEach(executeGroupArg => {
+      const executeGroupFlag = initAmMoveTransfValue.findParentArray ? initAmMoveTransfValue.findParentArray(executeGroupArg) : null;
+      if (executeGroupFlag) executeGroupFlag.splice(executeGroupFlag.indexOf(executeGroupArg), 1);
     });
-    par.push(g);
+    executeGroupValue.push(omParseLayer);
 
-    if (I.pushUndo) I.pushUndo(snap);
-    I.V = true;
-    I.omMulti.clear();
-    if (I.handle9) I.handle9(`[GRUP] ${xmls.length} layer digabung jadi "${title}"`);
+    if (initAmMoveTransfValue.pushUndo) initAmMoveTransfValue.pushUndo(snap);
+    initAmMoveTransfValue.V = true;
+    initAmMoveTransfValue.omMulti.clear();
+    if (initAmMoveTransfValue.handle9) initAmMoveTransfValue.handle9(`[GRUP] ${xmls.length} layer digabung jadi "${title}"`);
     upgradeMultiSelectBar();
 
-    if (I.omHandle21InContext) {
-      I.omHandle21InContext().then(() => {
+    if (initAmMoveTransfValue.omHandle21InContext) {
+      initAmMoveTransfValue.omHandle21InContext().then(() => {
         upgradeMultiSelectBar();
         drawGizmo();
       });
@@ -1289,8 +1289,8 @@
 
   document.getElementById("omMtClose").addEventListener("click", closeMoveTransform);
 
-  document.querySelectorAll("#omMtTabs .om-mt-tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+  document.querySelectorAll("#omMtTabs .om-mt-tab-btn").forEach(addEventListener => {
+    addEventListener.addEventListener("click", () => switchTab(addEventListener.dataset.tab));
   });
 
   document.getElementById("omMtKfBtn").addEventListener("click", () => {
@@ -1298,12 +1298,12 @@
     if (!layer || !layer.transform) return;
     const propKey = getActivePropKey();
     const prop = getActiveProp();
-    const tt = (I.H || 0) / 1000;
-    const hasKfAtPlayhead = prop && prop.kfs && prop.kfs.some(k => Math.abs(Number(k.t) - tt) < 0.002);
+    const initAmMoveTransformResult = (initAmMoveTransfValue.H || 0) / 1000;
+    const hasKfAtPlayhead = prop && prop.kfs && prop.kfs.some(initAmMoveTransformT => Math.abs(Number(initAmMoveTransformT.t) - initAmMoveTransformResult) < 0.002);
     if (hasKfAtPlayhead) {
-      if (I.omKfRemoveAt) I.omKfRemoveAt(propKey);
+      if (initAmMoveTransfValue.omKfRemoveAt) initAmMoveTransfValue.omKfRemoveAt(propKey);
     } else {
-      if (I.omKfInsert) I.omKfInsert(propKey);
+      if (initAmMoveTransfValue.omKfInsert) initAmMoveTransfValue.omKfInsert(propKey);
     }
     updateMtKfButton();
     drawGizmo();
@@ -1326,8 +1326,8 @@
           if (pPanel) pPanel.classList.add("on");
         }
       });
-    } else if (I.omOpenCurve) {
-      I.omOpenCurve();
+    } else if (initAmMoveTransfValue.omOpenCurve) {
+      initAmMoveTransfValue.omOpenCurve();
     }
   });
 
@@ -1336,11 +1336,11 @@
   window.omDrawGizmo = drawGizmo;
   window.omUpgradeMultiSelectBar = upgradeMultiSelectBar;
 
-  window.omOnLayerSelected = function(l) {
+  window.omOnLayerSelected = function(label) {
     if (mtPanel.classList.contains("on")) {
-      if (!l) closeMoveTransform();
+      if (!label) closeMoveTransform();
       else {
-        document.getElementById("omMtLayerName").textContent = l.label || l.id;
+        document.getElementById("omMtLayerName").textContent = label.label || label.id;
         updateMtCenter();
         updateMtReadouts();
         updateMtKfButton();
@@ -1357,7 +1357,7 @@
   };
 
   setInterval(() => {
-    if (I.omMulti) upgradeMultiSelectBar();
+    if (initAmMoveTransfValue.omMulti) upgradeMultiSelectBar();
   }, 300);
 
   window.addEventListener("resize", drawGizmo);

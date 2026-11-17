@@ -2,7 +2,7 @@ const http = require("http");
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
-const url = require("url");
+const nodeUrl = require("url");
 const crypto = require("crypto");
 
 const PORT = Number(process.env.OM_PORT) || 3000;
@@ -33,24 +33,24 @@ const MIME_TYPES = {
 };
 
 fs.mkdirSync(PROJECTS_DIR, { recursive: true });
-process.on("uncaughtException", e => console.error("[uncaught]", e && e.message));
-process.on("unhandledRejection", e => console.error("[unhandled]", e && e.message));
+process.on("uncaughtException", localMessage => console.error("[uncaught]", localMessage && localMessage.message));
+process.on("unhandledRejection", message => console.error("[unhandled]", message && message.message));
 
-function ensureDir(p) {
-  fs.mkdirSync(p, { recursive: true });
+function ensureDir(ensureDirValue) {
+  fs.mkdirSync(ensureDirValue, { recursive: true });
 }
-function sha(s) {
-  return crypto.createHash("sha256").update(String(s)).digest("hex");
+function sha(shaValue) {
+  return crypto.createHash("sha256").update(String(shaValue)).digest("hex");
 }
-function randId(len = 22) {
+function randId(randIdArg = 22) {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const bytes = crypto.randomBytes(len);
-  let out = "";
-  for (let i = 0; i < len; i++) out += alphabet[bytes[i] % alphabet.length];
-  return out;
+  const bytes = crypto.randomBytes(randIdArg);
+  let randIdText = "";
+  for (let randIdNumber = 0; randIdNumber < randIdArg; randIdNumber++) randIdText += alphabet[bytes[randIdNumber] % alphabet.length];
+  return randIdText;
 }
 const isValidId = id => /^[A-Za-z0-9_-]{16,64}$/.test(id || "");
-const safeName = n => String(n || "").replace(/[\\/:*?"<>|]/g, "_").slice(0, 180);
+const safeName = safeNameCondition => String(safeNameCondition || "").replace(/[\\/:*?"<>|]/g, "_").slice(0, 180);
 const projDir = id => path.join(PROJECTS_DIR, id);
 const metaPath = id => path.join(projDir(id), "meta.json");
 const scenePath = id => path.join(projDir(id), "scene.xml");
@@ -58,7 +58,7 @@ const scenePath = id => path.join(projDir(id), "scene.xml");
 function readMeta(id) {
   try {
     return JSON.parse(fs.readFileSync(metaPath(id), "utf8"));
-  } catch (e) {
+  } catch (readMetaResult) {
     return null;
   }
 }
@@ -67,45 +67,45 @@ function writeMeta(id, meta) {
   fs.writeFileSync(metaPath(id), JSON.stringify(meta));
 }
 function touchMeta(id) {
-  const m = readMeta(id);
-  if (!m) return;
-  m.lastSeen = Date.now();
-  writeMeta(id, m);
+  const touchMetaReadMeta = readMeta(id);
+  if (!touchMetaReadMeta) return;
+  touchMetaReadMeta.lastSeen = Date.now();
+  writeMeta(id, touchMetaReadMeta);
 }
-function uidOf(req) {
-  const cookies = String(req.headers.cookie || "").split(";").map(s => s.trim());
-  for (const c of cookies) {
-    if (c.startsWith("om_uid=")) {
-      const v = decodeURIComponent(c.slice(7));
-      if (/^[A-Za-z0-9_-]{10,64}$/.test(v)) return v;
+function uidOf(uidOfHeaders) {
+  const cookies = String(uidOfHeaders.headers.cookie || "").split(";").map(uidOfArg => uidOfArg.trim());
+  for (const uidOfValue of cookies) {
+    if (uidOfValue.startsWith("om_uid=")) {
+      const decodeUriComponent = decodeURIComponent(uidOfValue.slice(7));
+      if (/^[A-Za-z0-9_-]{10,64}$/.test(decodeUriComponent)) return decodeUriComponent;
     }
   }
   return "u" + randId(20);
 }
-function newUidCookie(uid) {
-  return `om_uid=${uid}; Path=/; Max-Age=31536000; SameSite=Lax`;
+function newUidCookie(newUidCookieArg) {
+  return `om_uid=${newUidCookieArg}; Path=/; Max-Age=31536000; SameSite=Lax`;
 }
-function readBody(req, limit = 200 * 1024 * 1024) {
+function readBody(readBodyOn, limit = 200 * 1024 * 1024) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
-    req.on("data", ch => {
-      size += ch.length;
+    readBodyOn.on("data", readBodyArg => {
+      size += readBodyArg.length;
       if (size > limit) {
         reject(new Error("body too large"));
-        req.destroy();
+        readBodyOn.destroy();
         return;
       }
-      chunks.push(ch);
+      chunks.push(readBodyArg);
     });
-    req.on("end", () => resolve(Buffer.concat(chunks)));
-    req.on("error", reject);
+    readBodyOn.on("end", () => resolve(Buffer.concat(chunks)));
+    readBodyOn.on("error", reject);
   });
 }
-function json(res, code, obj) {
-  const body = JSON.stringify(obj);
-  res.writeHead(code, { "Content-Type": "application/json", "Cache-Control": "no-store" });
-  res.end(body);
+function json(writeHead, code, jsonValue) {
+  const body = JSON.stringify(jsonValue);
+  writeHead.writeHead(code, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+  writeHead.end(body);
   return true;
 }
 function cleanupExpired() {
@@ -113,18 +113,18 @@ function cleanupExpired() {
   let entries = [];
   try {
     entries = fs.readdirSync(PROJECTS_DIR);
-  } catch (e) {
+  } catch (cleanupExpiredValue) {
     return removed;
   }
-  const now = Date.now();
+  const cleanupExpiredNow = Date.now();
   for (const id of entries) {
-    const m = readMeta(id);
-    const last = m && (m.lastSeen || m.createdAt) || 0;
-    if (now - last > DAY_MS) {
+    const cleanupExpiredReadMeta = readMeta(id);
+    const last = cleanupExpiredReadMeta && (cleanupExpiredReadMeta.lastSeen || cleanupExpiredReadMeta.createdAt) || 0;
+    if (cleanupExpiredNow - last > DAY_MS) {
       try {
         fs.rmSync(projDir(id), { recursive: true, force: true });
         removed++;
-      } catch (e) {}
+      } catch (cleanupExpiredResult) {}
     }
   }
   if (removed) console.log(`[storage] dibersihkan ${removed} proyek lewat 24 jam`);
@@ -138,7 +138,7 @@ function loadEffectIndex() {
   if (!effectIndex) {
     try {
       effectIndex = JSON.parse(fs.readFileSync(path.join(PUBLIC_DIR, "effect-index.json"), "utf8"));
-    } catch (e) {
+    } catch (loadEffectIndexValue) {
       effectIndex = {};
     }
   }
@@ -147,39 +147,39 @@ function loadEffectIndex() {
 
 function fetchRemoteProjectXml(targetUrl, project = null) {
   return new Promise((resolve, reject) => {
-    let p = `/api/project-xml?url=${encodeURIComponent(targetUrl)}`;
-    if (project) p += `&project=${encodeURIComponent(project)}`;
-    const req = https.request({
+    let fetchRemoteProjeText = `/api/project-xml?url=${encodeURIComponent(targetUrl)}`;
+    if (project) fetchRemoteProjeText += `&project=${encodeURIComponent(project)}`;
+    const fetchRemoteProjectXmlRequest = https.request({
       hostname: REMOTE_HOST,
       port: 443,
-      path: p,
+      path: fetchRemoteProjeText,
       method: "GET",
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Referer": `https://${REMOTE_HOST}/runtime/preset.html`,
         "Accept": "application/json, text/plain, */*"
       }
-    }, res => {
+    }, fetchRemoteProjectXmlOn => {
       let body = "";
-      res.on("data", c => body += c);
-      res.on("end", () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
+      fetchRemoteProjectXmlOn.on("data", fetchRemoteProjectXmlArg => body += fetchRemoteProjectXmlArg);
+      fetchRemoteProjectXmlOn.on("end", () => {
+        if (fetchRemoteProjectXmlOn.statusCode >= 200 && fetchRemoteProjectXmlOn.statusCode < 300) {
           try {
-            const data = JSON.parse(body);
-            if (data && (data.xml || data.success || data.projects)) {
-              return resolve(data);
+            const projectData = JSON.parse(body);
+            if (projectData && (projectData.xml || projectData.success || projectData.projects)) {
+              return resolve(projectData);
             }
-          } catch (e) {}
+          } catch (fetchRemoteProjectXmlValue) {}
         }
-        reject(new Error(`Server preset mengembalikan HTTP ${res.statusCode}`));
+        reject(new Error(`Server preset mengembalikan HTTP ${fetchRemoteProjectXmlOn.statusCode}`));
       });
     });
-    req.on("error", reject);
-    req.setTimeout(60000, () => {
-      req.destroy();
+    fetchRemoteProjectXmlRequest.on("error", reject);
+    fetchRemoteProjectXmlRequest.setTimeout(60000, () => {
+      fetchRemoteProjectXmlRequest.destroy();
       reject(new Error("Timeout saat menghubungi server preset"));
     });
-    req.end();
+    fetchRemoteProjectXmlRequest.end();
   });
 }
 
@@ -197,24 +197,24 @@ async function resolveProjectXml(targetUrl, project = null) {
   if (driveMatch) {
     const fileId = driveMatch[1];
     const downloadUrl = `https://docs.google.com/uc?export=download&id=${fileId}`;
-    const xml = await fetchUrlText(downloadUrl);
-    if (!/<scene[\s>]|<element[\s>]/i.test(xml)) {
+    const resolveProjectXmlResult = await fetchUrlText(downloadUrl);
+    if (!/<scene[\s>]|<element[\s>]/i.test(resolveProjectXmlResult)) {
       throw new Error("File Google Drive bukan merupakan file XML Alight Motion yang valid");
     }
     return {
-      xml,
+      xml: resolveProjectXmlResult,
       xmlName: "drive-" + fileId + ".xml",
       media: []
     };
   }
 
   // Direct XML URL
-  const text = await fetchUrlText(targetUrl);
-  if (/<scene[\s>]|<element[\s>]/i.test(text)) {
+  const resolveProjectXmlValue = await fetchUrlText(targetUrl);
+  if (/<scene[\s>]|<element[\s>]/i.test(resolveProjectXmlValue)) {
     let name = "preset.xml";
-    try { name = path.basename(new URL(targetUrl).pathname) || name; } catch (e) {}
+    try { name = path.basename(new URL(targetUrl).pathname) || name; } catch (resolveProjectXmlValueRaw) {}
     return {
-      xml: text,
+      xml: resolveProjectXmlValue,
       xmlName: name,
       media: []
     };
@@ -224,87 +224,87 @@ async function resolveProjectXml(targetUrl, project = null) {
   return await fetchRemoteProjectXml(targetUrl);
 }
 
-function fetchUrlText(u) {
+function fetchUrlText(fetchUrlTextArg) {
   return new Promise((resolve, reject) => {
-    const isHttps = u.startsWith("https:");
-    const mod = isHttps ? https : http;
-    mod.get(u, { headers: { "User-Agent": "Mozilla/5.0" } }, res => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return resolve(fetchUrlText(res.headers.location));
+    const isHttps = fetchUrlTextArg.startsWith("https:");
+    const fetchUrlTextValue = isHttps ? https : http;
+    fetchUrlTextValue.get(fetchUrlTextArg, { headers: { "User-Agent": "Mozilla/5.0" } }, statusCode => {
+      if (statusCode.statusCode >= 300 && statusCode.statusCode < 400 && statusCode.headers.location) {
+        return resolve(fetchUrlText(statusCode.headers.location));
       }
-      let d = "";
-      res.on("data", c => d += c);
-      res.on("end", () => resolve(d));
+      let fetchUrlTextResult = "";
+      statusCode.on("data", fetchUrlTextArgValue => fetchUrlTextResult += fetchUrlTextArgValue);
+      statusCode.on("end", () => resolve(fetchUrlTextResult));
     }).on("error", reject);
   });
 }
 
-async function handleApi(req, res, pathname, query) {
-  const uid = uidOf(req);
-  res.setHeader("Set-Cookie", newUidCookie(uid));
+async function handleApi(method, setHeader, pathname, query) {
+  const handleApiUidOf = uidOf(method);
+  setHeader.setHeader("Set-Cookie", newUidCookie(handleApiUidOf));
   const parts = pathname.split("/").filter(Boolean); // ["api","project",id,...]
 
   // /api/projects — daftar proyek & simpan proyek
   if (pathname === "/api/projects") {
-    if (req.method === "POST") {
+    if (method.method === "POST") {
       try {
-        const raw = (await readBody(req, 60 * 1024 * 1024)).toString("utf8");
-        const body = JSON.parse(raw);
+        const handleApiResult = (await readBody(method, 60 * 1024 * 1024)).toString("utf8");
+        const body = JSON.parse(handleApiResult);
         const id = (body.id && isValidId(body.id)) ? body.id : randId(22);
-        const m = readMeta(id) || { createdAt: Date.now(), owner: uid };
-        m.name = String(body.name || "Proyek").slice(0, 200);
-        m.width = Number(body.width) || 720;
-        m.height = Number(body.height) || 1280;
-        m.fps = Number(body.fps) || 30;
-        if (typeof body.thumb === "string") m.thumb = body.thumb.slice(0, 300000);
-        m.lastSeen = Date.now();
-        m.updatedAt = Date.now();
+        const handleApiValue = readMeta(id) || { createdAt: Date.now(), owner: handleApiUidOf };
+        handleApiValue.name = String(body.name || "Proyek").slice(0, 200);
+        handleApiValue.width = Number(body.width) || 720;
+        handleApiValue.height = Number(body.height) || 1280;
+        handleApiValue.fps = Number(body.fps) || 30;
+        if (typeof body.thumb === "string") handleApiValue.thumb = body.thumb.slice(0, 300000);
+        handleApiValue.lastSeen = Date.now();
+        handleApiValue.updatedAt = Date.now();
         ensureDir(projDir(id));
         if (body.xml) fs.writeFileSync(scenePath(id), String(body.xml));
-        writeMeta(id, m);
-        return json(res, 200, { ok: true, id, updatedAt: m.updatedAt });
-      } catch (e) {
-        return json(res, 500, { error: "save_failed", message: e.message });
+        writeMeta(id, handleApiValue);
+        return json(setHeader, 200, { ok: true, id, updatedAt: handleApiValue.updatedAt });
+      } catch (handleApiMessage) {
+        return json(setHeader, 500, { error: "save_failed", message: handleApiMessage.message });
       }
     }
 
-    const out = [];
+    const handleApiItems = [];
     let entries = [];
     try {
       entries = fs.readdirSync(PROJECTS_DIR);
-    } catch (e) {}
+    } catch (valueParsed) {}
     for (const id of entries) {
-      const m = readMeta(id);
-      if (!m) continue;
-      if (process.env.OM_MULTIUSER && m.owner && m.owner !== uid) continue;
-      let width = m.width;
-      let height = m.height;
-      let fps = m.fps;
+      const handleApiReadMeta = readMeta(id);
+      if (!handleApiReadMeta) continue;
+      if (process.env.OM_MULTIUSER && handleApiReadMeta.owner && handleApiReadMeta.owner !== handleApiUidOf) continue;
+      let width = handleApiReadMeta.width;
+      let height = handleApiReadMeta.height;
+      let handleApiFps = handleApiReadMeta.fps;
       if (!width || !height) {
         try {
-          const xml = fs.readFileSync(scenePath(id), "utf8");
-          const mW = xml.match(/width="(\d+)"/);
-          const mH = xml.match(/height="(\d+)"/);
-          const mF = xml.match(/fps="(\d+)"/);
-          if (mW) width = parseInt(mW[1], 10);
-          if (mH) height = parseInt(mH[1], 10);
-          if (mF) fps = parseInt(mF[1], 10);
-        } catch (e) {}
+          const readFileSync = fs.readFileSync(scenePath(id), "utf8");
+          const valueScoped = readFileSync.match(/width="(\d+)"/);
+          const handleApiFlag = readFileSync.match(/height="(\d+)"/);
+          const flagValue = readFileSync.match(/fps="(\d+)"/);
+          if (valueScoped) width = parseInt(valueScoped[1], 10);
+          if (handleApiFlag) height = parseInt(handleApiFlag[1], 10);
+          if (flagValue) handleApiFps = parseInt(flagValue[1], 10);
+        } catch (handleApiParsed) {}
       }
-      out.push({
+      handleApiItems.push({
         id,
-        name: m.name || "Proyek",
-        lastSeen: m.lastSeen || 0,
-        updatedAt: m.updatedAt || 0,
-        hasPassword: !!m.passwordHash,
+        name: handleApiReadMeta.name || "Proyek",
+        lastSeen: handleApiReadMeta.lastSeen || 0,
+        updatedAt: handleApiReadMeta.updatedAt || 0,
+        hasPassword: !!handleApiReadMeta.passwordHash,
         width: width || 720,
         height: height || 1280,
-        fps: fps || 30,
-        thumb: m.thumb || null
+        fps: handleApiFps || 30,
+        thumb: handleApiReadMeta.thumb || null
       });
     }
-    out.sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
-    json(res, 200, { uid, projects: out });
+    handleApiItems.sort((lastSeen, lastSeenArg) => (lastSeenArg.lastSeen || 0) - (lastSeen.lastSeen || 0));
+    json(setHeader, 200, { uid: handleApiUidOf, projects: handleApiItems });
     return true;
   }
 
@@ -313,115 +313,115 @@ async function handleApi(req, res, pathname, query) {
     const rest = parts.slice(3).join("/");
 
     // GET /api/project/<id> → meta
-    if (req.method === "GET" && rest === "") {
-      const m = readMeta(id);
-      if (!m) return json(res, 404, { error: "not_found" });
-      json(res, 200, { id, name: m.name || "Proyek", hasPassword: !!m.passwordHash, owner: m.owner === uid, updatedAt: m.updatedAt || 0, uploads: m.uploads || [] });
+    if (method.method === "GET" && rest === "") {
+      const readMetaValue = readMeta(id);
+      if (!readMetaValue) return json(setHeader, 404, { error: "not_found" });
+      json(setHeader, 200, { id, name: readMetaValue.name || "Proyek", hasPassword: !!readMetaValue.passwordHash, owner: readMetaValue.owner === handleApiUidOf, updatedAt: readMetaValue.updatedAt || 0, uploads: readMetaValue.uploads || [] });
       return true;
     }
 
     // GET /api/project/<id>/scene → XML (terkunci password kalau diset)
-    if (req.method === "GET" && rest === "scene") {
-      const m = readMeta(id);
-      if (!m) return json(res, 404, { error: "not_found" });
-      if (m.passwordHash) {
-        const pass = String(req.headers["x-om-pass"] || "");
-        if (sha((m.passwordSalt || "") + pass) !== m.passwordHash) {
-          return json(res, 401, { error: "need_password" });
+    if (method.method === "GET" && rest === "scene") {
+      const handleApiPasswordHash = readMeta(id);
+      if (!handleApiPasswordHash) return json(setHeader, 404, { error: "not_found" });
+      if (handleApiPasswordHash.passwordHash) {
+        const pass = String(method.headers["x-om-pass"] || "");
+        if (sha((handleApiPasswordHash.passwordSalt || "") + pass) !== handleApiPasswordHash.passwordHash) {
+          return json(setHeader, 401, { error: "need_password" });
         }
       }
       touchMeta(id);
       try {
-        const xml = fs.readFileSync(scenePath(id), "utf8");
-        res.writeHead(200, { "Content-Type": "application/xml", "Cache-Control": "no-store" });
-        res.end(xml);
-      } catch (e) {
-        json(res, 404, { error: "scene_missing" });
+        const handleApiReadFileSync = fs.readFileSync(scenePath(id), "utf8");
+        setHeader.writeHead(200, { "Content-Type": "application/xml", "Cache-Control": "no-store" });
+        setHeader.end(handleApiReadFileSync);
+      } catch (handleApiValueClamped) {
+        json(setHeader, 404, { error: "scene_missing" });
       }
       return true;
     }
 
     // POST /api/project/<id>/unlock
-    if (req.method === "POST" && rest === "unlock") {
-      const m = readMeta(id);
-      if (!m) return json(res, 404, { error: "not_found" });
+    if (method.method === "POST" && rest === "unlock") {
+      const passwordSalt = readMeta(id);
+      if (!passwordSalt) return json(setHeader, 404, { error: "not_found" });
       try {
-        const body = JSON.parse((await readBody(req, 64 * 1024)).toString("utf8") || "{}");
-        const ok = sha((m.passwordSalt || "") + String(body.password || "")) === m.passwordHash;
-        if (ok) touchMeta(id);
-        json(res, ok ? 200 : 403, ok ? { ok: true } : { error: "wrong_password" });
-      } catch (e) {
-        json(res, 400, { error: "bad_request" });
+        const body = JSON.parse((await readBody(method, 64 * 1024)).toString("utf8") || "{}");
+        const handleApiValueScoped = sha((passwordSalt.passwordSalt || "") + String(body.password || "")) === passwordSalt.passwordHash;
+        if (handleApiValueScoped) touchMeta(id);
+        json(setHeader, handleApiValueScoped ? 200 : 403, handleApiValueScoped ? { ok: true } : { error: "wrong_password" });
+      } catch (valueClamped) {
+        json(setHeader, 400, { error: "bad_request" });
       }
       return true;
     }
 
     // POST /api/project/<id> → simpan (nama + xml + opsional password + uploads manifest)
-    if (req.method === "POST" && rest === "") {
+    if (method.method === "POST" && rest === "") {
       try {
-        const raw = (await readBody(req, 60 * 1024 * 1024)).toString("utf8");
+        const handleApiScoped = (await readBody(method, 60 * 1024 * 1024)).toString("utf8");
         let body;
         try {
-          body = JSON.parse(raw);
-        } catch (e) {
-          return json(res, 400, { error: "invalid_json" });
+          body = JSON.parse(handleApiScoped);
+        } catch (handleApiClamped) {
+          return json(setHeader, 400, { error: "invalid_json" });
         }
-        const m = readMeta(id) || { createdAt: Date.now(), owner: uid };
-        if (m.passwordHash && m.owner !== uid) {
-          const pass = String(req.headers["x-om-pass"] || body.password || "");
-          if (sha((m.passwordSalt || "") + pass) !== m.passwordHash) return json(res, 403, { error: "forbidden" });
+        const passwordHash = readMeta(id) || { createdAt: Date.now(), owner: handleApiUidOf };
+        if (passwordHash.passwordHash && passwordHash.owner !== handleApiUidOf) {
+          const pass = String(method.headers["x-om-pass"] || body.password || "");
+          if (sha((passwordHash.passwordSalt || "") + pass) !== passwordHash.passwordHash) return json(setHeader, 403, { error: "forbidden" });
         }
-        m.name = String(body.name || m.name || "Proyek").slice(0, 200);
-        if (body.width) m.width = Number(body.width);
-        if (body.height) m.height = Number(body.height);
-        if (body.fps) m.fps = Number(body.fps);
-        if (typeof body.thumb === "string") m.thumb = body.thumb.slice(0, 300000);
+        passwordHash.name = String(body.name || passwordHash.name || "Proyek").slice(0, 200);
+        if (body.width) passwordHash.width = Number(body.width);
+        if (body.height) passwordHash.height = Number(body.height);
+        if (body.fps) passwordHash.fps = Number(body.fps);
+        if (typeof body.thumb === "string") passwordHash.thumb = body.thumb.slice(0, 300000);
         if (typeof body.password === "string" && body.password.length > 0) {
-          m.passwordSalt = m.passwordSalt || randId(12);
-          m.passwordHash = sha(m.passwordSalt + body.password);
+          passwordHash.passwordSalt = passwordHash.passwordSalt || randId(12);
+          passwordHash.passwordHash = sha(passwordHash.passwordSalt + body.password);
         }
-        if (Array.isArray(body.uploads)) m.uploads = body.uploads.slice(0, 500);
-        m.lastSeen = Date.now();
-        m.updatedAt = Date.now();
+        if (Array.isArray(body.uploads)) passwordHash.uploads = body.uploads.slice(0, 500);
+        passwordHash.lastSeen = Date.now();
+        passwordHash.updatedAt = Date.now();
         ensureDir(projDir(id));
         fs.writeFileSync(scenePath(id), String(body.xml || ""));
-        writeMeta(id, m);
-        json(res, 200, { ok: true, id, updatedAt: m.updatedAt });
-      } catch (e) {
-        json(res, 500, { error: "save_failed", message: e.message });
+        writeMeta(id, passwordHash);
+        json(setHeader, 200, { ok: true, id, updatedAt: passwordHash.updatedAt });
+      } catch (messageValue) {
+        json(setHeader, 500, { error: "save_failed", message: messageValue.message });
       }
       return true;
     }
 
     // DELETE /api/project/<id>
-    if (req.method === "DELETE" && rest === "") {
+    if (method.method === "DELETE" && rest === "") {
       try {
-        const dir = projDir(id);
-        if (fs.existsSync(dir)) {
-          fs.rmSync(dir, { recursive: true, force: true });
+        const handleApiProjDir = projDir(id);
+        if (fs.existsSync(handleApiProjDir)) {
+          fs.rmSync(handleApiProjDir, { recursive: true, force: true });
         }
-        json(res, 200, { ok: true, id });
-      } catch (e) {
-        json(res, 500, { error: "delete_failed", message: e.message });
+        json(setHeader, 200, { ok: true, id });
+      } catch (handleApiRaw) {
+        json(setHeader, 500, { error: "delete_failed", message: handleApiRaw.message });
       }
       return true;
     }
 
     // POST /api/project/<id>/upload?name=file.png  (raw body = file)
-    if (req.method === "POST" && rest === "upload") {
-      const m = readMeta(id);
-      if (!m) return json(res, 404, { error: "not_found" });
+    if (method.method === "POST" && rest === "upload") {
+      const handleApiLastSeen = readMeta(id);
+      if (!handleApiLastSeen) return json(setHeader, 404, { error: "not_found" });
       try {
         const qName = typeof query.get === "function" ? query.get("name") : query.name;
         const name = safeName(qName || "file.bin");
-        const buf = await readBody(req, 200 * 1024 * 1024);
+        const handleApiValueRaw = await readBody(method, 200 * 1024 * 1024);
         ensureDir(path.join(projDir(id), "uploads"));
-        fs.writeFileSync(path.join(projDir(id), "uploads", name), buf);
-        m.lastSeen = Date.now();
-        writeMeta(id, m);
-        json(res, 200, { ok: true, url: `/uploads/${id}/${encodeURIComponent(name)}`, name });
-      } catch (e) {
-        json(res, 500, { error: "upload_failed", message: e.message });
+        fs.writeFileSync(path.join(projDir(id), "uploads", name), handleApiValueRaw);
+        handleApiLastSeen.lastSeen = Date.now();
+        writeMeta(id, handleApiLastSeen);
+        json(setHeader, 200, { ok: true, url: `/uploads/${id}/${encodeURIComponent(name)}`, name });
+      } catch (handleApiValueParsed) {
+        json(setHeader, 500, { error: "upload_failed", message: handleApiValueParsed.message });
       }
       return true;
     }
@@ -429,35 +429,35 @@ async function handleApi(req, res, pathname, query) {
   }
 
   // GET /uploads/<id>/<file>
-  if (pathname.startsWith("/uploads/") && req.method === "GET") {
+  if (pathname.startsWith("/uploads/") && method.method === "GET") {
     const id = parts[1];
     const file = parts.slice(2).join("/");
     if (!isValidId(id) || !file) {
-      json(res, 404, { error: "not_found" });
+      json(setHeader, 404, { error: "not_found" });
       return true;
     }
     const full = path.join(projDir(id), "uploads", path.basename(file));
     if (!full.startsWith(path.join(projDir(id), "uploads")) || !fs.existsSync(full) || !fs.statSync(full).isFile()) {
-      json(res, 404, { error: "not_found" });
+      json(setHeader, 404, { error: "not_found" });
       return true;
     }
-    const ext = path.extname(full).toLowerCase();
-    res.writeHead(200, { "Content-Type": MIME_TYPES[ext] || "application/octet-stream", "Cache-Control": "public, max-age=31536000, immutable" });
-    fs.createReadStream(full).pipe(res);
+    const valueRaw = path.extname(full).toLowerCase();
+    setHeader.writeHead(200, { "Content-Type": MIME_TYPES[valueRaw] || "application/octet-stream", "Cache-Control": "public, max-age=31536000, immutable" });
+    fs.createReadStream(full).pipe(setHeader);
     return true;
   }
   return false;
 }
 
-const server = http.createServer(async (req, res) => {
-  const parsedUrl = url.parse(req.url, true);
+const server = http.createServer(async (request, response) => {
+  const parsedUrl = nodeUrl.parse(request.url, true);
   let pathname = decodeURIComponent(parsedUrl.pathname);
   const query = parsedUrl.query;
   if (pathname === "/") pathname = "/index.html";
 
   try {
     if (pathname.startsWith("/api/") || pathname.startsWith("/uploads/")) {
-      const handled = await handleApi(req, res, pathname, parsedUrl.query);
+      const handled = await handleApi(request, response, pathname, parsedUrl.query);
       if (handled) return;
     }
 
@@ -467,8 +467,8 @@ const server = http.createServer(async (req, res) => {
       if (/\.[a-z0-9]+$/i.test(cleaned)) {
         pathname = cleaned.startsWith("/") ? cleaned : "/" + cleaned;
       } else {
-        res.writeHead(200, { "Content-Type": "text/html", "Cache-Control": "no-store" });
-        fs.createReadStream(path.join(PUBLIC_DIR, "index.html")).pipe(res);
+        response.writeHead(200, { "Content-Type": "text/html", "Cache-Control": "no-store" });
+        fs.createReadStream(path.join(PUBLIC_DIR, "index.html")).pipe(response);
         return;
       }
     }
@@ -477,23 +477,23 @@ const server = http.createServer(async (req, res) => {
     if (pathname === "/api/effect-xml") {
       const effectId = query.id;
       if (effectId) {
-        const idx = loadEffectIndex();
-        const file = idx[effectId] || (effectId.includes(".") ? idx[effectId.split(".").pop()] : null);
+        const localLoadEffectIndex = loadEffectIndex();
+        const file = localLoadEffectIndex[effectId] || (effectId.includes(".") ? localLoadEffectIndex[effectId.split(".").pop()] : null);
         if (file) {
           const full = path.join(PUBLIC_DIR, "effects", file);
           if (fs.existsSync(full) && fs.statSync(full).isFile()) {
-            res.writeHead(200, {
+            response.writeHead(200, {
               "Content-Type": "application/xml",
               "Cache-Control": "no-store",
               "X-Effect-File": file
             });
-            fs.createReadStream(full).pipe(res);
+            fs.createReadStream(full).pipe(response);
             return;
           }
         }
       }
-      res.writeHead(404, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "effect_xml_not_found" }));
+      response.writeHead(404, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({ error: "effect_xml_not_found" }));
       return;
     }
 
@@ -503,17 +503,17 @@ const server = http.createServer(async (req, res) => {
       if (effectId) {
         const cachedBin = path.join(PUBLIC_DIR, "effects", `${effectId}.bin`);
         if (fs.existsSync(cachedBin) && fs.statSync(cachedBin).isFile()) {
-          res.writeHead(200, {
+          response.writeHead(200, {
             "Content-Type": "application/octet-stream",
             "Cache-Control": "no-store",
             "X-Effect-File": `${effectId}.bin`
           });
-          fs.createReadStream(cachedBin).pipe(res);
+          fs.createReadStream(cachedBin).pipe(response);
           return;
         }
       }
-      res.writeHead(404, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "effect_bin_not_found" }));
+      response.writeHead(404, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({ error: "effect_bin_not_found" }));
       return;
     }
 
@@ -521,12 +521,12 @@ const server = http.createServer(async (req, res) => {
     if (pathname === "/api/project-xml") {
       const targetUrl = query.url;
       try {
-        const result = await resolveProjectXml(targetUrl, query.project);
-        res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
-        res.end(JSON.stringify(result));
+        const localValueParsed = await resolveProjectXml(targetUrl, query.project);
+        response.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+        response.end(JSON.stringify(localValueParsed));
       } catch (err) {
-        res.writeHead(400, { "Content-Type": "application/json", "Cache-Control": "no-store" });
-        res.end(JSON.stringify({ error: err.message || "Gagal memproses link project" }));
+        response.writeHead(400, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+        response.end(JSON.stringify({ error: err.message || "Gagal memproses link project" }));
       }
       return;
     }
@@ -534,24 +534,24 @@ const server = http.createServer(async (req, res) => {
     if (pathname === "/api/drive-xml") {
       const targetUrl = query.url;
       try {
-        const result = await resolveProjectXml(targetUrl);
-        res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
-        res.end(JSON.stringify({ name: result.xmlName, xml: result.xml }));
+        const xmlName = await resolveProjectXml(targetUrl);
+        response.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+        response.end(JSON.stringify({ name: xmlName.xmlName, xml: xmlName.xml }));
       } catch (err) {
-        res.writeHead(400, { "Content-Type": "application/json", "Cache-Control": "no-store" });
-        res.end(JSON.stringify({ error: err.message || "Gagal mengambil XML dari Google Drive" }));
+        response.writeHead(400, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+        response.end(JSON.stringify({ error: err.message || "Gagal mengambil XML dari Google Drive" }));
       }
       return;
     }
 
     const localPath = path.join(PUBLIC_DIR, pathname);
     if (fs.existsSync(localPath) && fs.statSync(localPath).isFile()) {
-      const ext = path.extname(localPath).toLowerCase();
-      const contentType = MIME_TYPES[ext] || "application/octet-stream";
+      const localValue = path.extname(localPath).toLowerCase();
+      const contentType = MIME_TYPES[localValue] || "application/octet-stream";
       const headers = { "Content-Type": contentType };
-      if ([".html", ".js", ".json", ".css", ".xml", ""].includes(ext)) headers["Cache-Control"] = "no-store";
-      res.writeHead(200, headers);
-      fs.createReadStream(localPath).pipe(res);
+      if ([".html", ".js", ".json", ".css", ".xml", ""].includes(localValue)) headers["Cache-Control"] = "no-store";
+      response.writeHead(200, headers);
+      fs.createReadStream(localPath).pipe(response);
       return;
     }
 
@@ -559,32 +559,32 @@ const server = http.createServer(async (req, res) => {
     const remoteOptions = {
       hostname: REMOTE_HOST,
       port: 443,
-      path: req.url,
-      method: req.method,
+      path: request.url,
+      method: request.method,
       headers: {
-        ...req.headers,
+        ...request.headers,
         host: REMOTE_HOST,
         referer: `https://${REMOTE_HOST}/runtime/preset.html`
       }
     };
     const proxyReq = https.request(remoteOptions, (proxyRes) => {
-      if (res.headersSent || res.writableEnded) {
+      if (response.headersSent || response.writableEnded) {
         proxyRes.resume();
         return;
       }
-      if (req.url.match(/\.(html|js|json|css|xml)(\?|$)/)) proxyRes.headers["cache-control"] = "no-store";
-      res.writeHead(proxyRes.statusCode, proxyRes.headers);
-      proxyRes.pipe(res);
+      if (request.url.match(/\.(html|js|json|css|xml)(\?|$)/)) proxyRes.headers["cache-control"] = "no-store";
+      response.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(response);
     });
     proxyReq.on("error", (err) => {
-      res.writeHead(502, { "Content-Type": "text/plain" });
-      res.end("Proxy Error: " + err.message);
+      response.writeHead(502, { "Content-Type": "text/plain" });
+      response.end("Proxy Error: " + err.message);
     });
-    req.pipe(proxyReq);
-  } catch (e) {
+    request.pipe(proxyReq);
+  } catch (localValueRaw) {
     try {
-      json(res, 500, { error: "server_error", message: e.message });
-    } catch (e2) {}
+      json(response, 500, { error: "server_error", message: localValueRaw.message });
+    } catch (localRaw) {}
   }
 });
 

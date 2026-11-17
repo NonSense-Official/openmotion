@@ -3,12 +3,12 @@
 // =============================================================================
 
 (function initAmMobileUi() {
-  const I = new Proxy({}, {
-    get(_, prop) {
+  const toggleBookmark = new Proxy({}, {
+    get(initAmMobileUiArgRaw, prop) {
       return (window.__AM_INTERNAL && window.__AM_INTERNAL[prop]) || (window.AM && window.AM[prop]);
     },
-    set(_, prop, val) {
-      if (window.__AM_INTERNAL) window.__AM_INTERNAL[prop] = val;
+    set(initAmMobileUiRaw, prop, initAmMobileUiProp) {
+      if (window.__AM_INTERNAL) window.__AM_INTERNAL[prop] = initAmMobileUiProp;
       return true;
     }
   });
@@ -37,9 +37,9 @@
     }
   }
 
-  function onReady(fn) {
-    if (document.readyState !== "loading") fn();
-    else document.addEventListener("DOMContentLoaded", fn);
+  function onReady(onReadyArg) {
+    if (document.readyState !== "loading") onReadyArg();
+    else document.addEventListener("DOMContentLoaded", onReadyArg);
   }
 
   onReady(() => {
@@ -816,19 +816,19 @@
         badge.className = "tl-cap-badge";
         badge.textContent = "00:00.00";
         badge.title = "Ketuk untuk tambah/hapus penanda (bookmark)";
-        badge.addEventListener("click", (e) => {
-          e.stopPropagation();
-          if (I && I.toggleBookmark) I.toggleBookmark();
-          else if (I && I.addBookmark) I.addBookmark(I.H);
+        badge.addEventListener("click", (stopPropagation) => {
+          stopPropagation.stopPropagation();
+          if (toggleBookmark && toggleBookmark.toggleBookmark) toggleBookmark.toggleBookmark();
+          else if (toggleBookmark && toggleBookmark.addBookmark) toggleBookmark.addBookmark(toggleBookmark.H);
         });
         tlCap.appendChild(badge);
       }
     }
 
-    if (I && I.fitCanvas) setTimeout(() => I.fitCanvas(), 50);
+    if (toggleBookmark && toggleBookmark.fitCanvas) setTimeout(() => toggleBookmark.fitCanvas(), 50);
     if (typeof initAnimationCurveEditor === "function") initAnimationCurveEditor();
     window.addEventListener("resize", () => {
-      if (I && I.fitCanvas) I.fitCanvas();
+      if (toggleBookmark && toggleBookmark.fitCanvas) toggleBookmark.fitCanvas();
     });
 
     // Render Shape Tab Content by default
@@ -922,10 +922,10 @@
     if (btnNull) {
       btnNull.addEventListener("click", async () => {
         closeAddPopup();
-        const I = window.__AM_INTERNAL;
-        if (I && I.omAddNull) {
-          const l = await I.omAddNull();
-          if (l && I.selectLayer) I.selectLayer(l);
+        const amInternal = window.__AM_INTERNAL;
+        if (amInternal && amInternal.omAddNull) {
+          const renderAddObjectsValue = await amInternal.omAddNull();
+          if (renderAddObjectsValue && amInternal.selectLayer) amInternal.selectLayer(renderAddObjectsValue);
         }
       });
     }
@@ -934,11 +934,11 @@
     if (btnCamera) {
       btnCamera.addEventListener("click", async () => {
         closeAddPopup();
-        const I = window.__AM_INTERNAL;
-        if (I && I.omAddCamera) {
-          const l = await I.omAddCamera();
-          const target = l || (I.val && I.val.layers && I.val.layers[I.val.layers.length - 1]);
-          if (target && I.selectLayer) I.selectLayer(target);
+        const renderAddObjectsAmInternal = window.__AM_INTERNAL;
+        if (renderAddObjectsAmInternal && renderAddObjectsAmInternal.omAddCamera) {
+          const renderAddObjectsValueRaw = await renderAddObjectsAmInternal.omAddCamera();
+          const target = renderAddObjectsValueRaw || (renderAddObjectsAmInternal.val && renderAddObjectsAmInternal.val.layers && renderAddObjectsAmInternal.val.layers[renderAddObjectsAmInternal.val.layers.length - 1]);
+          if (target && renderAddObjectsAmInternal.selectLayer) renderAddObjectsAmInternal.selectLayer(target);
         }
       });
     }
@@ -947,10 +947,10 @@
     if (btnGroup) {
       btnGroup.addEventListener("click", async () => {
         closeAddPopup();
-        const I = window.__AM_INTERNAL;
-        if (I && I.omAddGroup) {
-          const l = await I.omAddGroup();
-          if (l && I.selectLayer) I.selectLayer(l);
+        const amInternalValue = window.__AM_INTERNAL;
+        if (amInternalValue && amInternalValue.omAddGroup) {
+          const renderAddObjectsResult = await amInternalValue.omAddGroup();
+          if (renderAddObjectsResult && amInternalValue.selectLayer) amInternalValue.selectLayer(renderAddObjectsResult);
         }
       });
     }
@@ -959,24 +959,24 @@
     if (btnElements) {
       btnElements.addEventListener("click", () => {
         closeAddPopup();
-        const I = window.__AM_INTERNAL;
-        if (I && I.handle9) I.handle9("[ELEMEN] Pilih preset / elemen untuk ditambahkan");
+        const renderAddObjectsHandle = window.__AM_INTERNAL;
+        if (renderAddObjectsHandle && renderAddObjectsHandle.handle9) renderAddObjectsHandle.handle9("[ELEMEN] Pilih preset / elemen untuk ditambahkan");
       });
     }
   }
 
   function addShapeLayer(shapeType) {
-    const I = window.__AM_INTERNAL;
-    if (!I || !I.val) return;
-    const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
+    const addShapeLayerAmInternal = window.__AM_INTERNAL;
+    if (!addShapeLayerAmInternal || !addShapeLayerAmInternal.val) return;
+    const snap = addShapeLayerAmInternal.sceneSnapshot ? addShapeLayerAmInternal.sceneSnapshot() : null;
     const shapeXml = shapeType === "circle" ? ".circle" : shapeType === "star" ? ".star" : ".rect";
     const newLayer = {
       id: "shape_" + Date.now().toString(36),
       tag: "shape",
       shapeType: shapeXml,
-      label: "Bentuk " + (I.val.layers ? I.val.layers.length + 1 : 1),
-      startTime: I.H || 0,
-      endTime: (I.H || 0) + 3000,
+      label: "Bentuk " + (addShapeLayerAmInternal.val.layers ? addShapeLayerAmInternal.val.layers.length + 1 : 1),
+      startTime: addShapeLayerAmInternal.H || 0,
+      endTime: (addShapeLayerAmInternal.H || 0) + 3000,
       color: "#00ffa8",
       fillColor: "#00ffa8",
       fillType: "color",
@@ -989,27 +989,27 @@
       effects: []
     };
 
-    if (I.val.layers) {
-      I.val.layers.push(newLayer);
-      if (snap && I.pushUndo) I.pushUndo(snap);
-      I.V = true;
-      if (I.bind4) I.bind4();
-      if (I.selectLayer) I.selectLayer(newLayer);
-      if (I.val2) I.val2.renderAt(I.H);
+    if (addShapeLayerAmInternal.val.layers) {
+      addShapeLayerAmInternal.val.layers.push(newLayer);
+      if (snap && addShapeLayerAmInternal.pushUndo) addShapeLayerAmInternal.pushUndo(snap);
+      addShapeLayerAmInternal.V = true;
+      if (addShapeLayerAmInternal.bind4) addShapeLayerAmInternal.bind4();
+      if (addShapeLayerAmInternal.selectLayer) addShapeLayerAmInternal.selectLayer(newLayer);
+      if (addShapeLayerAmInternal.val2) addShapeLayerAmInternal.val2.renderAt(addShapeLayerAmInternal.H);
     }
   }
 
   function addTextLayer() {
-    const I = window.__AM_INTERNAL;
-    if (!I || !I.val) return null;
-    const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
+    const addTextLayerAmInternal = window.__AM_INTERNAL;
+    if (!addTextLayerAmInternal || !addTextLayerAmInternal.val) return null;
+    const snap = addTextLayerAmInternal.sceneSnapshot ? addTextLayerAmInternal.sceneSnapshot() : null;
     const newLayer = {
       id: "text_" + Date.now().toString(36),
       tag: "text",
-      label: "Teks " + (I.val.layers ? I.val.layers.length + 1 : 1),
+      label: "Teks " + (addTextLayerAmInternal.val.layers ? addTextLayerAmInternal.val.layers.length + 1 : 1),
       textContent: "Teks Open Motion",
-      startTime: I.H || 0,
-      endTime: (I.H || 0) + 3000,
+      startTime: addTextLayerAmInternal.H || 0,
+      endTime: (addTextLayerAmInternal.H || 0) + 3000,
       fontSize: 28,
       font: "Roboto",
       align: "center",
@@ -1027,13 +1027,13 @@
       effects: []
     };
 
-    if (I.val.layers) {
-      I.val.layers.push(newLayer);
-      if (snap && I.pushUndo) I.pushUndo(snap);
-      I.V = true;
-      if (I.bind4) I.bind4();
-      if (I.selectLayer) I.selectLayer(newLayer);
-      if (I.val2) I.val2.renderAt(I.H);
+    if (addTextLayerAmInternal.val.layers) {
+      addTextLayerAmInternal.val.layers.push(newLayer);
+      if (snap && addTextLayerAmInternal.pushUndo) addTextLayerAmInternal.pushUndo(snap);
+      addTextLayerAmInternal.V = true;
+      if (addTextLayerAmInternal.bind4) addTextLayerAmInternal.bind4();
+      if (addTextLayerAmInternal.selectLayer) addTextLayerAmInternal.selectLayer(newLayer);
+      if (addTextLayerAmInternal.val2) addTextLayerAmInternal.val2.renderAt(addTextLayerAmInternal.H);
     }
     return newLayer;
   }
@@ -1046,7 +1046,7 @@
       try {
         activePreviewAudio.pause();
         activePreviewAudio.currentTime = 0;
-      } catch (e) {}
+      } catch (stopAudioPreviewValue) {}
       activePreviewAudio = null;
     }
     if (activePreviewCard) {
@@ -1062,36 +1062,36 @@
     const numFrames = Math.floor(sampleRate * durSec);
     const buffer = new Float32Array(numFrames);
     if (type === "synth_pulse") {
-      for (let i = 0; i < numFrames; i++) {
-        const t = i / sampleRate;
-        const beat = (t % 0.5) / 0.5;
-        const freq = (t % 2 < 1 ? 110 : 130.81);
-        const env = Math.exp(-beat * 6);
-        const osc = Math.sin(2 * Math.PI * freq * t) + 0.3 * Math.sin(2 * Math.PI * freq * 2 * t);
-        buffer[i] = osc * env * 0.7;
+      for (let createSynthesizedAudioBlobNumber = 0; createSynthesizedAudioBlobNumber < numFrames; createSynthesizedAudioBlobNumber++) {
+        const createSynthesizeValue = createSynthesizedAudioBlobNumber / sampleRate;
+        const beat = (createSynthesizeValue % 0.5) / 0.5;
+        const freq = (createSynthesizeValue % 2 < 1 ? 110 : 130.81);
+        const exp = Math.exp(-beat * 6);
+        const createSynthesizedAudioBlobValueParsed = Math.sin(2 * Math.PI * freq * createSynthesizeValue) + 0.3 * Math.sin(2 * Math.PI * freq * 2 * createSynthesizeValue);
+        buffer[createSynthesizedAudioBlobNumber] = createSynthesizedAudioBlobValueParsed * exp * 0.7;
       }
     } else if (type === "dramatic_hit") {
-      for (let i = 0; i < numFrames; i++) {
-        const t = i / sampleRate;
-        const f = Math.max(35, 180 * Math.exp(-t * 2.5));
-        const env = Math.exp(-t * 0.8);
-        const noise = (Math.random() * 2 - 1) * Math.exp(-t * 8) * 0.4;
-        buffer[i] = (Math.sin(2 * Math.PI * f * t) + noise) * env * 0.8;
+      for (let createSynthesizedAudioBlobValue = 0; createSynthesizedAudioBlobValue < numFrames; createSynthesizedAudioBlobValue++) {
+        const createSynthesizedAudioBlobResult = createSynthesizedAudioBlobValue / sampleRate;
+        const createSynthesizedAudioBlobParsed = Math.max(35, 180 * Math.exp(-createSynthesizedAudioBlobResult * 2.5));
+        const createSynthesizedAudioBlobExp = Math.exp(-createSynthesizedAudioBlobResult * 0.8);
+        const noise = (Math.random() * 2 - 1) * Math.exp(-createSynthesizedAudioBlobResult * 8) * 0.4;
+        buffer[createSynthesizedAudioBlobValue] = (Math.sin(2 * Math.PI * createSynthesizedAudioBlobParsed * createSynthesizedAudioBlobResult) + noise) * createSynthesizedAudioBlobExp * 0.8;
       }
     } else {
-      for (let i = 0; i < numFrames; i++) {
-        const t = i / sampleRate;
+      for (let createSynthesizedAudioBlobValueRaw = 0; createSynthesizedAudioBlobValueRaw < numFrames; createSynthesizedAudioBlobValueRaw++) {
+        const valueRaw = createSynthesizedAudioBlobValueRaw / sampleRate;
         const notes = [261.63, 329.63, 392.00, 523.25];
-        const freq = notes[Math.floor(t * 4) % notes.length];
-        const beat = (t % 0.25) / 0.25;
-        const env = Math.exp(-beat * 8);
-        buffer[i] = (Math.sin(2 * Math.PI * freq * t) + 0.2 * Math.sin(2 * Math.PI * freq * 3 * t)) * env * 0.5;
+        const freq = notes[Math.floor(valueRaw * 4) % notes.length];
+        const beat = (valueRaw % 0.25) / 0.25;
+        const expValue = Math.exp(-beat * 8);
+        buffer[createSynthesizedAudioBlobValueRaw] = (Math.sin(2 * Math.PI * freq * valueRaw) + 0.2 * Math.sin(2 * Math.PI * freq * 3 * valueRaw)) * expValue * 0.5;
       }
     }
     const wavBytes = new ArrayBuffer(44 + numFrames * 2);
     const view = new DataView(wavBytes);
     function writeString(offset, string) {
-      for (let j = 0; j < string.length; j++) view.setUint8(offset + j, string.charCodeAt(j));
+      for (let writeStringNumber = 0; writeStringNumber < string.length; writeStringNumber++) view.setUint8(offset + writeStringNumber, string.charCodeAt(writeStringNumber));
     }
     writeString(0, "RIFF");
     view.setUint32(4, 36 + numFrames * 2, true);
@@ -1107,9 +1107,9 @@
     writeString(36, "data");
     view.setUint32(40, numFrames * 2, true);
     let offset = 44;
-    for (let i = 0; i < numFrames; i++) {
-      const s = Math.max(-1, Math.min(1, buffer[i]));
-      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    for (let createSynthesizedAudioBlobRaw = 0; createSynthesizedAudioBlobRaw < numFrames; createSynthesizedAudioBlobRaw++) {
+      const createSynthesizedAudioBlobMax = Math.max(-1, Math.min(1, buffer[createSynthesizedAudioBlobRaw]));
+      view.setInt16(offset, createSynthesizedAudioBlobMax < 0 ? createSynthesizedAudioBlobMax * 0x8000 : createSynthesizedAudioBlobMax * 0x7FFF, true);
       offset += 2;
     }
     return new Blob([view], { type: "audio/wav" });
@@ -1117,13 +1117,13 @@
 
   function addAudioLayer(file, optName, optDurMs) {
     if (!file) return;
-    const I = window.__AM_INTERNAL;
-    if (I && I.addAudioLayer) {
-      I.addAudioLayer(file, optName, optDurMs);
+    const addAudioLayerAmInternal = window.__AM_INTERNAL;
+    if (addAudioLayerAmInternal && addAudioLayerAmInternal.addAudioLayer) {
+      addAudioLayerAmInternal.addAudioLayer(file, optName, optDurMs);
       return;
     }
-    if (!I || !I.val) return;
-    const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
+    if (!addAudioLayerAmInternal || !addAudioLayerAmInternal.val) return;
+    const snap = addAudioLayerAmInternal.sceneSnapshot ? addAudioLayerAmInternal.sceneSnapshot() : null;
     const audioId = "audio_" + Date.now().toString(36);
     let audioUrl = "";
     let audioName = "";
@@ -1146,8 +1146,8 @@
         tag: "audio",
         label: audioName.replace(/\.[^/.]+$/, "") || "Audio",
         src: audioUrl,
-        startTime: I.H || 0,
-        endTime: (I.H || 0) + (durMs || 5000),
+        startTime: addAudioLayerAmInternal.H || 0,
+        endTime: (addAudioLayerAmInternal.H || 0) + (durMs || 5000),
         inTime: 0,
         outTime: durMs || 5000,
         speed: 1,
@@ -1160,16 +1160,16 @@
         },
         effects: []
       };
-      if (I.val.layers) {
-        I.val.layers.push(newLayer);
-        if (snap && I.pushUndo) I.pushUndo(snap);
-        I.V = true;
-        if (I.val.totalTime < newLayer.endTime) {
-          I.val.totalTime = newLayer.endTime;
+      if (addAudioLayerAmInternal.val.layers) {
+        addAudioLayerAmInternal.val.layers.push(newLayer);
+        if (snap && addAudioLayerAmInternal.pushUndo) addAudioLayerAmInternal.pushUndo(snap);
+        addAudioLayerAmInternal.V = true;
+        if (addAudioLayerAmInternal.val.totalTime < newLayer.endTime) {
+          addAudioLayerAmInternal.val.totalTime = newLayer.endTime;
         }
-        if (I.bind4) I.bind4();
-        if (I.selectLayer) I.selectLayer(newLayer);
-        if (I.val2) I.val2.renderAt(I.H);
+        if (addAudioLayerAmInternal.bind4) addAudioLayerAmInternal.bind4();
+        if (addAudioLayerAmInternal.selectLayer) addAudioLayerAmInternal.selectLayer(newLayer);
+        if (addAudioLayerAmInternal.val2) addAudioLayerAmInternal.val2.renderAt(addAudioLayerAmInternal.H);
       }
     };
     if (optDurMs && optDurMs > 0) {
@@ -1186,8 +1186,8 @@
   }
 
   function renderAddMedia(area) {
-    const I = window.__AM_INTERNAL || {};
-    const mediaList = (I.val && I.val.media) || [];
+    const renderAddMediaValue = window.__AM_INTERNAL || {};
+    const mediaList = (renderAddMediaValue.val && renderAddMediaValue.val.media) || [];
 
     area.innerHTML = `
       <div class="am-media-picker-container">
@@ -1205,15 +1205,15 @@
             <div class="am-media-card-sub">Foto / Video</div>
           </div>
 
-          ${mediaList.map((m, idx) => {
-            const isVid = (m.type && m.type.startsWith("video")) || (m.filename && m.filename.endsWith(".mp4"));
-            const thumbUrl = (I.val2 && I.val2.images && I.val2.images.get(m.filename)) ? I.val2.images.get(m.filename).src : (m.url || "");
+          ${mediaList.map((renderAddMediaFilename, renderAddMediaArg) => {
+            const isVid = (renderAddMediaFilename.type && renderAddMediaFilename.type.startsWith("video")) || (renderAddMediaFilename.filename && renderAddMediaFilename.filename.endsWith(".mp4"));
+            const thumbUrl = (renderAddMediaValue.val2 && renderAddMediaValue.val2.images && renderAddMediaValue.val2.images.get(renderAddMediaFilename.filename)) ? renderAddMediaValue.val2.images.get(renderAddMediaFilename.filename).src : (renderAddMediaFilename.url || "");
             return `
-              <div class="am-media-card" data-idx="${idx}" data-filename="${escapeHtml(m.filename)}" title="${escapeHtml(m.title || m.filename)}">
+              <div class="am-media-card" data-idx="${renderAddMediaArg}" data-filename="${escapeHtml(renderAddMediaFilename.filename)}" title="${escapeHtml(renderAddMediaFilename.title || renderAddMediaFilename.filename)}">
                 <div class="am-media-card-thumb">
                   ${thumbUrl ? `<img src="${thumbUrl}" alt="Media" style="width:100%;height:100%;object-fit:cover;">` : (isVid ? `<img src="./icons/ic_export_video.svg" style="width:32px;height:32px;opacity:0.7;">` : `<img src="./icons/ic_add_imagevideo.svg" style="width:32px;height:32px;opacity:0.7;">`)}
                 </div>
-                <div class="am-media-card-name" title="${escapeHtml(m.title || m.filename)}">${escapeHtml(m.title || m.filename)}</div>
+                <div class="am-media-card-name" title="${escapeHtml(renderAddMediaFilename.title || renderAddMediaFilename.filename)}">${escapeHtml(renderAddMediaFilename.title || renderAddMediaFilename.filename)}</div>
                 <div class="am-media-card-sub">${isVid ? 'Video' : 'Foto'}</div>
                 <button class="am-media-card-add-btn" title="Tambahkan ke Timeline">
                   <img src="./icons/ac_ic_add_element.svg" alt="+">
@@ -1230,12 +1230,12 @@
 
     if (uploadCard && fileInput) {
       uploadCard.addEventListener("click", () => fileInput.click());
-      fileInput.addEventListener("change", async (e) => {
-        const files = Array.from(e.target.files || []);
+      fileInput.addEventListener("change", async (renderAddMediaTarget) => {
+        const files = Array.from(renderAddMediaTarget.target.files || []);
         if (files.length > 0) {
           for (const file of files) {
-            if (I.omAddMediaFile) {
-              await I.omAddMediaFile(file);
+            if (renderAddMediaValue.omAddMediaFile) {
+              await renderAddMediaValue.omAddMediaFile(file);
             }
           }
           closeAddPopup();
@@ -1245,17 +1245,17 @@
 
     area.querySelectorAll(".am-media-card:not(.am-media-upload-card)").forEach(card => {
       card.addEventListener("click", async () => {
-        const fn = card.dataset.filename;
-        const m = mediaList.find(x => x.filename === fn);
-        if (m) {
-          const meta = I.omMeta ? I.omMeta() : { w: 720, h: 1280, total: 5000 };
-          const isVid = (m.type && m.type.startsWith("video")) || (m.filename && m.filename.endsWith(".mp4"));
-          const uri = m.uri || ("am:user:" + Date.now());
-          const s = Math.round(Math.min(meta.w, meta.h) * 0.7);
-          const xml = '<shape id="' + generateOmId() + '" label="' + m.filename + '" startTime="' + (I.H || 0) + '" endTime="' + ((I.H || 0) + 3000) + '" fillType="media" fillImage="' + uri + '" mediaFillMode="' + (isVid ? "fit" : "fill") + '" s=".rect"><property name="size" type="vec2" value="' + s + ',' + s + '" /><transform><location value="' + Math.round(meta.w / 2) + ',' + Math.round(meta.h / 2) + ',0" /><scale value="1,1" /><rotation value="0" /></transform></shape>';
-          if (I.omParseLayer && I.omAddLayer) {
-            const layer = I.omParseLayer(xml);
-            if (layer) await I.omAddLayer(layer, m.filename);
+        const filenameValue = card.dataset.filename;
+        const renderAddMediaFlag = mediaList.find(filenameArg => filenameArg.filename === filenameValue);
+        if (renderAddMediaFlag) {
+          const meta = renderAddMediaValue.omMeta ? renderAddMediaValue.omMeta() : { w: 720, h: 1280, total: 5000 };
+          const isVid = (renderAddMediaFlag.type && renderAddMediaFlag.type.startsWith("video")) || (renderAddMediaFlag.filename && renderAddMediaFlag.filename.endsWith(".mp4"));
+          const renderAddMediaResult = renderAddMediaFlag.uri || ("am:user:" + Date.now());
+          const round = Math.round(Math.min(meta.w, meta.h) * 0.7);
+          const renderAddMediaValueRaw = '<shape id="' + generateOmId() + '" label="' + renderAddMediaFlag.filename + '" startTime="' + (renderAddMediaValue.H || 0) + '" endTime="' + ((renderAddMediaValue.H || 0) + 3000) + '" fillType="media" fillImage="' + renderAddMediaResult + '" mediaFillMode="' + (isVid ? "fit" : "fill") + '" s=".rect"><property name="size" type="vec2" value="' + round + ',' + round + '" /><transform><location value="' + Math.round(meta.w / 2) + ',' + Math.round(meta.h / 2) + ',0" /><scale value="1,1" /><rotation value="0" /></transform></shape>';
+          if (renderAddMediaValue.omParseLayer && renderAddMediaValue.omAddLayer) {
+            const layer = renderAddMediaValue.omParseLayer(renderAddMediaValueRaw);
+            if (layer) await renderAddMediaValue.omAddLayer(layer, renderAddMediaFlag.filename);
           }
           closeAddPopup();
         }
@@ -1287,13 +1287,13 @@
             </button>
           </div>
 
-          ${sampleTracks.map(t => `
-            <div class="am-audio-card" data-id="${t.id}" data-name="${t.name}" data-dur="${t.dur}" data-dur-ms="${t.durMs}" data-src="${t.src || ''}" data-synth="${t.synth || ''}">
+          ${sampleTracks.map(renderAddAudioId => `
+            <div class="am-audio-card" data-id="${renderAddAudioId.id}" data-name="${renderAddAudioId.name}" data-dur="${renderAddAudioId.dur}" data-dur-ms="${renderAddAudioId.durMs}" data-src="${renderAddAudioId.src || ''}" data-synth="${renderAddAudioId.synth || ''}">
               <div class="am-audio-card-thumb">
-                <div class="am-audio-card-art">${t.art}</div>
+                <div class="am-audio-card-art">${renderAddAudioId.art}</div>
               </div>
-              <div class="am-audio-card-name" title="${t.name}">${t.name}</div>
-              <div class="am-audio-card-dur">${t.dur}</div>
+              <div class="am-audio-card-name" title="${renderAddAudioId.name}">${renderAddAudioId.name}</div>
+              <div class="am-audio-card-dur">${renderAddAudioId.dur}</div>
               <button class="am-audio-preview-btn" title="Dengarkan">
                 <img src="./icons/ac_ic_play.svg" alt="Play">
               </button>
@@ -1310,8 +1310,8 @@
     const uploadCard = area.querySelector("#am-card-upload-audio");
     if (uploadCard && fileInput) {
       uploadCard.addEventListener("click", () => fileInput.click());
-      fileInput.addEventListener("change", e => {
-        const file = e.target.files && e.target.files[0];
+      fileInput.addEventListener("change", renderAddAudioTarget => {
+        const file = renderAddAudioTarget.target.files && renderAddAudioTarget.target.files[0];
         if (file) {
           stopAudioPreview();
           addAudioLayer(file);
@@ -1337,8 +1337,8 @@
       }
 
       if (previewBtn) {
-        previewBtn.addEventListener("click", async e => {
-          e.stopPropagation();
+        previewBtn.addEventListener("click", async renderAddAudioStopPropagation => {
+          renderAddAudioStopPropagation.stopPropagation();
           if (activePreviewCard === card) {
             stopAudioPreview();
             return;
@@ -1346,29 +1346,29 @@
           stopAudioPreview();
           const target = await getTrackBlobOrUrl();
           const playUrl = typeof target === "string" ? target : URL.createObjectURL(target);
-          const aud = new Audio(playUrl);
-          activePreviewAudio = aud;
+          const addEventListener = new Audio(playUrl);
+          activePreviewAudio = addEventListener;
           activePreviewCard = card;
           card.classList.add("is-playing");
           const icon = previewBtn.querySelector("img");
           if (icon) icon.src = "./icons/ac_cue_collapse.svg";
 
-          aud.addEventListener("ended", () => stopAudioPreview());
-          aud.addEventListener("error", () => stopAudioPreview());
-          aud.play().catch(() => stopAudioPreview());
+          addEventListener.addEventListener("ended", () => stopAudioPreview());
+          addEventListener.addEventListener("error", () => stopAudioPreview());
+          addEventListener.play().catch(() => stopAudioPreview());
         });
       }
 
       if (addBtn) {
-        addBtn.addEventListener("click", async e => {
-          e.stopPropagation();
+        addBtn.addEventListener("click", async renderAddAudioArg => {
+          renderAddAudioArg.stopPropagation();
           stopAudioPreview();
           const target = await getTrackBlobOrUrl();
           if (typeof target === "string") {
             addAudioLayer({ name: trackName + ".mp3", url: target }, trackName, durMs);
           } else {
-            const f = new File([target], trackName + ".wav", { type: "audio/wav" });
-            addAudioLayer(f, trackName, durMs);
+            const renderAddAudioFile = new File([target], trackName + ".wav", { type: "audio/wav" });
+            addAudioLayer(renderAddAudioFile, trackName, durMs);
           }
           closeAddPopup();
         });
@@ -1377,37 +1377,37 @@
   }
 
   function openAddPopup() {
-    const pop = document.getElementById("am-add-popup");
-    const fab = document.getElementById("am-fab-add");
-    if (pop) pop.style.display = "flex";
-    if (fab) fab.style.display = "none";
+    const openAddPopupAmAddPopupEl = document.getElementById("am-add-popup");
+    const openAddPopupAmFabAddEl = document.getElementById("am-fab-add");
+    if (openAddPopupAmAddPopupEl) openAddPopupAmAddPopupEl.style.display = "flex";
+    if (openAddPopupAmFabAddEl) openAddPopupAmFabAddEl.style.display = "none";
     isAddPopupOpen = true;
   }
 
   function closeAddPopup() {
     stopAudioPreview();
-    const pop = document.getElementById("am-add-popup");
-    const fab = document.getElementById("am-fab-add");
-    if (pop) pop.style.display = "none";
-    if (fab) fab.style.display = "block";
+    const closeAddPopupAmAddPopupEl = document.getElementById("am-add-popup");
+    const closeAddPopupAmFabAddEl = document.getElementById("am-fab-add");
+    if (closeAddPopupAmAddPopupEl) closeAddPopupAmAddPopupEl.style.display = "none";
+    if (closeAddPopupAmFabAddEl) closeAddPopupAmFabAddEl.style.display = "block";
     isAddPopupOpen = false;
   }
 
   function bindEvents() {
-    const I = window.__AM_INTERNAL || {};
+    const bindEventsValue = window.__AM_INTERNAL || {};
 
     // Play/Pause button
     const btnPlay = document.getElementById("am-btn-play");
     const playIcon = document.getElementById("am-play-icon");
     if (btnPlay) {
       btnPlay.addEventListener("click", () => {
-        if (I.togglePlay) I.togglePlay();
+        if (bindEventsValue.togglePlay) bindEventsValue.togglePlay();
         updatePlayState();
       });
     }
 
     function updatePlayState(playing) {
-      const isPlaying = playing !== undefined ? playing : I.isPlaying;
+      const isPlaying = playing !== undefined ? playing : bindEventsValue.isPlaying;
       if (playIcon) {
         playIcon.src = isPlaying ? "./icons/ac_ic_pause.svg" : "./icons/ac_ic_play.svg";
       }
@@ -1432,19 +1432,19 @@
           canvas.width = targetW;
           canvas.height = targetH;
         }
-        const w = canvas.width;
-        const h = canvas.height;
-        ctx.clearRect(0, 0, w, h);
+        const width = canvas.width;
+        const renderMeterHeight = canvas.height;
+        ctx.clearRect(0, 0, width, renderMeterHeight);
 
-        const isPlaying = !!(I && I.isPlaying);
+        const isPlaying = !!(bindEventsValue && bindEventsValue.isPlaying);
         let targetLevel = 0;
 
         if (isPlaying) {
-          const layers = (I.val && I.val.layers) || [];
-          const hasAudio = layers.some(l => l.tag === "audio" || l.tag === "video" || l.src || l.gain);
+          const layers = (bindEventsValue.val && bindEventsValue.val.layers) || [];
+          const hasAudio = layers.some(renderMeterTag => renderMeterTag.tag === "audio" || renderMeterTag.tag === "video" || renderMeterTag.src || renderMeterTag.gain);
           if (hasAudio) {
-            const t = Date.now() / 120;
-            targetLevel = 0.35 + 0.35 * Math.abs(Math.sin(t * 1.7) * Math.cos(t * 2.3)) + 0.2 * (Math.random() - 0.5);
+            const renderMeterValue = Date.now() / 120;
+            targetLevel = 0.35 + 0.35 * Math.abs(Math.sin(renderMeterValue * 1.7) * Math.cos(renderMeterValue * 2.3)) + 0.2 * (Math.random() - 0.5);
             targetLevel = Math.max(0.1, Math.min(1.0, targetLevel));
           }
         }
@@ -1458,14 +1458,14 @@
         else peakLevel = Math.max(0, peakLevel - 0.01);
 
         if (smoothedLevel > 0.01) {
-          const half = w / 2;
+          const half = width / 2;
           const span = half * smoothedLevel;
           const left = half - span;
           const right = half + span;
 
           // Symmetric linear gradient matching LevelMeterView.smali:
           // 0.0: #FF0000, 0.2: #F3C507, 0.4: #00FF36, 0.6: #00FF36, 0.8: #F3C507, 1.0: #FF0000
-          const grad = ctx.createLinearGradient(0, 0, w, 0);
+          const grad = ctx.createLinearGradient(0, 0, width, 0);
           grad.addColorStop(0.0, "#FF0000");
           grad.addColorStop(0.2, "#F3C507");
           grad.addColorStop(0.4, "#00FF36");
@@ -1476,12 +1476,12 @@
           // Background track (alpha 0x4d approx 0.25)
           ctx.globalAlpha = 0.25;
           ctx.fillStyle = grad;
-          ctx.fillRect(0, 0, w, h);
+          ctx.fillRect(0, 0, width, renderMeterHeight);
 
           // Active level expanding bilaterally outward from center
           ctx.globalAlpha = 1.0;
           ctx.fillStyle = grad;
-          ctx.fillRect(left, 0, right - left, h);
+          ctx.fillRect(left, 0, right - left, renderMeterHeight);
         }
 
         requestAnimationFrame(renderMeter);
@@ -1495,24 +1495,24 @@
     const btnPrev = document.getElementById("am-btn-prevframe");
     const btnNext = document.getElementById("am-btn-nextframe");
     if (btnPrev) {
-      btnPrev.addEventListener("click", (e) => {
-        if (e.shiftKey || e.altKey) {
-          I.stepFrame && I.stepFrame(-1);
-        } else if (I.jumpPrevKeyframeOrBookmark) {
-          I.jumpPrevKeyframeOrBookmark(currentSelectedLayer);
-        } else if (I.stepFrame) {
-          I.stepFrame(-1);
+      btnPrev.addEventListener("click", (shiftKey) => {
+        if (shiftKey.shiftKey || shiftKey.altKey) {
+          bindEventsValue.stepFrame && bindEventsValue.stepFrame(-1);
+        } else if (bindEventsValue.jumpPrevKeyframeOrBookmark) {
+          bindEventsValue.jumpPrevKeyframeOrBookmark(currentSelectedLayer);
+        } else if (bindEventsValue.stepFrame) {
+          bindEventsValue.stepFrame(-1);
         }
       });
     }
     if (btnNext) {
-      btnNext.addEventListener("click", (e) => {
-        if (e.shiftKey || e.altKey) {
-          I.stepFrame && I.stepFrame(1);
-        } else if (I.jumpNextKeyframeOrBookmark) {
-          I.jumpNextKeyframeOrBookmark(currentSelectedLayer);
-        } else if (I.stepFrame) {
-          I.stepFrame(1);
+      btnNext.addEventListener("click", (bindEventsShiftKey) => {
+        if (bindEventsShiftKey.shiftKey || bindEventsShiftKey.altKey) {
+          bindEventsValue.stepFrame && bindEventsValue.stepFrame(1);
+        } else if (bindEventsValue.jumpNextKeyframeOrBookmark) {
+          bindEventsValue.jumpNextKeyframeOrBookmark(currentSelectedLayer);
+        } else if (bindEventsValue.stepFrame) {
+          bindEventsValue.stepFrame(1);
         }
       });
     }
@@ -1520,15 +1520,15 @@
     // Undo / Redo
     const btnUndo = document.getElementById("am-btn-undo");
     const btnRedo = document.getElementById("am-btn-redo");
-    if (btnUndo) btnUndo.addEventListener("click", () => I.undoScene && I.undoScene());
-    if (btnRedo) btnRedo.addEventListener("click", () => I.redoScene && I.redoScene());
+    if (btnUndo) btnUndo.addEventListener("click", () => bindEventsValue.undoScene && bindEventsValue.undoScene());
+    if (btnRedo) btnRedo.addEventListener("click", () => bindEventsValue.redoScene && bindEventsValue.redoScene());
 
     // Bookmark toggling via timecode or bookmark button
     function toggleBookmarkAtPlayhead() {
-      if (I.toggleBookmark) {
-        I.toggleBookmark();
-      } else if (I.addBookmark) {
-        I.addBookmark(I.H);
+      if (bindEventsValue.toggleBookmark) {
+        bindEventsValue.toggleBookmark();
+      } else if (bindEventsValue.addBookmark) {
+        bindEventsValue.addBookmark(bindEventsValue.H);
       }
     }
     const btnBm = document.getElementById("am-btn-bookmark");
@@ -1546,9 +1546,9 @@
       document.removeEventListener("pointerdown", handleOutsideCopyPaste);
     }
 
-    function handleOutsideCopyPaste(e) {
+    function handleOutsideCopyPaste(handleOutsideCopyPasteTarget) {
       if (!activeCopyPastePopup) return;
-      if (activeCopyPastePopup.contains(e.target) || (btnCopyPaste && btnCopyPaste.contains(e.target))) return;
+      if (activeCopyPastePopup.contains(handleOutsideCopyPasteTarget.target) || (btnCopyPaste && btnCopyPaste.contains(handleOutsideCopyPasteTarget.target))) return;
       closeCopyPastePopup();
     }
 
@@ -1558,9 +1558,9 @@
         return;
       }
 
-      const curLayer = currentSelectedLayer || (I.omLayerCur && I.omLayerCur()) || (I.val2 && I.val2.debugSelectedLayerId && I.val && I.val.layers && I.val.layers.find(x => x.id === I.val2.debugSelectedLayerId));
-      const allLayers = (I.val && I.val.layers) || [];
-      const multiIds = (I.omMulti && I.omMulti.size) ? I.omMultiIds() : [];
+      const curLayer = currentSelectedLayer || (bindEventsValue.omLayerCur && bindEventsValue.omLayerCur()) || (bindEventsValue.val2 && bindEventsValue.val2.debugSelectedLayerId && bindEventsValue.val && bindEventsValue.val.layers && bindEventsValue.val.layers.find(openCopyPastePopupId => openCopyPastePopupId.id === bindEventsValue.val2.debugSelectedLayerId));
+      const allLayers = (bindEventsValue.val && bindEventsValue.val.layers) || [];
+      const multiIds = (bindEventsValue.omMulti && bindEventsValue.omMulti.size) ? bindEventsValue.omMultiIds() : [];
       const selectedCount = multiIds.length || (curLayer ? 1 : 0);
       const allSelected = allLayers.length > 0 && selectedCount >= allLayers.length;
       const hasClipboardLayers = !!(window.__omClipboardLayers && window.__omClipboardLayers.length);
@@ -1694,9 +1694,9 @@
       if (btnSelAll) {
         btnSelAll.addEventListener("click", () => {
           if (allSelected) {
-            I.omMultiClear && I.omMultiClear();
+            bindEventsValue.omMultiClear && bindEventsValue.omMultiClear();
           } else {
-            I.omMultiSelectAll && I.omMultiSelectAll();
+            bindEventsValue.omMultiSelectAll && bindEventsValue.omMultiSelectAll();
           }
           closeCopyPastePopup();
         });
@@ -1705,7 +1705,7 @@
       const btnDup = popup.querySelector("#am-cp-duplicate");
       if (btnDup && hasSelected) {
         btnDup.addEventListener("click", () => {
-          I.duplicateLayer && I.duplicateLayer(curLayer);
+          bindEventsValue.duplicateLayer && bindEventsValue.duplicateLayer(curLayer);
           closeCopyPastePopup();
         });
       }
@@ -1713,7 +1713,7 @@
       const btnCopySt = popup.querySelector("#am-cp-copystyle");
       if (btnCopySt && hasSelected) {
         btnCopySt.addEventListener("click", () => {
-          I.omCopyStyle && I.omCopyStyle(curLayer);
+          bindEventsValue.omCopyStyle && bindEventsValue.omCopyStyle(curLayer);
           closeCopyPastePopup();
         });
       }
@@ -1721,7 +1721,7 @@
       const btnCopyL = popup.querySelector("#am-cp-copylayer");
       if (btnCopyL && hasSelected) {
         btnCopyL.addEventListener("click", () => {
-          I.omCopyLayers && I.omCopyLayers();
+          bindEventsValue.omCopyLayers && bindEventsValue.omCopyLayers();
           closeCopyPastePopup();
         });
       }
@@ -1729,7 +1729,7 @@
       const btnPasteL = popup.querySelector("#am-cp-pastelayer");
       if (btnPasteL && hasClipboardLayers) {
         btnPasteL.addEventListener("click", () => {
-          I.omPasteLayers && I.omPasteLayers();
+          bindEventsValue.omPasteLayers && bindEventsValue.omPasteLayers();
           closeCopyPastePopup();
         });
       }
@@ -1770,11 +1770,11 @@
         speed: "Kecepatan"
       };
 
-      popup.querySelectorAll(".am-pastestyle-btn").forEach(btn => {
-        const prop = btn.dataset.prop;
-        btn.addEventListener("click", () => {
+      popup.querySelectorAll(".am-pastestyle-btn").forEach(dataset => {
+        const prop = dataset.dataset.prop;
+        dataset.addEventListener("click", () => {
           styleOptions[prop] = !styleOptions[prop];
-          btn.classList.toggle("active", styleOptions[prop]);
+          dataset.classList.toggle("active", styleOptions[prop]);
           if (titleEl) {
             titleEl.textContent = `${optionNames[prop] || 'Opsi'} ${styleOptions[prop] ? 'Diaktifkan' : 'Dinonaktifkan'}`;
             titleEl.style.color = styleOptions[prop] ? '#00ffa8' : '#a4acba';
@@ -1794,7 +1794,7 @@
       const btnConfirmPaste = popup.querySelector("#am-ps-btn-paste");
       if (btnConfirmPaste) {
         btnConfirmPaste.addEventListener("click", () => {
-          I.omPasteStyle && I.omPasteStyle(styleOptions);
+          bindEventsValue.omPasteStyle && bindEventsValue.omPasteStyle(styleOptions);
           closeCopyPastePopup();
         });
       }
@@ -1805,8 +1805,8 @@
     }
 
     if (btnCopyPaste) {
-      btnCopyPaste.addEventListener("click", (e) => {
-        e.stopPropagation();
+      btnCopyPaste.addEventListener("click", (bindEventsStopPropagation) => {
+        bindEventsStopPropagation.stopPropagation();
         openCopyPastePopup();
       });
     }
@@ -1835,8 +1835,8 @@
     let canvasZoomPercent = 100;
 
     function hasCameraLayerInScene() {
-      const layers = (I.val && I.val.layers) || [];
-      return layers.some(l => l.tag === "camera");
+      const layers = (bindEventsValue.val && bindEventsValue.val.layers) || [];
+      return layers.some(hasCameraLayerInSceneTag => hasCameraLayerInSceneTag.tag === "camera");
     }
 
     const camPill = document.getElementById("am-canvas-camera-pill");
@@ -1862,11 +1862,11 @@
     function toggleCameraView() {
       if (!hasCameraLayerInScene()) return;
       isCameraViewActive = !isCameraViewActive;
-      if (I.setCameraViewEnabled) {
-        I.setCameraViewEnabled(isCameraViewActive);
-      } else if (I.val2) {
-        I.val2.cameraViewEnabled = isCameraViewActive;
-        if (I.val2.renderAt) I.val2.renderAt(I.H);
+      if (bindEventsValue.setCameraViewEnabled) {
+        bindEventsValue.setCameraViewEnabled(isCameraViewActive);
+      } else if (bindEventsValue.val2) {
+        bindEventsValue.val2.cameraViewEnabled = isCameraViewActive;
+        if (bindEventsValue.val2.renderAt) bindEventsValue.val2.renderAt(bindEventsValue.H);
       }
       updateCameraViewModeButton();
     }
@@ -1955,24 +1955,24 @@
     window.omUpdateCameraStatus = updateCameraViewModeButton;
 
     // Authentic Alight Motion Timecode & FPS Sync
-    function formatAmTime(ms, fps = 30) {
-      if (isNaN(ms) || ms < 0) ms = 0;
-      const totalSec = ms / 1000;
-      const m = Math.floor(totalSec / 60);
-      const s = Math.floor(totalSec % 60);
+    function formatAmTime(formatAmTimeArg, formatAmTimeArgValue = 30) {
+      if (isNaN(formatAmTimeArg) || formatAmTimeArg < 0) formatAmTimeArg = 0;
+      const totalSec = formatAmTimeArg / 1000;
+      const formatAmTimeValue = Math.floor(totalSec / 60);
+      const floor = Math.floor(totalSec % 60);
       const hundredths = Math.floor((totalSec % 1) * 100);
-      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}.${String(hundredths).padStart(2, "0")}`;
+      return `${String(formatAmTimeValue).padStart(2, "0")}:${String(floor).padStart(2, "0")}.${String(hundredths).padStart(2, "0")}`;
     }
 
-    window.omOnTimeUpdate = (currentTime, totalTime, fps) => {
-      const curStr = formatAmTime(currentTime, fps);
+    window.omOnTimeUpdate = (currentTime, totalTime, bindEventsCondition) => {
+      const curStr = formatAmTime(currentTime, bindEventsCondition);
       const navTime = document.getElementById("am-nav-time");
       const navFps = document.getElementById("am-nav-fps");
       const infoTime = document.getElementById("am-info-time");
       const capBadge = document.getElementById("tl-cap-badge");
 
       if (navTime) navTime.textContent = curStr;
-      if (navFps) navFps.textContent = `${fps || 30} FPS`;
+      if (navFps) navFps.textContent = `${bindEventsCondition || 30} FPS`;
       if (infoTime) infoTime.textContent = curStr;
       if (capBadge) capBadge.textContent = curStr;
     };
@@ -2022,11 +2022,11 @@
     const btnSelAlignToggle = document.getElementById("am-btn-sel-align-toggle");
     const btnSelAlignBack = document.getElementById("am-btn-sel-align-back");
 
-    if (btnSelCancel) btnSelCancel.addEventListener("click", () => I.omMultiClear && I.omMultiClear());
-    if (btnSelGroup) btnSelGroup.addEventListener("click", () => I.omMultiGroup && I.omMultiGroup("normal"));
-    if (btnSelMask) btnSelMask.addEventListener("click", () => I.omMultiGroup && I.omMultiGroup("mask"));
-    if (btnSelExclude) btnSelExclude.addEventListener("click", () => I.omMultiGroup && I.omMultiGroup("exclude"));
-    if (btnSelDel) btnSelDel.addEventListener("click", () => I.omMultiDelete && I.omMultiDelete());
+    if (btnSelCancel) btnSelCancel.addEventListener("click", () => bindEventsValue.omMultiClear && bindEventsValue.omMultiClear());
+    if (btnSelGroup) btnSelGroup.addEventListener("click", () => bindEventsValue.omMultiGroup && bindEventsValue.omMultiGroup("normal"));
+    if (btnSelMask) btnSelMask.addEventListener("click", () => bindEventsValue.omMultiGroup && bindEventsValue.omMultiGroup("mask"));
+    if (btnSelExclude) btnSelExclude.addEventListener("click", () => bindEventsValue.omMultiGroup && bindEventsValue.omMultiGroup("exclude"));
+    if (btnSelDel) btnSelDel.addEventListener("click", () => bindEventsValue.omMultiDelete && bindEventsValue.omMultiDelete());
 
     if (btnSelAlignToggle) {
       btnSelAlignToggle.addEventListener("click", () => {
@@ -2051,14 +2051,14 @@
     const btnAlignDistribV = document.getElementById("am-btn-align-distrib-v-screen");
     const btnAlignDistribH = document.getElementById("am-btn-align-distrib-h-screen");
 
-    if (btnAlignLeft) btnAlignLeft.addEventListener("click", () => I.omMultiAlignScreen && I.omMultiAlignScreen("left"));
-    if (btnAlignCenterH) btnAlignCenterH.addEventListener("click", () => I.omMultiAlignScreen && I.omMultiAlignScreen("center-h"));
-    if (btnAlignRight) btnAlignRight.addEventListener("click", () => I.omMultiAlignScreen && I.omMultiAlignScreen("right"));
-    if (btnAlignTop) btnAlignTop.addEventListener("click", () => I.omMultiAlignScreen && I.omMultiAlignScreen("top"));
-    if (btnAlignCenterV) btnAlignCenterV.addEventListener("click", () => I.omMultiAlignScreen && I.omMultiAlignScreen("center-v"));
-    if (btnAlignBottom) btnAlignBottom.addEventListener("click", () => I.omMultiAlignScreen && I.omMultiAlignScreen("bottom"));
-    if (btnAlignDistribV) btnAlignDistribV.addEventListener("click", () => I.omMultiAlignScreen && I.omMultiAlignScreen("distribute-v"));
-    if (btnAlignDistribH) btnAlignDistribH.addEventListener("click", () => I.omMultiAlignScreen && I.omMultiAlignScreen("distribute-h"));
+    if (btnAlignLeft) btnAlignLeft.addEventListener("click", () => bindEventsValue.omMultiAlignScreen && bindEventsValue.omMultiAlignScreen("left"));
+    if (btnAlignCenterH) btnAlignCenterH.addEventListener("click", () => bindEventsValue.omMultiAlignScreen && bindEventsValue.omMultiAlignScreen("center-h"));
+    if (btnAlignRight) btnAlignRight.addEventListener("click", () => bindEventsValue.omMultiAlignScreen && bindEventsValue.omMultiAlignScreen("right"));
+    if (btnAlignTop) btnAlignTop.addEventListener("click", () => bindEventsValue.omMultiAlignScreen && bindEventsValue.omMultiAlignScreen("top"));
+    if (btnAlignCenterV) btnAlignCenterV.addEventListener("click", () => bindEventsValue.omMultiAlignScreen && bindEventsValue.omMultiAlignScreen("center-v"));
+    if (btnAlignBottom) btnAlignBottom.addEventListener("click", () => bindEventsValue.omMultiAlignScreen && bindEventsValue.omMultiAlignScreen("bottom"));
+    if (btnAlignDistribV) btnAlignDistribV.addEventListener("click", () => bindEventsValue.omMultiAlignScreen && bindEventsValue.omMultiAlignScreen("distribute-v"));
+    if (btnAlignDistribH) btnAlignDistribH.addEventListener("click", () => bindEventsValue.omMultiAlignScreen && bindEventsValue.omMultiAlignScreen("distribute-h"));
 
     // Multi-Select Bottom Bar Buttons (activity_edit_select_bottomvar.xml)
     const btnMultiTrimLeft = document.getElementById("am-btn-multi-trim-left");
@@ -2068,15 +2068,15 @@
     const btnAlignDistribTl = document.getElementById("am-btn-align-distrib-tl");
     const btnAlignRightTl = document.getElementById("am-btn-align-right-tl");
 
-    if (btnMultiTrimLeft) btnMultiTrimLeft.addEventListener("click", () => I.omTrimSide && I.omTrimSide("l"));
-    if (btnMultiSplit) btnMultiSplit.addEventListener("click", () => I.splitLayerAt && I.splitLayerAt());
-    if (btnMultiTrimRight) btnMultiTrimRight.addEventListener("click", () => I.omTrimSide && I.omTrimSide("r"));
-    if (btnAlignLeftTl) btnAlignLeftTl.addEventListener("click", () => I.omMultiAlignTimeline && I.omMultiAlignTimeline("left"));
-    if (btnAlignDistribTl) btnAlignDistribTl.addEventListener("click", () => I.omMultiAlignTimeline && I.omMultiAlignTimeline("distribute"));
-    if (btnAlignRightTl) btnAlignRightTl.addEventListener("click", () => I.omMultiAlignTimeline && I.omMultiAlignTimeline("right"));
+    if (btnMultiTrimLeft) btnMultiTrimLeft.addEventListener("click", () => bindEventsValue.omTrimSide && bindEventsValue.omTrimSide("l"));
+    if (btnMultiSplit) btnMultiSplit.addEventListener("click", () => bindEventsValue.splitLayerAt && bindEventsValue.splitLayerAt());
+    if (btnMultiTrimRight) btnMultiTrimRight.addEventListener("click", () => bindEventsValue.omTrimSide && bindEventsValue.omTrimSide("r"));
+    if (btnAlignLeftTl) btnAlignLeftTl.addEventListener("click", () => bindEventsValue.omMultiAlignTimeline && bindEventsValue.omMultiAlignTimeline("left"));
+    if (btnAlignDistribTl) btnAlignDistribTl.addEventListener("click", () => bindEventsValue.omMultiAlignTimeline && bindEventsValue.omMultiAlignTimeline("distribute"));
+    if (btnAlignRightTl) btnAlignRightTl.addEventListener("click", () => bindEventsValue.omMultiAlignTimeline && bindEventsValue.omMultiAlignTimeline("right"));
 
-    window.omOnMultiSelectChanged = (ids) => {
-      const count = ids ? ids.length : 0;
+    window.omOnMultiSelectChanged = (flagArg) => {
+      const count = flagArg ? flagArg.length : 0;
       const elemPanel = document.getElementById("am-element-edit-panel");
       const tlView = document.getElementById("am-timeline-view");
       const selectBottomBar = document.getElementById("am-select-bottom-bar");
@@ -2115,7 +2115,7 @@
     const btnGroupUp = document.getElementById("am-btn-group-up");
     if (btnGroupUp) {
       btnGroupUp.addEventListener("click", () => {
-        if (I.omExitGroup) I.omExitGroup();
+        if (bindEventsValue.omExitGroup) bindEventsValue.omExitGroup();
       });
     }
 
@@ -2138,8 +2138,8 @@
     if (quickText) {
       quickText.addEventListener("click", () => {
         closeAddPopup();
-        const l = addTextLayer();
-        if (l) openTextEditor(l);
+        const bindEventsAddTextLayer = addTextLayer();
+        if (bindEventsAddTextLayer) openTextEditor(bindEventsAddTextLayer);
       });
     }
 
@@ -2161,22 +2161,22 @@
 
     // Media tab in Add Popup
     const addTabs = document.querySelectorAll(".am-add-tab-item");
-    addTabs.forEach(t => {
-      t.addEventListener("click", () => {
-        addTabs.forEach(x => x.classList.remove("active"));
-        t.classList.add("active");
-        const tab = t.dataset.tab;
+    addTabs.forEach(bindEventsAddEventListener => {
+      bindEventsAddEventListener.addEventListener("click", () => {
+        addTabs.forEach(bindEventsClassList => bindEventsClassList.classList.remove("active"));
+        bindEventsAddEventListener.classList.add("active");
+        const bindEventsTab = bindEventsAddEventListener.dataset.tab;
         const area = document.getElementById("am-add-content-area");
         if (!area) return;
-        if (tab === "shape") renderAddShapes();
-        else if (tab === "media") {
+        if (bindEventsTab === "shape") renderAddShapes();
+        else if (bindEventsTab === "media") {
           renderAddMedia(area);
-        } else if (tab === "audio") {
+        } else if (bindEventsTab === "audio") {
           renderAddAudio(area);
-        } else if (tab === "object") {
+        } else if (bindEventsTab === "object") {
           renderAddObjects();
         } else {
-          area.innerHTML = `<div style="padding:20px;color:#888;font-size:12px;width:100%;text-align:center;">Kategori ${tab} siap digunakan</div>`;
+          area.innerHTML = `<div style="padding:20px;color:#888;font-size:12px;width:100%;text-align:center;">Kategori ${bindEventsTab} siap digunakan</div>`;
         }
       });
     });
@@ -2198,8 +2198,8 @@
     }
     if (btnExit) {
       btnExit.addEventListener("click", async () => {
-        if (I.omSaveProject) {
-          try { await I.omSaveProject(); } catch (e) {}
+        if (bindEventsValue.omSaveProject) {
+          try { await bindEventsValue.omSaveProject(); } catch (bindEventsParsed) {}
         }
         const home = document.getElementById("am-home-screen");
         const root = document.getElementById("am-mobile-root");
@@ -2220,21 +2220,21 @@
     const projTitleInput = document.getElementById("am-project-title");
     if (projTitleInput) {
       const saveTitle = () => {
-        const t = projTitleInput.value.trim();
-        if (!t) return;
-        if (I.val) {
-          I.val.title = t;
+        const bindEventsTitle = projTitleInput.value.trim();
+        if (!bindEventsTitle) return;
+        if (bindEventsValue.val) {
+          bindEventsValue.val.title = bindEventsTitle;
         }
-        if (I.omSaveProject) {
-          I.omSaveProject();
-        } else if (I.omScheduleSave) {
-          I.omScheduleSave();
+        if (bindEventsValue.omSaveProject) {
+          bindEventsValue.omSaveProject();
+        } else if (bindEventsValue.omScheduleSave) {
+          bindEventsValue.omScheduleSave();
         }
       };
       projTitleInput.addEventListener("change", saveTitle);
       projTitleInput.addEventListener("blur", saveTitle);
-      projTitleInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") projTitleInput.blur();
+      projTitleInput.addEventListener("keydown", (keyArg) => {
+        if (keyArg.key === "Enter") projTitleInput.blur();
       });
     }
 
@@ -2266,8 +2266,8 @@
       closeLayerParentPopup();
       if (!currentSelectedLayer) return;
 
-      const I = window.__AM_INTERNAL || {};
-      const layers = (I.val && I.val.layers) || [];
+      const openLayerParentPValue = window.__AM_INTERNAL || {};
+      const layers = (openLayerParentPValue.val && openLayerParentPValue.val.layers) || [];
 
       const popup = document.createElement("div");
       popup.id = "am-parent-popup";
@@ -2276,14 +2276,14 @@
       const wouldCauseCycle = (target, candidate) => {
         if (!target || !candidate) return false;
         if (target.id === candidate.id) return true;
-        let cur = candidate;
+        let idValue = candidate;
         let count = 0;
-        while (cur && count++ < 32) {
-          if (cur.id === target.id) return true;
-          if (!cur.parentId) break;
-          cur = cur.parentLayer || (I.val && I.val.layerById ? I.val.layerById.get(cur.parentId) : null);
-          if (!cur && I.val && I.val.layers) {
-            cur = I.val.layers.find(l => l.id === candidate.parentId);
+        while (idValue && count++ < 32) {
+          if (idValue.id === target.id) return true;
+          if (!idValue.parentId) break;
+          idValue = idValue.parentLayer || (openLayerParentPValue.val && openLayerParentPValue.val.layerById ? openLayerParentPValue.val.layerById.get(idValue.parentId) : null);
+          if (!idValue && openLayerParentPValue.val && openLayerParentPValue.val.layers) {
+            idValue = openLayerParentPValue.val.layers.find(idArg => idArg.id === candidate.parentId);
           }
         }
         return false;
@@ -2293,51 +2293,51 @@
       let itemsHtml = '';
       const displayLayers = [...layers].reverse();
 
-      for (const l of displayLayers) {
-        const isSelf = (l.id === currentSelectedLayer.id);
-        const isCycle = wouldCauseCycle(currentSelectedLayer, l);
+      for (const openLayerParentPopupId of displayLayers) {
+        const isSelf = (openLayerParentPopupId.id === currentSelectedLayer.id);
+        const isCycle = wouldCauseCycle(currentSelectedLayer, openLayerParentPopupId);
         const isDisabled = isSelf || isCycle;
-        const isCurrentParent = (currentSelectedLayer.parentId === l.id);
+        const isCurrentParent = (currentSelectedLayer.parentId === openLayerParentPopupId.id);
 
         let iconSrc = './icons/ac_add_shape.svg';
         let tagColor = '#3366ff';
         let subText = '';
 
-        if (l.tag === 'nullobj') {
+        if (openLayerParentPopupId.tag === 'nullobj') {
           iconSrc = './icons/ic_null.svg';
           tagColor = '#00ffa8';
           subText = 'Objek Null';
-        } else if (l.tag === 'camera') {
+        } else if (openLayerParentPopupId.tag === 'camera') {
           iconSrc = './icons/ic_camera_outline.svg';
           tagColor = '#00c3ff';
           subText = 'Kamera';
-        } else if (l.tag === 'embedScene' || l.tag === 'group' || (I.isGroup && I.isGroup(l))) {
+        } else if (openLayerParentPopupId.tag === 'embedScene' || openLayerParentPopupId.tag === 'group' || (openLayerParentPValue.isGroup && openLayerParentPValue.isGroup(openLayerParentPopupId))) {
           iconSrc = './icons/ac_ic_groupelements.svg';
           tagColor = '#a370f7';
           subText = 'Grup';
-        } else if (l.tag === 'text') {
+        } else if (openLayerParentPopupId.tag === 'text') {
           iconSrc = './icons/ac_edit_text.svg';
           tagColor = '#ff9c00';
           subText = 'Teks';
-        } else if (l.tag === 'audio') {
+        } else if (openLayerParentPopupId.tag === 'audio') {
           iconSrc = './icons/ac_ic_audio.svg';
           tagColor = '#5cdbd3';
           subText = 'Audio';
-        } else if (l.fillType === 'media' || l.fillImage || l.fillVideo) {
+        } else if (openLayerParentPopupId.fillType === 'media' || openLayerParentPopupId.fillImage || openLayerParentPopupId.fillVideo) {
           iconSrc = './icons/ic_add_imagevideo.svg';
           tagColor = '#ff5c7c';
           subText = 'Media';
         }
 
         itemsHtml += `
-          <div class="am-parent-item ${isCurrentParent ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}" data-layer-id="${l.id}">
+          <div class="am-parent-item ${isCurrentParent ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}" data-layer-id="${openLayerParentPopupId.id}">
             <div class="am-parent-select-view"></div>
             <div class="am-parent-tag-color" style="background:${tagColor};"></div>
             <div class="am-parent-icon">
-              <img src="${iconSrc}" alt="${l.tag}">
+              <img src="${iconSrc}" alt="${openLayerParentPopupId.tag}">
             </div>
             <div class="am-parent-labels">
-              <span class="am-parent-label">${l.label || l.id || 'Layer'}</span>
+              <span class="am-parent-label">${openLayerParentPopupId.label || openLayerParentPopupId.id || 'Layer'}</span>
               ${subText ? `<span class="am-parent-sublabel">${subText}</span>` : ''}
             </div>
             <div class="am-parent-end-icon" style="${isCurrentParent ? '' : 'display:none;'}">
@@ -2385,31 +2385,31 @@
       if (noneBtn) {
         noneBtn.addEventListener("click", () => {
           closeLayerParentPopup();
-          if (I.setLayerParent) {
-            I.setLayerParent(currentSelectedLayer, '');
+          if (openLayerParentPValue.setLayerParent) {
+            openLayerParentPValue.setLayerParent(currentSelectedLayer, '');
           } else {
             currentSelectedLayer.parentId = '';
             currentSelectedLayer.parentLayer = null;
-            if (I.resolveHierarchy) I.resolveHierarchy();
-            I.V = true;
-            if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+            if (openLayerParentPValue.resolveHierarchy) openLayerParentPValue.resolveHierarchy();
+            openLayerParentPValue.V = true;
+            if (openLayerParentPValue.val2 && openLayerParentPValue.val2.renderAt) openLayerParentPValue.val2.renderAt(openLayerParentPValue.H);
           }
           updateParentButtonState(currentSelectedLayer);
         });
       }
 
-      popup.querySelectorAll(".am-parent-item:not(.disabled)").forEach(item => {
-        item.addEventListener("click", () => {
-          const targetId = item.dataset.layerId;
+      popup.querySelectorAll(".am-parent-item:not(.disabled)").forEach(openLayerParentPopupAddEventListener => {
+        openLayerParentPopupAddEventListener.addEventListener("click", () => {
+          const targetId = openLayerParentPopupAddEventListener.dataset.layerId;
           closeLayerParentPopup();
           if (!targetId) return;
-          if (I.setLayerParent) {
-            I.setLayerParent(currentSelectedLayer, targetId);
+          if (openLayerParentPValue.setLayerParent) {
+            openLayerParentPValue.setLayerParent(currentSelectedLayer, targetId);
           } else {
             currentSelectedLayer.parentId = targetId;
-            if (I.resolveHierarchy) I.resolveHierarchy();
-            I.V = true;
-            if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+            if (openLayerParentPValue.resolveHierarchy) openLayerParentPValue.resolveHierarchy();
+            openLayerParentPValue.V = true;
+            if (openLayerParentPValue.val2 && openLayerParentPValue.val2.renderAt) openLayerParentPValue.val2.renderAt(openLayerParentPValue.H);
           }
           updateParentButtonState(currentSelectedLayer);
         });
@@ -2434,43 +2434,43 @@
     if (elemTitleInput) {
       const saveElemTitle = () => {
         if (!currentSelectedLayer) return;
-        const t = elemTitleInput.value.trim();
-        if (t) {
-          currentSelectedLayer.label = t;
-          I.V = true;
-          if (I.bind4) I.bind4();
-          if (I.omScheduleSave) I.omScheduleSave();
+        const bindEventsFlag = elemTitleInput.value.trim();
+        if (bindEventsFlag) {
+          currentSelectedLayer.label = bindEventsFlag;
+          bindEventsValue.V = true;
+          if (bindEventsValue.bind4) bindEventsValue.bind4();
+          if (bindEventsValue.omScheduleSave) bindEventsValue.omScheduleSave();
         }
       };
       elemTitleInput.addEventListener("change", saveElemTitle);
       elemTitleInput.addEventListener("blur", saveElemTitle);
-      elemTitleInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") elemTitleInput.blur();
+      elemTitleInput.addEventListener("keydown", (bindEventsArgValue) => {
+        if (bindEventsArgValue.key === "Enter") elemTitleInput.blur();
       });
     }
 
     if (elemBack) {
       elemBack.addEventListener("click", () => {
-        if (I.deselectLayer) I.deselectLayer();
+        if (bindEventsValue.deselectLayer) bindEventsValue.deselectLayer();
       });
     }
     if (elemParent) {
-      elemParent.addEventListener("click", (e) => {
-        e.stopPropagation();
+      elemParent.addEventListener("click", (bindEventsArgRaw) => {
+        bindEventsArgRaw.stopPropagation();
         if (!currentSelectedLayer) return;
         openLayerParentPopup(elemParent);
       });
     }
     if (elemDelete) {
       elemDelete.addEventListener("click", () => {
-        if (currentSelectedLayer && I.deleteLayer) {
-          I.deleteLayer(currentSelectedLayer);
-          if (I.deselectLayer) I.deselectLayer();
+        if (currentSelectedLayer && bindEventsValue.deleteLayer) {
+          bindEventsValue.deleteLayer(currentSelectedLayer);
+          if (bindEventsValue.deselectLayer) bindEventsValue.deselectLayer();
         }
       });
     }
     if (elemOverflow) {
-      elemOverflow.addEventListener("click", (e) => {
+      elemOverflow.addEventListener("click", (bindEventsArgParsed) => {
         if (!currentSelectedLayer) return;
         const existing = document.getElementById("am-layer-overflow-menu");
         if (existing) { existing.remove(); return; }
@@ -2479,29 +2479,29 @@
         menu.id = "am-layer-overflow-menu";
         menu.style.cssText = "position:absolute;top:46px;right:10px;background:#1a1d26;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,0.6);z-index:999;display:flex;flex-direction:column;gap:4px;min-width:160px;";
 
-        const isGrp = I.isGroup && I.isGroup(currentSelectedLayer);
-        const items = [];
+        const isGrp = bindEventsValue.isGroup && bindEventsValue.isGroup(currentSelectedLayer);
+        const bindEventsItems = [];
         if (isGrp) {
-          items.push({ text: "Edit Isi Grup", icon: "./icons/ac_ic_groupelements.svg", action: () => I.omEnterGroup && I.omEnterGroup(currentSelectedLayer) });
-          items.push({ text: "Buka Grup (Ungroup)", icon: "./icons/ic_exclude_group_bl.svg", action: () => I.omUngroup && I.omUngroup(currentSelectedLayer) });
+          bindEventsItems.push({ text: "Edit Isi Grup", icon: "./icons/ac_ic_groupelements.svg", action: () => bindEventsValue.omEnterGroup && bindEventsValue.omEnterGroup(currentSelectedLayer) });
+          bindEventsItems.push({ text: "Buka Grup (Ungroup)", icon: "./icons/ic_exclude_group_bl.svg", action: () => bindEventsValue.omUngroup && bindEventsValue.omUngroup(currentSelectedLayer) });
         }
-        items.push({ text: "Duplikat Layer", icon: "./icons/ic_layer_copy_paste_menu.svg", action: () => I.duplicateLayer && I.duplicateLayer(currentSelectedLayer) });
-        items.push({ text: "Hapus Layer", icon: "./icons/ac_ic_delete.svg", danger: true, action: () => {
-          if (I.deleteLayer) I.deleteLayer(currentSelectedLayer);
-          if (I.deselectLayer) I.deselectLayer();
+        bindEventsItems.push({ text: "Duplikat Layer", icon: "./icons/ic_layer_copy_paste_menu.svg", action: () => bindEventsValue.duplicateLayer && bindEventsValue.duplicateLayer(currentSelectedLayer) });
+        bindEventsItems.push({ text: "Hapus Layer", icon: "./icons/ac_ic_delete.svg", danger: true, action: () => {
+          if (bindEventsValue.deleteLayer) bindEventsValue.deleteLayer(currentSelectedLayer);
+          if (bindEventsValue.deselectLayer) bindEventsValue.deselectLayer();
           currentSelectedLayer = null;
         }});
 
-        items.forEach(it => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.style.cssText = `background:transparent;border:0;color:${it.danger ? "#ff5252" : "#ffffff"};padding:8px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer;text-align:left;width:100%;`;
-          btn.innerHTML = `<img src="${it.icon}" style="width:16px;height:16px;filter:${it.danger ? "none" : "brightness(0) invert(1)"}"><span>${it.text}</span>`;
-          btn.addEventListener("click", () => {
+        bindEventsItems.forEach(danger => {
+          const bindEventsButtonEl = document.createElement("button");
+          bindEventsButtonEl.type = "button";
+          bindEventsButtonEl.style.cssText = `background:transparent;border:0;color:${danger.danger ? "#ff5252" : "#ffffff"};padding:8px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer;text-align:left;width:100%;`;
+          bindEventsButtonEl.innerHTML = `<img src="${danger.icon}" style="width:16px;height:16px;filter:${danger.danger ? "none" : "brightness(0) invert(1)"}"><span>${danger.text}</span>`;
+          bindEventsButtonEl.addEventListener("click", () => {
             menu.remove();
-            it.action();
+            danger.action();
           });
-          menu.appendChild(btn);
+          menu.appendChild(bindEventsButtonEl);
         });
 
         document.body.appendChild(menu);
@@ -2516,11 +2516,11 @@
     }
 
     // Keyboard shortcuts: Escape to exit layer/subpanel, Backspace/Delete to remove selected layer
-    window.addEventListener("keydown", (e) => {
-      const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : "";
-      const isInput = tag === "input" || tag === "textarea" || (document.activeElement && document.activeElement.isContentEditable);
+    window.addEventListener("keydown", (bindEventsKey) => {
+      const bindEventsResult = document.activeElement ? document.activeElement.tagName.toLowerCase() : "";
+      const isInput = bindEventsResult === "input" || bindEventsResult === "textarea" || (document.activeElement && document.activeElement.isContentEditable);
 
-      if (e.key === "Escape") {
+      if (bindEventsKey.key === "Escape") {
         if (isInput) {
           document.activeElement.blur();
           return;
@@ -2545,8 +2545,8 @@
           closeTextEditor(true);
           return;
         }
-        const sub = document.getElementById("am-subpanel-container");
-        if (sub && sub.classList.contains("open")) {
+        const bindEventsAmSubpanelContaiEl = document.getElementById("am-subpanel-container");
+        if (bindEventsAmSubpanelContaiEl && bindEventsAmSubpanelContaiEl.classList.contains("open")) {
           closeSubpanel();
           return;
         }
@@ -2562,19 +2562,19 @@
         if (typeof window.omCloseMoveTransform === "function") {
           window.omCloseMoveTransform();
         }
-        if (I.deselectLayer) {
-          I.deselectLayer();
+        if (bindEventsValue.deselectLayer) {
+          bindEventsValue.deselectLayer();
         }
         currentSelectedLayer = null;
         return;
       }
 
-      if ((e.key === "Backspace" || e.key === "Delete") && !isInput) {
-        const target = currentSelectedLayer || (I.val && I.val.layers && I.val2 && I.val2.debugSelectedLayerId && I.val.layers.find(x => x.id === I.val2.debugSelectedLayerId));
-        if (target && I.deleteLayer) {
-          e.preventDefault();
-          I.deleteLayer(target);
-          if (I.deselectLayer) I.deselectLayer();
+      if ((bindEventsKey.key === "Backspace" || bindEventsKey.key === "Delete") && !isInput) {
+        const target = currentSelectedLayer || (bindEventsValue.val && bindEventsValue.val.layers && bindEventsValue.val2 && bindEventsValue.val2.debugSelectedLayerId && bindEventsValue.val.layers.find(bindEventsId => bindEventsId.id === bindEventsValue.val2.debugSelectedLayerId));
+        if (target && bindEventsValue.deleteLayer) {
+          bindEventsKey.preventDefault();
+          bindEventsValue.deleteLayer(target);
+          if (bindEventsValue.deselectLayer) bindEventsValue.deselectLayer();
           currentSelectedLayer = null;
         }
         return;
@@ -2599,9 +2599,9 @@
         openSubpanel("Kecepatan & Retiming", renderSpeedControl);
       });
     }
-    if (btnTrimLeft) btnTrimLeft.addEventListener("click", () => I.omTrimSide && I.omTrimSide("l", currentSelectedLayer));
-    if (btnSplit) btnSplit.addEventListener("click", () => I.splitLayerAt && I.splitLayerAt(currentSelectedLayer));
-    if (btnTrimRight) btnTrimRight.addEventListener("click", () => I.omTrimSide && I.omTrimSide("r", currentSelectedLayer));
+    if (btnTrimLeft) btnTrimLeft.addEventListener("click", () => bindEventsValue.omTrimSide && bindEventsValue.omTrimSide("l", currentSelectedLayer));
+    if (btnSplit) btnSplit.addEventListener("click", () => bindEventsValue.splitLayerAt && bindEventsValue.splitLayerAt(currentSelectedLayer));
+    if (btnTrimRight) btnTrimRight.addEventListener("click", () => bindEventsValue.omTrimSide && bindEventsValue.omTrimSide("r", currentSelectedLayer));
     if (btnAudio) {
       btnAudio.addEventListener("click", () => {
         openSubpanel("Volume & Audio", renderAudioVolume);
@@ -2669,8 +2669,8 @@
         if (!currentSelectedLayer) return;
         if (currentSelectedLayer.tag === "camera") {
           openSubpanel("Opsi Kamera", renderCameraOptions);
-        } else if (I.isGroup && I.isGroup(currentSelectedLayer)) {
-          if (I.omEnterGroup) I.omEnterGroup(currentSelectedLayer);
+        } else if (bindEventsValue.isGroup && bindEventsValue.isGroup(currentSelectedLayer)) {
+          if (bindEventsValue.omEnterGroup) bindEventsValue.omEnterGroup(currentSelectedLayer);
         } else if (currentSelectedLayer.tag === "text") {
           openTextEditor(currentSelectedLayer);
         } else if (currentSelectedLayer.path || currentSelectedLayer.points || currentSelectedLayer.tag === "drawing" || currentSelectedLayer.tag === "vector") {
@@ -2707,10 +2707,10 @@
       });
     }
 
-    const btnEpBack1 = document.getElementById("am-btn-editpoints-back");
-    const btnEpBack2 = document.getElementById("am-ep-btn-back");
-    if (btnEpBack1) btnEpBack1.addEventListener("click", () => closeEditPoints(true));
-    if (btnEpBack2) btnEpBack2.addEventListener("click", () => closeEditPoints(true));
+    const amBtnEditpointsBackEl = document.getElementById("am-btn-editpoints-back");
+    const amEpBtnBackEl = document.getElementById("am-ep-btn-back");
+    if (amBtnEditpointsBackEl) amBtnEditpointsBackEl.addEventListener("click", () => closeEditPoints(true));
+    if (amEpBtnBackEl) amEpBtnBackEl.addEventListener("click", () => closeEditPoints(true));
 
     const btnModePoints = document.getElementById("am-btn-mode-points");
     const btnModeKf = document.getElementById("am-btn-mode-keyframes");
@@ -2763,8 +2763,8 @@
     if (btnOpenClose) {
       btnOpenClose.addEventListener("click", () => {
         epIsClosed = !epIsClosed;
-        const img = document.getElementById("am-ep-img-openclose");
-        if (img) img.src = epIsClosed ? "./icons/ac_ic_path_close.svg" : "./icons/ac_ic_path_open.svg";
+        const bindEventsAmEpImgOpencloseEl = document.getElementById("am-ep-img-openclose");
+        if (bindEventsAmEpImgOpencloseEl) bindEventsAmEpImgOpencloseEl.src = epIsClosed ? "./icons/ac_ic_path_close.svg" : "./icons/ac_ic_path_open.svg";
         applyPointsToLayer();
         renderCanvasOverlay();
       });
@@ -2773,22 +2773,22 @@
     if (btnCurveType) {
       btnCurveType.addEventListener("click", () => {
         if (!epPoints[epActiveIdx]) return;
-        const pt = epPoints[epActiveIdx];
-        const img = document.getElementById("am-ep-img-curvetype");
-        if (pt.type === "curved") {
-          pt.type = "corner";
-          pt.in = null;
-          pt.out = null;
-          if (img) img.src = "./icons/ac_ic_vertex_sharp.svg";
+        const bindEventsEpActiveIdx = epPoints[epActiveIdx];
+        const bindEventsAmEpImgCurvetypeEl = document.getElementById("am-ep-img-curvetype");
+        if (bindEventsEpActiveIdx.type === "curved") {
+          bindEventsEpActiveIdx.type = "corner";
+          bindEventsEpActiveIdx.in = null;
+          bindEventsEpActiveIdx.out = null;
+          if (bindEventsAmEpImgCurvetypeEl) bindEventsAmEpImgCurvetypeEl.src = "./icons/ac_ic_vertex_sharp.svg";
         } else {
-          pt.type = "curved";
+          bindEventsEpActiveIdx.type = "curved";
           const prev = epPoints[(epActiveIdx - 1 + epPoints.length) % epPoints.length];
           const next = epPoints[(epActiveIdx + 1) % epPoints.length];
-          const vx = (next.x - prev.x) * 0.25;
-          const vy = (next.y - prev.y) * 0.25;
-          pt.in = [pt.x - vx, pt.y - vy];
-          pt.out = [pt.x + vx, pt.y + vy];
-          if (img) img.src = "./icons/ac_ic_vertex_curved.svg";
+          const bindEventsValueRaw = (next.x - prev.x) * 0.25;
+          const bindEventsRaw = (next.y - prev.y) * 0.25;
+          bindEventsEpActiveIdx.in = [bindEventsEpActiveIdx.x - bindEventsValueRaw, bindEventsEpActiveIdx.y - bindEventsRaw];
+          bindEventsEpActiveIdx.out = [bindEventsEpActiveIdx.x + bindEventsValueRaw, bindEventsEpActiveIdx.y + bindEventsRaw];
+          if (bindEventsAmEpImgCurvetypeEl) bindEventsAmEpImgCurvetypeEl.src = "./icons/ac_ic_vertex_curved.svg";
         }
         applyPointsToLayer();
         renderCanvasOverlay();
@@ -2802,11 +2802,11 @@
           epActiveIdx = Math.max(0, epActiveIdx - 1);
         } else {
           const nextIdx = (epActiveIdx + 1) % epPoints.length;
-          const p1 = epPoints[epActiveIdx];
-          const p2 = epPoints[nextIdx];
+          const epActiveIdxValue = epPoints[epActiveIdx];
+          const bindEventsNextIdx = epPoints[nextIdx];
           const newPt = {
-            x: Math.round((p1.x + p2.x) / 2),
-            y: Math.round((p1.y + p2.y) / 2),
+            x: Math.round((epActiveIdxValue.x + bindEventsNextIdx.x) / 2),
+            y: Math.round((epActiveIdxValue.y + bindEventsNextIdx.y) / 2),
             type: "corner",
             in: null,
             out: null
@@ -2841,20 +2841,20 @@
 
     const epTrackpad = document.getElementById("am-ep-trackpad");
     if (epTrackpad) {
-      epTrackpad.addEventListener("pointerdown", (e) => {
-        epTrackpad.setPointerCapture(e.pointerId);
-        let lx = e.clientX, ly = e.clientY;
+      epTrackpad.addEventListener("pointerdown", (pointerId) => {
+        epTrackpad.setPointerCapture(pointerId.pointerId);
+        let clientX = pointerId.clientX, clientY = pointerId.clientY;
         function onMove(ev) {
-          const dx = ev.clientX - lx;
-          const dy = ev.clientY - ly;
-          lx = ev.clientX;
-          ly = ev.clientY;
+          const onMoveValue = ev.clientX - clientX;
+          const onMoveResult = ev.clientY - clientY;
+          clientX = ev.clientX;
+          clientY = ev.clientY;
           if (!epPoints[epActiveIdx]) return;
-          const pt = epPoints[epActiveIdx];
-          pt.x += dx * 1.5;
-          pt.y += dy * 1.5;
-          if (pt.in) { pt.in[0] += dx * 1.5; pt.in[1] += dy * 1.5; }
-          if (pt.out) { pt.out[0] += dx * 1.5; pt.out[1] += dy * 1.5; }
+          const onMoveEpActiveIdx = epPoints[epActiveIdx];
+          onMoveEpActiveIdx.x += onMoveValue * 1.5;
+          onMoveEpActiveIdx.y += onMoveResult * 1.5;
+          if (onMoveEpActiveIdx.in) { onMoveEpActiveIdx.in[0] += onMoveValue * 1.5; onMoveEpActiveIdx.in[1] += onMoveResult * 1.5; }
+          if (onMoveEpActiveIdx.out) { onMoveEpActiveIdx.out[0] += onMoveValue * 1.5; onMoveEpActiveIdx.out[1] += onMoveResult * 1.5; }
           applyPointsToLayer();
           renderCanvasOverlay();
         }
@@ -2886,13 +2886,13 @@
   }
 
   function renderBlendingOpacity(contentEl, layer) {
-    const I = window.__AM_INTERNAL || {};
+    const renderBlendingOpValue = window.__AM_INTERNAL || {};
     let curOp = 100;
-    const op = (layer.transform && layer.transform.opacity) || layer.opacity;
-    if (op && Array.isArray(op.value)) {
-      curOp = Math.round(op.value[0] * 100);
-    } else if (typeof op === "number") {
-      curOp = Math.round(op * 100);
+    const renderBlendingOpacityValue = (layer.transform && layer.transform.opacity) || layer.opacity;
+    if (renderBlendingOpacityValue && Array.isArray(renderBlendingOpacityValue.value)) {
+      curOp = Math.round(renderBlendingOpacityValue.value[0] * 100);
+    } else if (typeof renderBlendingOpacityValue === "number") {
+      curOp = Math.round(renderBlendingOpacityValue * 100);
     }
     const curBlend = (layer.blendMode || "normal").toLowerCase();
 
@@ -3002,8 +3002,8 @@
 
     function updateKfButton() {
       const opProp = layer.transform && layer.transform.opacity;
-      const tSec = ((I.H || 0) / 1000);
-      const hasKf = !!(opProp && opProp.kfs && opProp.kfs.some(k => Math.abs(Number(k.t) - tSec) < 0.002));
+      const tSec = ((renderBlendingOpValue.H || 0) / 1000);
+      const hasKf = !!(opProp && opProp.kfs && opProp.kfs.some(updateKfButtonT => Math.abs(Number(updateKfButtonT.t) - tSec) < 0.002));
       if (hasKf) {
         kfBtn.classList.add("active");
         kfBtn.title = "Hapus Keyframe Opasitas";
@@ -3018,51 +3018,51 @@
 
     kfBtn.addEventListener("click", () => {
       const opProp = layer.transform && layer.transform.opacity;
-      const tSec = ((I.H || 0) / 1000);
-      const hasKf = !!(opProp && opProp.kfs && opProp.kfs.some(k => Math.abs(Number(k.t) - tSec) < 0.002));
+      const tSec = ((renderBlendingOpValue.H || 0) / 1000);
+      const hasKf = !!(opProp && opProp.kfs && opProp.kfs.some(renderBlendingOpacityT => Math.abs(Number(renderBlendingOpacityT.t) - tSec) < 0.002));
       if (hasKf) {
-        if (I.omKfRemoveAt) I.omKfRemoveAt("op");
+        if (renderBlendingOpValue.omKfRemoveAt) renderBlendingOpValue.omKfRemoveAt("op");
         else if (opProp && opProp.kfs) {
-          const idx = opProp.kfs.findIndex(k => Math.abs(Number(k.t) - tSec) < 0.002);
-          if (idx >= 0) opProp.kfs.splice(idx, 1);
+          const renderBlendingOpacityResult = opProp.kfs.findIndex(tArg => Math.abs(Number(tArg.t) - tSec) < 0.002);
+          if (renderBlendingOpacityResult >= 0) opProp.kfs.splice(renderBlendingOpacityResult, 1);
         }
       } else {
-        if (I.omKfInsert) I.omKfInsert("op");
+        if (renderBlendingOpValue.omKfInsert) renderBlendingOpValue.omKfInsert("op");
         else {
           if (!layer.transform) layer.transform = {};
           if (!layer.transform.opacity) layer.transform.opacity = { value: [Number(slider.value) / 100], kfs: [] };
           const norm = Number(slider.value) / 100;
           layer.transform.opacity.value = [norm];
           layer.transform.opacity.kfs = layer.transform.opacity.kfs || [];
-          const idx = layer.transform.opacity.kfs.findIndex(k => Math.abs(Number(k.t) - tSec) < 0.002);
-          if (idx >= 0) layer.transform.opacity.kfs[idx].v = [norm];
+          const renderBlendingOpacityValueRaw = layer.transform.opacity.kfs.findIndex(renderBlendingOpacityArg => Math.abs(Number(renderBlendingOpacityArg.t) - tSec) < 0.002);
+          if (renderBlendingOpacityValueRaw >= 0) layer.transform.opacity.kfs[renderBlendingOpacityValueRaw].v = [norm];
           else layer.transform.opacity.kfs.push({ t: tSec, v: [norm], e: null, easing: null });
-          layer.transform.opacity.kfs.sort((a, b) => a.t - b.t);
+          layer.transform.opacity.kfs.sort((renderBlendingOpacityArgValue, renderBlendingOpacityArgRaw) => renderBlendingOpacityArgValue.t - renderBlendingOpacityArgRaw.t);
         }
       }
       layer.opacity = layer.transform.opacity;
       layer.userTouched = true;
-      I.V = true;
-      if (I.val2) I.val2.renderAt(I.H);
+      renderBlendingOpValue.V = true;
+      if (renderBlendingOpValue.val2) renderBlendingOpValue.val2.renderAt(renderBlendingOpValue.H);
       updateKfButton();
     });
 
     slider.addEventListener("input", () => {
-      const v = Number(slider.value);
-      valBox.textContent = v + "%";
-      const norm = v / 100;
+      const renderBlendingOpNumber = Number(slider.value);
+      valBox.textContent = renderBlendingOpNumber + "%";
+      const norm = renderBlendingOpNumber / 100;
       if (!layer.transform) layer.transform = {};
       if (layer.transform.opacity && typeof layer.transform.opacity === "object") {
-        if (I.omSetKeyable) {
-          I.omSetKeyable(layer.transform.opacity, norm);
+        if (renderBlendingOpValue.omSetKeyable) {
+          renderBlendingOpValue.omSetKeyable(layer.transform.opacity, norm);
         } else {
           layer.transform.opacity.value = [norm];
           if (layer.transform.opacity.kfs && layer.transform.opacity.kfs.length) {
-            const tSec = ((I.H || 0) / 1000);
-            const idx = layer.transform.opacity.kfs.findIndex(k => Math.abs(Number(k.t) - tSec) < 0.002);
-            if (idx >= 0) layer.transform.opacity.kfs[idx].v = [norm];
+            const tSec = ((renderBlendingOpValue.H || 0) / 1000);
+            const renderBlendingOpacityRaw = layer.transform.opacity.kfs.findIndex(renderBlendingOpacityArgParsed => Math.abs(Number(renderBlendingOpacityArgParsed.t) - tSec) < 0.002);
+            if (renderBlendingOpacityRaw >= 0) layer.transform.opacity.kfs[renderBlendingOpacityRaw].v = [norm];
             else layer.transform.opacity.kfs.push({ t: tSec, v: [norm], e: null, easing: null });
-            layer.transform.opacity.kfs.sort((a, b) => a.t - b.t);
+            layer.transform.opacity.kfs.sort((renderBlendingOpacityParsed, renderBlendingOpacityArgClamped) => renderBlendingOpacityParsed.t - renderBlendingOpacityArgClamped.t);
           }
         }
       } else {
@@ -3070,8 +3070,8 @@
       }
       layer.opacity = layer.transform.opacity;
       layer.userTouched = true;
-      I.V = true;
-      if (I.val2) I.val2.renderAt(I.H);
+      renderBlendingOpValue.V = true;
+      if (renderBlendingOpValue.val2) renderBlendingOpValue.val2.renderAt(renderBlendingOpValue.H);
       updateKfButton();
     });
 
@@ -3080,11 +3080,11 @@
     let activeBlendId = curBlend;
     if (activeBlendId === "diff") activeBlendId = "difference";
 
-    blendCategories.forEach(cat => {
+    blendCategories.forEach(renderBlendingOpacityItems => {
       const card = document.createElement("div");
       card.className = "am-blend-cat-card";
 
-      const matchedItem = cat.items.find(it => it.id === activeBlendId);
+      const matchedItem = renderBlendingOpacityItems.items.find(renderBlendingOpacityClamped => renderBlendingOpacityClamped.id === activeBlendId);
       const isCatActive = !!matchedItem;
       if (isCatActive) card.classList.add("open", "active-cat");
 
@@ -3094,7 +3094,7 @@
         <span class="am-blend-expand-icon">
           <svg viewBox="0 0 80 80" width="12" height="12" fill="#fff"><path d="M56.63 42.79L26.71 64.45C25.31 65.46 23.42 65.04 22.5 63.49C22.17 62.95 22 62.31 22 61.66L22 18.34C22 16.5 23.36 15 25.04 15C25.63 15 26.21 15.19 26.71 15.55L56.63 37.21C58.03 38.22 58.42 40.29 57.5 41.84C57.27 42.22 56.98 42.54 56.63 42.79Z"/></svg>
         </span>
-        <span class="am-blend-cat-title">${cat.name}</span>
+        <span class="am-blend-cat-title">${renderBlendingOpacityItems.name}</span>
         <span class="am-blend-cat-selected">${isCatActive ? matchedItem.name : ""}</span>
         <span class="am-blend-cat-check" style="${isCatActive ? "" : "display:none;"}">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="#00ffa8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -3108,18 +3108,18 @@
       const modeList = document.createElement("div");
       modeList.className = "am-blend-mode-list";
 
-      cat.items.forEach(it => {
+      renderBlendingOpacityItems.items.forEach(renderBlendingOpacityId => {
         const itemEl = document.createElement("div");
-        itemEl.className = "am-blend-mode-item" + (activeBlendId === it.id ? " active" : "");
-        itemEl.dataset.blendId = it.id;
+        itemEl.className = "am-blend-mode-item" + (activeBlendId === renderBlendingOpacityId.id ? " active" : "");
+        itemEl.dataset.blendId = renderBlendingOpacityId.id;
 
         let previewHtml = "";
-        if (it.id === "mask") {
+        if (renderBlendingOpacityId.id === "mask") {
           previewHtml = `
             <div style="width:20px;height:20px;border-radius:50%;background:#00b4d8;position:absolute;left:7px;top:11px;opacity:0.4;"></div>
             <div style="width:20px;height:20px;border-radius:50%;background:#00ffa8;position:absolute;left:14px;top:11px;"></div>
           `;
-        } else if (it.id === "exclude") {
+        } else if (renderBlendingOpacityId.id === "exclude") {
           previewHtml = `
             <div style="width:20px;height:20px;border-radius:50%;background:#00b4d8;position:absolute;left:7px;top:11px;"></div>
             <div style="width:16px;height:16px;border-radius:50%;background:#181b28;position:absolute;left:17px;top:13px;"></div>
@@ -3127,42 +3127,42 @@
         } else {
           previewHtml = `
             <div class="am-blend-prev-c1"></div>
-            <div class="am-blend-prev-c2" style="mix-blend-mode:${it.mode};"></div>
+            <div class="am-blend-prev-c2" style="mix-blend-mode:${renderBlendingOpacityId.mode};"></div>
           `;
         }
 
         itemEl.innerHTML = `
           <div class="am-blend-mode-thumb">${previewHtml}</div>
-          <div class="am-blend-mode-label">${it.name}</div>
+          <div class="am-blend-mode-label">${renderBlendingOpacityId.name}</div>
         `;
 
-        itemEl.addEventListener("click", (e) => {
-          e.stopPropagation();
-          activeBlendId = it.id;
-          layer.blendMode = it.id;
+        itemEl.addEventListener("click", (renderBlendingOpacityStopPropagation) => {
+          renderBlendingOpacityStopPropagation.stopPropagation();
+          activeBlendId = renderBlendingOpacityId.id;
+          layer.blendMode = renderBlendingOpacityId.id;
           layer.userTouched = true;
 
-          contentEl.querySelectorAll(".am-blend-mode-item").forEach(x => x.classList.remove("active"));
+          contentEl.querySelectorAll(".am-blend-mode-item").forEach(renderBlendingOpacityClassList => renderBlendingOpacityClassList.classList.remove("active"));
           itemEl.classList.add("active");
 
-          catContainer.querySelectorAll(".am-blend-cat-card").forEach(c => {
-            const selEl = c.querySelector(".am-blend-cat-selected");
-            const chkEl = c.querySelector(".am-blend-cat-check");
-            if (c === card) {
-              c.classList.add("active-cat");
-              if (selEl) selEl.textContent = it.name;
+          catContainer.querySelectorAll(".am-blend-cat-card").forEach(renderBlendingOpElement => {
+            const selEl = renderBlendingOpElement.querySelector(".am-blend-cat-selected");
+            const chkEl = renderBlendingOpElement.querySelector(".am-blend-cat-check");
+            if (renderBlendingOpElement === card) {
+              renderBlendingOpElement.classList.add("active-cat");
+              if (selEl) selEl.textContent = renderBlendingOpacityId.name;
               if (chkEl) chkEl.style.display = "";
             } else {
-              c.classList.remove("active-cat");
+              renderBlendingOpElement.classList.remove("active-cat");
               if (selEl) selEl.textContent = "";
               if (chkEl) chkEl.style.display = "none";
             }
           });
 
-          I.V = true;
-          if (I.val2) I.val2.renderAt(I.H);
-          if (I.bind4) I.bind4();
-          if (I.omScheduleSave) I.omScheduleSave();
+          renderBlendingOpValue.V = true;
+          if (renderBlendingOpValue.val2) renderBlendingOpValue.val2.renderAt(renderBlendingOpValue.H);
+          if (renderBlendingOpValue.bind4) renderBlendingOpValue.bind4();
+          if (renderBlendingOpValue.omScheduleSave) renderBlendingOpValue.omScheduleSave();
         });
 
         modeList.appendChild(itemEl);
@@ -3175,7 +3175,7 @@
   }
 
   function renderColorFill(contentEl, layer) {
-    const I = window.__AM_INTERNAL || {};
+    const renderColorFillValue = window.__AM_INTERNAL || {};
 
     const swatches = [
       "#ffffff", "#000000", "#808080", "#c0c0c0",
@@ -3184,57 +3184,57 @@
       "#5856d6", "#af52de", "#ff2d55", "#a2845e"
     ];
 
-    function parseColor(c) {
-      if (!c) return { r: 0, g: 255, b: 168, a: 1 };
-      if (Array.isArray(c)) {
+    function parseColor(parseColorArg) {
+      if (!parseColorArg) return { r: 0, g: 255, b: 168, a: 1 };
+      if (Array.isArray(parseColorArg)) {
         return {
-          r: Math.round(Math.max(0, Math.min(1, c[0] || 0)) * 255),
-          g: Math.round(Math.max(0, Math.min(1, c[1] || 0)) * 255),
-          b: Math.round(Math.max(0, Math.min(1, c[2] || 0)) * 255),
-          a: c[3] === undefined ? 1 : Math.max(0, Math.min(1, c[3]))
+          r: Math.round(Math.max(0, Math.min(1, parseColorArg[0] || 0)) * 255),
+          g: Math.round(Math.max(0, Math.min(1, parseColorArg[1] || 0)) * 255),
+          b: Math.round(Math.max(0, Math.min(1, parseColorArg[2] || 0)) * 255),
+          a: parseColorArg[3] === undefined ? 1 : Math.max(0, Math.min(1, parseColorArg[3]))
         };
       }
-      if (typeof c === "string") {
-        let hex = c.trim().replace(/^#/, "");
-        if (hex.length === 3) hex = hex.split("").map(x => x + x).join("") + "ff";
-        else if (hex.length === 6) hex += "ff";
-        if (hex.length === 8) {
+      if (typeof parseColorArg === "string") {
+        let parseColorValue = parseColorArg.trim().replace(/^#/, "");
+        if (parseColorValue.length === 3) parseColorValue = parseColorValue.split("").map(parseColorArgValue => parseColorArgValue + parseColorArgValue).join("") + "ff";
+        else if (parseColorValue.length === 6) parseColorValue += "ff";
+        if (parseColorValue.length === 8) {
           return {
-            r: parseInt(hex.slice(0, 2), 16) || 0,
-            g: parseInt(hex.slice(2, 4), 16) || 0,
-            b: parseInt(hex.slice(4, 6), 16) || 0,
-            a: (parseInt(hex.slice(6, 8), 16) || 255) / 255
+            r: parseInt(parseColorValue.slice(0, 2), 16) || 0,
+            g: parseInt(parseColorValue.slice(2, 4), 16) || 0,
+            b: parseInt(parseColorValue.slice(4, 6), 16) || 0,
+            a: (parseInt(parseColorValue.slice(6, 8), 16) || 255) / 255
           };
         }
       }
       return { r: 0, g: 255, b: 168, a: 1 };
     }
 
-    function rgbaToHex(r, g, b, a) {
-      const hR = Math.round(r).toString(16).padStart(2, "0");
-      const hG = Math.round(g).toString(16).padStart(2, "0");
-      const hB = Math.round(b).toString(16).padStart(2, "0");
-      const alphaVal = a === undefined ? 1 : a;
-      if (alphaVal >= 0.999) return `#${hR}${hG}${hB}`;
-      const hA = Math.round(Math.max(0, Math.min(1, alphaVal)) * 255).toString(16).padStart(2, "0");
-      return `#${hR}${hG}${hB}${hA}`;
+    function rgbaToHex(rgbaToHexValue, greenByte, blueByte, rgbaToHexCondition) {
+      const rgbaToHexResult = Math.round(rgbaToHexValue).toString(16).padStart(2, "0");
+      const rgbaToHexValueRaw = Math.round(greenByte).toString(16).padStart(2, "0");
+      const rgbaToHexRaw = Math.round(blueByte).toString(16).padStart(2, "0");
+      const alphaVal = rgbaToHexCondition === undefined ? 1 : rgbaToHexCondition;
+      if (alphaVal >= 0.999) return `#${rgbaToHexResult}${rgbaToHexValueRaw}${rgbaToHexRaw}`;
+      const rgbaToHexValueParsed = Math.round(Math.max(0, Math.min(1, alphaVal)) * 255).toString(16).padStart(2, "0");
+      return `#${rgbaToHexResult}${rgbaToHexValueRaw}${rgbaToHexRaw}${rgbaToHexValueParsed}`;
     }
 
-    function colorToCss(c) {
-      const p = parseColor(c);
-      return `rgba(${p.r}, ${p.g}, ${p.b}, ${p.a.toFixed(3)})`;
+    function colorToCss(colorToCssValue) {
+      const colorToCssParseColor = parseColor(colorToCssValue);
+      return `rgba(${colorToCssParseColor.r}, ${colorToCssParseColor.g}, ${colorToCssParseColor.b}, ${colorToCssParseColor.a.toFixed(3)})`;
     }
 
-    function colorToHexStr(c) {
-      const p = parseColor(c);
-      return rgbaToHex(p.r, p.g, p.b, p.a);
+    function colorToHexStr(colorToHexStrValue) {
+      const colorToHexStrParseColor = parseColor(colorToHexStrValue);
+      return rgbaToHex(colorToHexStrParseColor.r, colorToHexStrParseColor.g, colorToHexStrParseColor.b, colorToHexStrParseColor.a);
     }
 
-    function resolveMediaSrc(l) {
-      if (l.mediaUrl) return l.mediaUrl;
-      const key = l.fillImage || l.fillVideo || l.src;
-      if (I.val2 && I.val2.images && key) {
-        const el = I.val2.images.get(key);
+    function resolveMediaSrc(mediaUrl) {
+      if (mediaUrl.mediaUrl) return mediaUrl.mediaUrl;
+      const resolveMediaSrcValue = mediaUrl.fillImage || mediaUrl.fillVideo || mediaUrl.src;
+      if (renderColorFillValue.val2 && renderColorFillValue.val2.images && resolveMediaSrcValue) {
+        const el = renderColorFillValue.val2.images.get(resolveMediaSrcValue);
         if (el && el.src) return el.src;
       }
       return "";
@@ -3250,69 +3250,69 @@
 
     let gradStart = (layer.gradient && layer.gradient.start) ? [...layer.gradient.start] : (activeTab === "radial" ? [0.5, 0.5] : [0, 0.5]);
     let gradEnd = (layer.gradient && layer.gradient.end) ? [...layer.gradient.end] : (activeTab === "radial" ? [1, 0.5] : [1, 0.5]);
-    let gradColor1 = (layer.gradient && layer.gradient.startColor) ? parseColor(layer.gradient.startColor) : { ...currentColor };
-    let gradColor2 = (layer.gradient && layer.gradient.endColor) ? parseColor(layer.gradient.endColor) : { r: 0, g: 85, b: 255, a: 1 };
+    let renderColorFillR = (layer.gradient && layer.gradient.startColor) ? parseColor(layer.gradient.startColor) : { ...currentColor };
+    let rValue = (layer.gradient && layer.gradient.endColor) ? parseColor(layer.gradient.endColor) : { r: 0, g: 85, b: 255, a: 1 };
     let activeGradStop = 1;
 
     let mediaFillMode = layer.mediaFillMode || "fill";
 
     function commitChanges() {
-      I.V = true;
-      if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
-      if (I.omScheduleSave) I.omScheduleSave();
+      renderColorFillValue.V = true;
+      if (renderColorFillValue.val2 && renderColorFillValue.val2.renderAt) renderColorFillValue.val2.renderAt(renderColorFillValue.H);
+      if (renderColorFillValue.omScheduleSave) renderColorFillValue.omScheduleSave();
     }
 
     function applySolidColor() {
       layer.fillType = "color";
-      const hex = rgbaToHex(currentColor.r, currentColor.g, currentColor.b, currentColor.a);
-      layer.color = hex;
+      const applySolidColorRgbaToHex = rgbaToHex(currentColor.r, currentColor.g, currentColor.b, currentColor.a);
+      layer.color = applySolidColorRgbaToHex;
       layer.fillColor = [currentColor.r / 255, currentColor.g / 255, currentColor.b / 255, currentColor.a];
       commitChanges();
     }
 
     function applyGradient() {
       layer.fillType = "gradient";
-      const c1Arr = [gradColor1.r / 255, gradColor1.g / 255, gradColor1.b / 255, gradColor1.a];
-      const c2Arr = [gradColor2.r / 255, gradColor2.g / 255, gradColor2.b / 255, gradColor2.a];
+      const applyGradientList = [renderColorFillR.r / 255, renderColorFillR.g / 255, renderColorFillR.b / 255, renderColorFillR.a];
+      const listValue = [rValue.r / 255, rValue.g / 255, rValue.b / 255, rValue.a];
       layer.gradient = {
         type: activeTab === "radial" ? "radial" : "linear",
         start: [...gradStart],
         end: [...gradEnd],
-        startColor: c1Arr,
-        endColor: c2Arr,
+        startColor: applyGradientList,
+        endColor: listValue,
         stops: [
-          { t: 0, color: c1Arr },
-          { t: 1, color: c2Arr }
+          { t: 0, color: applyGradientList },
+          { t: 1, color: listValue }
         ]
       };
       commitChanges();
     }
 
-    async function triggerEyeDropper(cb) {
+    async function triggerEyeDropper(triggerEyeDroppeCallback) {
       if (window.EyeDropper) {
         try {
-          const ed = new window.EyeDropper();
-          const res = await ed.open();
-          if (res && res.sRGBHex) {
-            cb(res.sRGBHex);
+          const open = new window.EyeDropper();
+          const sRgbHex = await open.open();
+          if (sRgbHex && sRgbHex.sRGBHex) {
+            triggerEyeDroppeCallback(sRgbHex.sRGBHex);
           }
-        } catch (e) {}
+        } catch (triggerEyeDropperValue) {}
       } else {
         const dummyPicker = document.createElement("input");
         dummyPicker.type = "color";
-        dummyPicker.onchange = (e) => cb(e.target.value);
+        dummyPicker.onchange = (triggerEyeDropperTarget) => triggerEyeDroppeCallback(triggerEyeDropperTarget.target.value);
         dummyPicker.click();
       }
     }
 
     function checkHasKeyframe() {
       const keyable = layer.fillColorKeyable || (layer.transform && layer.transform.fillColor);
-      const tSec = ((I.H || 0) / 1000);
-      return !!(keyable && keyable.kfs && keyable.kfs.some(k => Math.abs(Number(k.t) - tSec) < 0.002));
+      const tSec = ((renderColorFillValue.H || 0) / 1000);
+      return !!(keyable && keyable.kfs && keyable.kfs.some(checkHasKeyframeT => Math.abs(Number(checkHasKeyframeT.t) - tSec) < 0.002));
     }
 
     function renderView() {
-      const activeColorObj = activeTab === "solid" ? currentColor : (activeGradStop === 1 ? gradColor1 : gradColor2);
+      const activeColorObj = activeTab === "solid" ? currentColor : (activeGradStop === 1 ? renderColorFillR : rValue);
       const activeHexStr = colorToHexStr(activeColorObj);
       const hasKf = checkHasKeyframe();
 
@@ -3382,12 +3382,12 @@
       `;
     }
 
-    function renderSolidSection(hexStr, col) {
+    function renderSolidSection(hexStr, renderSolidSectionR) {
       return `
         <div style="display:flex;flex-direction:column;gap:12px;">
           <div class="am-cf-top-bar">
             <div class="am-cf-color-preview-wrap">
-              <div class="am-cf-color-preview" style="background:${colorToCss(col)};"></div>
+              <div class="am-cf-color-preview" style="background:${colorToCss(renderSolidSectionR)};"></div>
             </div>
             <input type="text" id="am-cf-hex-input" class="am-cf-hex-input" value="${hexStr}">
             <button id="am-cf-spoid-btn" class="am-cf-icon-btn" title="Pipet Warna (EyeDropper)">
@@ -3399,8 +3399,8 @@
 
           <div style="font-size:11px;font-weight:700;color:var(--am-p5);text-transform:uppercase;">Palet Warna</div>
           <div class="am-palette-grid" id="am-cf-swatches">
-            ${swatches.map(hex => `
-              <div class="am-palette-chip ${hex.toLowerCase() === hexStr.slice(0, 7).toLowerCase() ? 'active' : ''}" data-color="${hex}" style="background:${hex};"></div>
+            ${swatches.map(renderSolidSectionArg => `
+              <div class="am-palette-chip ${renderSolidSectionArg.toLowerCase() === hexStr.slice(0, 7).toLowerCase() ? 'active' : ''}" data-color="${renderSolidSectionArg}" style="background:${renderSolidSectionArg};"></div>
             `).join('')}
           </div>
 
@@ -3408,59 +3408,59 @@
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Merah (R)</span>
-                <span id="am-cf-r-val" class="am-cf-slider-val">${col.r}</span>
+                <span id="am-cf-r-val" class="am-cf-slider-val">${renderSolidSectionR.r}</span>
               </div>
-              <input type="range" id="am-cf-r" min="0" max="255" value="${col.r}" class="am-cf-range am-cf-range-r">
+              <input type="range" id="am-cf-r" min="0" max="255" value="${renderSolidSectionR.r}" class="am-cf-range am-cf-range-r">
             </div>
 
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Hijau (G)</span>
-                <span id="am-cf-g-val" class="am-cf-slider-val">${col.g}</span>
+                <span id="am-cf-g-val" class="am-cf-slider-val">${renderSolidSectionR.g}</span>
               </div>
-              <input type="range" id="am-cf-g" min="0" max="255" value="${col.g}" class="am-cf-range am-cf-range-g">
+              <input type="range" id="am-cf-g" min="0" max="255" value="${renderSolidSectionR.g}" class="am-cf-range am-cf-range-g">
             </div>
 
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Biru (B)</span>
-                <span id="am-cf-b-val" class="am-cf-slider-val">${col.b}</span>
+                <span id="am-cf-b-val" class="am-cf-slider-val">${renderSolidSectionR.b}</span>
               </div>
-              <input type="range" id="am-cf-b" min="0" max="255" value="${col.b}" class="am-cf-range am-cf-range-b">
+              <input type="range" id="am-cf-b" min="0" max="255" value="${renderSolidSectionR.b}" class="am-cf-range am-cf-range-b">
             </div>
 
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Opasitas (Alpha)</span>
-                <span id="am-cf-a-val" class="am-cf-slider-val">${Math.round(col.a * 100)}%</span>
+                <span id="am-cf-a-val" class="am-cf-slider-val">${Math.round(renderSolidSectionR.a * 100)}%</span>
               </div>
-              <input type="range" id="am-cf-a" min="0" max="100" value="${Math.round(col.a * 100)}" class="am-cf-range am-cf-range-a">
+              <input type="range" id="am-cf-a" min="0" max="100" value="${Math.round(renderSolidSectionR.a * 100)}" class="am-cf-range am-cf-range-a">
             </div>
           </div>
         </div>
       `;
     }
 
-    function renderLinearSection(hexStr, col) {
-      const gradCss = `linear-gradient(to right, ${colorToCss(gradColor1)}, ${colorToCss(gradColor2)})`;
+    function renderLinearSection(hexStr, renderLinearSectionR) {
+      const gradCss = `linear-gradient(to right, ${colorToCss(renderColorFillR)}, ${colorToCss(rValue)})`;
       return `
         <div style="display:flex;flex-direction:column;gap:12px;">
           <div class="am-cf-stops-container">
             <div class="am-cf-stop-card ${activeGradStop === 1 ? 'active' : ''}" id="am-cf-stop-1">
-              <div class="am-cf-stop-chip" style="background:${colorToCss(gradColor1)};"></div>
+              <div class="am-cf-stop-chip" style="background:${colorToCss(renderColorFillR)};"></div>
               <div class="am-cf-stop-info">
                 <span class="am-cf-stop-title">Titik 1 (Mulai)</span>
-                <span class="am-cf-stop-hex">${colorToHexStr(gradColor1)}</span>
+                <span class="am-cf-stop-hex">${colorToHexStr(renderColorFillR)}</span>
               </div>
             </div>
 
             <button id="am-cf-swap-btn" class="am-cf-swap-btn" title="Tukar Warna">⇄</button>
 
             <div class="am-cf-stop-card ${activeGradStop === 2 ? 'active' : ''}" id="am-cf-stop-2">
-              <div class="am-cf-stop-chip" style="background:${colorToCss(gradColor2)};"></div>
+              <div class="am-cf-stop-chip" style="background:${colorToCss(rValue)};"></div>
               <div class="am-cf-stop-info">
                 <span class="am-cf-stop-title">Titik 2 (Akhir)</span>
-                <span class="am-cf-stop-hex">${colorToHexStr(gradColor2)}</span>
+                <span class="am-cf-stop-hex">${colorToHexStr(rValue)}</span>
               </div>
             </div>
           </div>
@@ -3501,7 +3501,7 @@
           </div>
           <div class="am-cf-top-bar">
             <div class="am-cf-color-preview-wrap">
-              <div class="am-cf-color-preview" style="background:${colorToCss(col)};"></div>
+              <div class="am-cf-color-preview" style="background:${colorToCss(renderLinearSectionR)};"></div>
             </div>
             <input type="text" id="am-cf-hex-input" class="am-cf-hex-input" value="${hexStr}">
             <button id="am-cf-spoid-btn" class="am-cf-icon-btn" title="Pipet Warna (EyeDropper)">
@@ -3512,8 +3512,8 @@
           </div>
 
           <div class="am-palette-grid" id="am-cf-swatches">
-            ${swatches.map(hex => `
-              <div class="am-palette-chip ${hex.toLowerCase() === hexStr.slice(0, 7).toLowerCase() ? 'active' : ''}" data-color="${hex}" style="background:${hex};"></div>
+            ${swatches.map(renderLinearSectionArg => `
+              <div class="am-palette-chip ${renderLinearSectionArg.toLowerCase() === hexStr.slice(0, 7).toLowerCase() ? 'active' : ''}" data-color="${renderLinearSectionArg}" style="background:${renderLinearSectionArg};"></div>
             `).join('')}
           </div>
 
@@ -3521,57 +3521,57 @@
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Merah (R)</span>
-                <span id="am-cf-r-val" class="am-cf-slider-val">${col.r}</span>
+                <span id="am-cf-r-val" class="am-cf-slider-val">${renderLinearSectionR.r}</span>
               </div>
-              <input type="range" id="am-cf-r" min="0" max="255" value="${col.r}" class="am-cf-range am-cf-range-r">
+              <input type="range" id="am-cf-r" min="0" max="255" value="${renderLinearSectionR.r}" class="am-cf-range am-cf-range-r">
             </div>
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Hijau (G)</span>
-                <span id="am-cf-g-val" class="am-cf-slider-val">${col.g}</span>
+                <span id="am-cf-g-val" class="am-cf-slider-val">${renderLinearSectionR.g}</span>
               </div>
-              <input type="range" id="am-cf-g" min="0" max="255" value="${col.g}" class="am-cf-range am-cf-range-g">
+              <input type="range" id="am-cf-g" min="0" max="255" value="${renderLinearSectionR.g}" class="am-cf-range am-cf-range-g">
             </div>
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Biru (B)</span>
-                <span id="am-cf-b-val" class="am-cf-slider-val">${col.b}</span>
+                <span id="am-cf-b-val" class="am-cf-slider-val">${renderLinearSectionR.b}</span>
               </div>
-              <input type="range" id="am-cf-b" min="0" max="255" value="${col.b}" class="am-cf-range am-cf-range-b">
+              <input type="range" id="am-cf-b" min="0" max="255" value="${renderLinearSectionR.b}" class="am-cf-range am-cf-range-b">
             </div>
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Opasitas (Alpha)</span>
-                <span id="am-cf-a-val" class="am-cf-slider-val">${Math.round(col.a * 100)}%</span>
+                <span id="am-cf-a-val" class="am-cf-slider-val">${Math.round(renderLinearSectionR.a * 100)}%</span>
               </div>
-              <input type="range" id="am-cf-a" min="0" max="100" value="${Math.round(col.a * 100)}" class="am-cf-range am-cf-range-a">
+              <input type="range" id="am-cf-a" min="0" max="100" value="${Math.round(renderLinearSectionR.a * 100)}" class="am-cf-range am-cf-range-a">
             </div>
           </div>
         </div>
       `;
     }
 
-    function renderRadialSection(hexStr, col) {
-      const gradCss = `radial-gradient(circle, ${colorToCss(gradColor1)} 0%, ${colorToCss(gradColor2)} 100%)`;
+    function renderRadialSection(hexStr, renderRadialSectionR) {
+      const gradCss = `radial-gradient(circle, ${colorToCss(renderColorFillR)} 0%, ${colorToCss(rValue)} 100%)`;
       const curRadius = Math.round(Math.hypot(gradEnd[0] - gradStart[0], gradEnd[1] - gradStart[1]) * 100) || 50;
       return `
         <div style="display:flex;flex-direction:column;gap:12px;">
           <div class="am-cf-stops-container">
             <div class="am-cf-stop-card ${activeGradStop === 1 ? 'active' : ''}" id="am-cf-stop-1">
-              <div class="am-cf-stop-chip" style="background:${colorToCss(gradColor1)};"></div>
+              <div class="am-cf-stop-chip" style="background:${colorToCss(renderColorFillR)};"></div>
               <div class="am-cf-stop-info">
                 <span class="am-cf-stop-title">Pusat (Dalam)</span>
-                <span class="am-cf-stop-hex">${colorToHexStr(gradColor1)}</span>
+                <span class="am-cf-stop-hex">${colorToHexStr(renderColorFillR)}</span>
               </div>
             </div>
 
             <button id="am-cf-swap-btn" class="am-cf-swap-btn" title="Tukar Warna">⇄</button>
 
             <div class="am-cf-stop-card ${activeGradStop === 2 ? 'active' : ''}" id="am-cf-stop-2">
-              <div class="am-cf-stop-chip" style="background:${colorToCss(gradColor2)};"></div>
+              <div class="am-cf-stop-chip" style="background:${colorToCss(rValue)};"></div>
               <div class="am-cf-stop-info">
                 <span class="am-cf-stop-title">Tepi (Luar)</span>
-                <span class="am-cf-stop-hex">${colorToHexStr(gradColor2)}</span>
+                <span class="am-cf-stop-hex">${colorToHexStr(rValue)}</span>
               </div>
             </div>
           </div>
@@ -3610,7 +3610,7 @@
           </div>
           <div class="am-cf-top-bar">
             <div class="am-cf-color-preview-wrap">
-              <div class="am-cf-color-preview" style="background:${colorToCss(col)};"></div>
+              <div class="am-cf-color-preview" style="background:${colorToCss(renderRadialSectionR)};"></div>
             </div>
             <input type="text" id="am-cf-hex-input" class="am-cf-hex-input" value="${hexStr}">
             <button id="am-cf-spoid-btn" class="am-cf-icon-btn" title="Pipet Warna (EyeDropper)">
@@ -3621,8 +3621,8 @@
           </div>
 
           <div class="am-palette-grid" id="am-cf-swatches">
-            ${swatches.map(hex => `
-              <div class="am-palette-chip ${hex.toLowerCase() === hexStr.slice(0, 7).toLowerCase() ? 'active' : ''}" data-color="${hex}" style="background:${hex};"></div>
+            ${swatches.map(renderRadialSectionArg => `
+              <div class="am-palette-chip ${renderRadialSectionArg.toLowerCase() === hexStr.slice(0, 7).toLowerCase() ? 'active' : ''}" data-color="${renderRadialSectionArg}" style="background:${renderRadialSectionArg};"></div>
             `).join('')}
           </div>
 
@@ -3630,30 +3630,30 @@
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Merah (R)</span>
-                <span id="am-cf-r-val" class="am-cf-slider-val">${col.r}</span>
+                <span id="am-cf-r-val" class="am-cf-slider-val">${renderRadialSectionR.r}</span>
               </div>
-              <input type="range" id="am-cf-r" min="0" max="255" value="${col.r}" class="am-cf-range am-cf-range-r">
+              <input type="range" id="am-cf-r" min="0" max="255" value="${renderRadialSectionR.r}" class="am-cf-range am-cf-range-r">
             </div>
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Hijau (G)</span>
-                <span id="am-cf-g-val" class="am-cf-slider-val">${col.g}</span>
+                <span id="am-cf-g-val" class="am-cf-slider-val">${renderRadialSectionR.g}</span>
               </div>
-              <input type="range" id="am-cf-g" min="0" max="255" value="${col.g}" class="am-cf-range am-cf-range-g">
+              <input type="range" id="am-cf-g" min="0" max="255" value="${renderRadialSectionR.g}" class="am-cf-range am-cf-range-g">
             </div>
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Biru (B)</span>
-                <span id="am-cf-b-val" class="am-cf-slider-val">${col.b}</span>
+                <span id="am-cf-b-val" class="am-cf-slider-val">${renderRadialSectionR.b}</span>
               </div>
-              <input type="range" id="am-cf-b" min="0" max="255" value="${col.b}" class="am-cf-range am-cf-range-b">
+              <input type="range" id="am-cf-b" min="0" max="255" value="${renderRadialSectionR.b}" class="am-cf-range am-cf-range-b">
             </div>
             <div class="am-cf-slider-row">
               <div class="am-cf-slider-header">
                 <span>Opasitas (Alpha)</span>
-                <span id="am-cf-a-val" class="am-cf-slider-val">${Math.round(col.a * 100)}%</span>
+                <span id="am-cf-a-val" class="am-cf-slider-val">${Math.round(renderRadialSectionR.a * 100)}%</span>
               </div>
-              <input type="range" id="am-cf-a" min="0" max="100" value="${Math.round(col.a * 100)}" class="am-cf-range am-cf-range-a">
+              <input type="range" id="am-cf-a" min="0" max="100" value="${Math.round(renderRadialSectionR.a * 100)}" class="am-cf-range am-cf-range-a">
             </div>
           </div>
         </div>
@@ -3717,8 +3717,8 @@
         btnBack.onclick = () => {
           const subpanel = document.getElementById("am-subpanel-container");
           if (subpanel) subpanel.classList.remove("open");
-          const ep = document.getElementById("am-element-edit-panel");
-          if (ep) ep.style.display = "flex";
+          const bindViewEventsAmElementEditPanEl = document.getElementById("am-element-edit-panel");
+          if (bindViewEventsAmElementEditPanEl) bindViewEventsAmElementEditPanEl.style.display = "flex";
         };
       }
 
@@ -3726,10 +3726,10 @@
       if (btnKf) {
         btnKf.onclick = () => {
           if (checkHasKeyframe()) {
-            if (I.omKfRemoveAt) I.omKfRemoveAt("color", layer);
+            if (renderColorFillValue.omKfRemoveAt) renderColorFillValue.omKfRemoveAt("color", layer);
             else if (typeof window.omKfRemoveAt === "function") window.omKfRemoveAt("color", layer);
           } else {
-            if (I.omKfInsert) I.omKfInsert("color", layer);
+            if (renderColorFillValue.omKfInsert) renderColorFillValue.omKfInsert("color", layer);
             else if (typeof window.omKfInsert === "function") window.omKfInsert("color", layer);
           }
           renderView();
@@ -3750,19 +3750,19 @@
         };
       }
 
-      contentEl.querySelectorAll(".am-cf-tab-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const t = btn.dataset.tab;
-          if (t === "none") {
+      contentEl.querySelectorAll(".am-cf-tab-btn").forEach(bindViewEventsDataset => {
+        bindViewEventsDataset.addEventListener("click", () => {
+          const bindViewEventsTab = bindViewEventsDataset.dataset.tab;
+          if (bindViewEventsTab === "none") {
             layer.fillType = "none";
             commitChanges();
             renderView();
             return;
           }
           if (layer.fillType === "none") {
-            layer.fillType = (t === "media") ? "media" : (t === "linear" || t === "radial") ? "gradient" : "color";
+            layer.fillType = (bindViewEventsTab === "media") ? "media" : (bindViewEventsTab === "linear" || bindViewEventsTab === "radial") ? "gradient" : "color";
           }
-          activeTab = t;
+          activeTab = bindViewEventsTab;
           if (activeTab === "solid") {
             applySolidColor();
           } else if (activeTab === "linear" || activeTab === "radial") {
@@ -3781,15 +3781,15 @@
 
       const hexInput = contentEl.querySelector("#am-cf-hex-input");
       if (hexInput) {
-        hexInput.addEventListener("change", (e) => {
-          const val = e.target.value.trim();
-          const parsed = parseColor(val);
+        hexInput.addEventListener("change", (bindViewEventsParsed) => {
+          const bindViewEventsValueRaw = bindViewEventsParsed.target.value.trim();
+          const parsed = parseColor(bindViewEventsValueRaw);
           if (activeTab === "solid") {
             currentColor = parsed;
             applySolidColor();
           } else {
-            if (activeGradStop === 1) gradColor1 = parsed;
-            else gradColor2 = parsed;
+            if (activeGradStop === 1) renderColorFillR = parsed;
+            else rValue = parsed;
             applyGradient();
           }
           renderView();
@@ -3799,14 +3799,14 @@
       const spoidBtn = contentEl.querySelector("#am-cf-spoid-btn");
       if (spoidBtn) {
         spoidBtn.addEventListener("click", () => {
-          triggerEyeDropper((hex) => {
-            const parsed = parseColor(hex);
+          triggerEyeDropper((bindViewEventsValue) => {
+            const parsed = parseColor(bindViewEventsValue);
             if (activeTab === "solid") {
               currentColor = parsed;
               applySolidColor();
             } else {
-              if (activeGradStop === 1) gradColor1 = parsed;
-              else gradColor2 = parsed;
+              if (activeGradStop === 1) renderColorFillR = parsed;
+              else rValue = parsed;
               applyGradient();
             }
             renderView();
@@ -3816,8 +3816,8 @@
 
       contentEl.querySelectorAll("#am-cf-swatches .am-palette-chip").forEach(chip => {
         chip.addEventListener("click", () => {
-          const hex = chip.dataset.color;
-          const parsed = parseColor(hex);
+          const color = chip.dataset.color;
+          const parsed = parseColor(color);
           if (activeTab === "solid") {
             currentColor.r = parsed.r;
             currentColor.g = parsed.g;
@@ -3825,13 +3825,13 @@
             applySolidColor();
           } else {
             if (activeGradStop === 1) {
-              gradColor1.r = parsed.r;
-              gradColor1.g = parsed.g;
-              gradColor1.b = parsed.b;
+              renderColorFillR.r = parsed.r;
+              renderColorFillR.g = parsed.g;
+              renderColorFillR.b = parsed.b;
             } else {
-              gradColor2.r = parsed.r;
-              gradColor2.g = parsed.g;
-              gradColor2.b = parsed.b;
+              rValue.r = parsed.r;
+              rValue.g = parsed.g;
+              rValue.b = parsed.b;
             }
             applyGradient();
           }
@@ -3845,7 +3845,7 @@
       const aSlider = contentEl.querySelector("#am-cf-a");
 
       function updateActiveColorFromSliders() {
-        const target = activeTab === "solid" ? currentColor : (activeGradStop === 1 ? gradColor1 : gradColor2);
+        const target = activeTab === "solid" ? currentColor : (activeGradStop === 1 ? renderColorFillR : rValue);
         if (rSlider) target.r = parseInt(rSlider.value, 10);
         if (gSlider) target.g = parseInt(gSlider.value, 10);
         if (bSlider) target.b = parseInt(bSlider.value, 10);
@@ -3871,13 +3871,13 @@
           const barPreview = contentEl.querySelector(".am-cf-bar-preview");
           if (barPreview) {
             barPreview.style.background = activeTab === "radial"
-              ? `radial-gradient(circle, ${colorToCss(gradColor1)} 0%, ${colorToCss(gradColor2)} 100%)`
-              : `linear-gradient(to right, ${colorToCss(gradColor1)}, ${colorToCss(gradColor2)})`;
+              ? `radial-gradient(circle, ${colorToCss(renderColorFillR)} 0%, ${colorToCss(rValue)} 100%)`
+              : `linear-gradient(to right, ${colorToCss(renderColorFillR)}, ${colorToCss(rValue)})`;
           }
-          const stop1Chip = contentEl.querySelector("#am-cf-stop-1 .am-cf-stop-chip");
-          const stop2Chip = contentEl.querySelector("#am-cf-stop-2 .am-cf-stop-chip");
-          if (stop1Chip) stop1Chip.style.background = colorToCss(gradColor1);
-          if (stop2Chip) stop2Chip.style.background = colorToCss(gradColor2);
+          const amCfStop = contentEl.querySelector("#am-cf-stop-1 .am-cf-stop-chip");
+          const updateActiveColorFromSlidersAmCfStopAmCfStopChipEl = contentEl.querySelector("#am-cf-stop-2 .am-cf-stop-chip");
+          if (amCfStop) amCfStop.style.background = colorToCss(renderColorFillR);
+          if (updateActiveColorFromSlidersAmCfStopAmCfStopChipEl) updateActiveColorFromSlidersAmCfStopAmCfStopChipEl.style.background = colorToCss(rValue);
         }
       }
 
@@ -3886,16 +3886,16 @@
       if (bSlider) bSlider.addEventListener("input", updateActiveColorFromSliders);
       if (aSlider) aSlider.addEventListener("input", updateActiveColorFromSliders);
 
-      const stop1Card = contentEl.querySelector("#am-cf-stop-1");
-      const stop2Card = contentEl.querySelector("#am-cf-stop-2");
-      if (stop1Card) {
-        stop1Card.addEventListener("click", () => {
+      const amCfStopEl = contentEl.querySelector("#am-cf-stop-1");
+      const bindViewEventsAmCfStopEl = contentEl.querySelector("#am-cf-stop-2");
+      if (amCfStopEl) {
+        amCfStopEl.addEventListener("click", () => {
           activeGradStop = 1;
           renderView();
         });
       }
-      if (stop2Card) {
-        stop2Card.addEventListener("click", () => {
+      if (bindViewEventsAmCfStopEl) {
+        bindViewEventsAmCfStopEl.addEventListener("click", () => {
           activeGradStop = 2;
           renderView();
         });
@@ -3904,18 +3904,18 @@
       const swapBtn = contentEl.querySelector("#am-cf-swap-btn");
       if (swapBtn) {
         swapBtn.addEventListener("click", () => {
-          const tmp = { ...gradColor1 };
-          gradColor1 = { ...gradColor2 };
-          gradColor2 = tmp;
+          const bindViewEventsResult = { ...renderColorFillR };
+          renderColorFillR = { ...rValue };
+          rValue = bindViewEventsResult;
           applyGradient();
           renderView();
         });
       }
 
-      contentEl.querySelectorAll(".am-cf-dir-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          gradStart = [parseFloat(btn.dataset.sx), parseFloat(btn.dataset.sy)];
-          gradEnd = [parseFloat(btn.dataset.ex), parseFloat(btn.dataset.ey)];
+      contentEl.querySelectorAll(".am-cf-dir-btn").forEach(bindViewEventsAddEventListener => {
+        bindViewEventsAddEventListener.addEventListener("click", () => {
+          gradStart = [parseFloat(bindViewEventsAddEventListener.dataset.sx), parseFloat(bindViewEventsAddEventListener.dataset.sy)];
+          gradEnd = [parseFloat(bindViewEventsAddEventListener.dataset.ex), parseFloat(bindViewEventsAddEventListener.dataset.ey)];
           applyGradient();
           renderView();
         });
@@ -3924,18 +3924,18 @@
       const sxSlider = contentEl.querySelector("#am-cf-sx");
       const exSlider = contentEl.querySelector("#am-cf-ex");
       if (sxSlider) {
-        sxSlider.addEventListener("input", (e) => {
-          gradStart[0] = parseInt(e.target.value, 10) / 100;
+        sxSlider.addEventListener("input", (bindViewEventsTarget) => {
+          gradStart[0] = parseInt(bindViewEventsTarget.target.value, 10) / 100;
           const valEl = contentEl.querySelector("#am-cf-sx-val");
-          if (valEl) valEl.textContent = e.target.value + "%";
+          if (valEl) valEl.textContent = bindViewEventsTarget.target.value + "%";
           applyGradient();
         });
       }
       if (exSlider) {
-        exSlider.addEventListener("input", (e) => {
-          gradEnd[0] = parseInt(e.target.value, 10) / 100;
+        exSlider.addEventListener("input", (targetArg) => {
+          gradEnd[0] = parseInt(targetArg.target.value, 10) / 100;
           const valEl = contentEl.querySelector("#am-cf-ex-val");
-          if (valEl) valEl.textContent = e.target.value + "%";
+          if (valEl) valEl.textContent = targetArg.target.value + "%";
           applyGradient();
         });
       }
@@ -3944,27 +3944,27 @@
       const cySlider = contentEl.querySelector("#am-cf-cy");
       const radSlider = contentEl.querySelector("#am-cf-rad");
       if (cxSlider) {
-        cxSlider.addEventListener("input", (e) => {
-          gradStart[0] = parseInt(e.target.value, 10) / 100;
+        cxSlider.addEventListener("input", (bindViewEventsArg) => {
+          gradStart[0] = parseInt(bindViewEventsArg.target.value, 10) / 100;
           const valEl = contentEl.querySelector("#am-cf-cx-val");
-          if (valEl) valEl.textContent = e.target.value + "%";
+          if (valEl) valEl.textContent = bindViewEventsArg.target.value + "%";
           applyGradient();
         });
       }
       if (cySlider) {
-        cySlider.addEventListener("input", (e) => {
-          gradStart[1] = parseInt(e.target.value, 10) / 100;
+        cySlider.addEventListener("input", (bindViewEventsArgValue) => {
+          gradStart[1] = parseInt(bindViewEventsArgValue.target.value, 10) / 100;
           const valEl = contentEl.querySelector("#am-cf-cy-val");
-          if (valEl) valEl.textContent = e.target.value + "%";
+          if (valEl) valEl.textContent = bindViewEventsArgValue.target.value + "%";
           applyGradient();
         });
       }
       if (radSlider) {
-        radSlider.addEventListener("input", (e) => {
-          const r = parseInt(e.target.value, 10) / 100;
-          gradEnd = [gradStart[0] + r, gradStart[1]];
+        radSlider.addEventListener("input", (bindViewEventsArgRaw) => {
+          const bindViewEventsRaw = parseInt(bindViewEventsArgRaw.target.value, 10) / 100;
+          gradEnd = [gradStart[0] + bindViewEventsRaw, gradStart[1]];
           const valEl = contentEl.querySelector("#am-cf-rad-val");
-          if (valEl) valEl.textContent = e.target.value + "%";
+          if (valEl) valEl.textContent = bindViewEventsArgRaw.target.value + "%";
           applyGradient();
         });
       }
@@ -3972,31 +3972,31 @@
       const changeMediaBtn = contentEl.querySelector("#am-cf-change-media-btn");
       if (changeMediaBtn) {
         changeMediaBtn.addEventListener("click", () => {
-          const fi = document.createElement("input");
-          fi.type = "file";
-          fi.accept = "image/*,video/*";
-          fi.onchange = async (e) => {
-            const f = e.target.files && e.target.files[0];
-            if (!f) return;
-            if (I.replaceMediaForLayer) {
-              await I.replaceMediaForLayer(layer, f);
+          const bindViewEventsInputEl = document.createElement("input");
+          bindViewEventsInputEl.type = "file";
+          bindViewEventsInputEl.accept = "image/*,video/*";
+          bindViewEventsInputEl.onchange = async (bindViewEventsArgParsed) => {
+            const bindViewEventsData = bindViewEventsArgParsed.target.files && bindViewEventsArgParsed.target.files[0];
+            if (!bindViewEventsData) return;
+            if (renderColorFillValue.replaceMediaForLayer) {
+              await renderColorFillValue.replaceMediaForLayer(layer, bindViewEventsData);
             } else {
               layer.fillType = "media";
-              layer.mediaUrl = URL.createObjectURL(f);
-              layer.fillImage = f.name;
-              I.V = true;
+              layer.mediaUrl = URL.createObjectURL(bindViewEventsData);
+              layer.fillImage = bindViewEventsData.name;
+              renderColorFillValue.V = true;
             }
             activeTab = "media";
             commitChanges();
             renderView();
           };
-          fi.click();
+          bindViewEventsInputEl.click();
         });
       }
 
-      contentEl.querySelectorAll(".am-cf-crop-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          mediaFillMode = btn.dataset.mode;
+      contentEl.querySelectorAll(".am-cf-crop-btn").forEach(datasetArg => {
+        datasetArg.addEventListener("click", () => {
+          mediaFillMode = datasetArg.dataset.mode;
           layer.mediaFillMode = mediaFillMode;
           commitChanges();
           renderView();
@@ -4009,26 +4009,26 @@
 
   function computePathBounds(commands) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    function addPt(x, y) {
-      if (x < minX) minX = x;
-      if (x > maxX) maxX = x;
-      if (y < minY) minY = y;
-      if (y > maxY) maxY = y;
+    function addPt(addPtArg, addPtArgValue) {
+      if (addPtArg < minX) minX = addPtArg;
+      if (addPtArg > maxX) maxX = addPtArg;
+      if (addPtArgValue < minY) minY = addPtArgValue;
+      if (addPtArgValue > maxY) maxY = addPtArgValue;
     }
     let curX = 0, curY = 0;
-    for (const cmd of commands) {
-      const type = cmd[0];
+    for (const computePathBoundsResult of commands) {
+      const type = computePathBoundsResult[0];
       if (type === 'M' || type === 'L') {
-        curX = cmd[1]; curY = cmd[2];
+        curX = computePathBoundsResult[1]; curY = computePathBoundsResult[2];
         addPt(curX, curY);
       } else if (type === 'C') {
-        const cp1x = cmd[1], cp1y = cmd[2], cp2x = cmd[3], cp2y = cmd[4], endX = cmd[5], endY = cmd[6];
-        for (let s = 0; s <= 16; s++) {
-          const t = s / 16;
-          const it = 1 - t;
-          const x = it*it*it*curX + 3*it*it*t*cp1x + 3*it*t*t*cp2x + t*t*t*endX;
-          const y = it*it*it*curY + 3*it*it*t*cp1y + 3*it*t*t*cp2y + t*t*t*endY;
-          addPt(x, y);
+        const computePathBoundsValueParsed = computePathBoundsResult[1], computePathBoundsParsed = computePathBoundsResult[2], computePathBoundsValueClamped = computePathBoundsResult[3], computePathBoundsClamped = computePathBoundsResult[4], endX = computePathBoundsResult[5], endY = computePathBoundsResult[6];
+        for (let computePathBoundNumber = 0; computePathBoundNumber <= 16; computePathBoundNumber++) {
+          const computePathBoundValue = computePathBoundNumber / 16;
+          const computePathBoundsValue = 1 - computePathBoundValue;
+          const computePathBoundsValueRaw = computePathBoundsValue*computePathBoundsValue*computePathBoundsValue*curX + 3*computePathBoundsValue*computePathBoundsValue*computePathBoundValue*computePathBoundsValueParsed + 3*computePathBoundsValue*computePathBoundValue*computePathBoundValue*computePathBoundsValueClamped + computePathBoundValue*computePathBoundValue*computePathBoundValue*endX;
+          const computePathBoundsRaw = computePathBoundsValue*computePathBoundsValue*computePathBoundsValue*curY + 3*computePathBoundsValue*computePathBoundsValue*computePathBoundValue*computePathBoundsParsed + 3*computePathBoundsValue*computePathBoundValue*computePathBoundValue*computePathBoundsClamped + computePathBoundValue*computePathBoundValue*computePathBoundValue*endY;
+          addPt(computePathBoundsValueRaw, computePathBoundsRaw);
         }
         curX = endX; curY = endY;
       }
@@ -4036,15 +4036,15 @@
     if (!isFinite(minX) || !isFinite(maxX)) {
       return { minX: -50, minY: -50, maxX: 50, maxY: 50, cx: 0, cy: 0, hx: 50, hy: 50, w: 100, h: 100 };
     }
-    const w = Math.max(1, maxX - minX);
-    const h = Math.max(1, maxY - minY);
+    const computePathBoundsMax = Math.max(1, maxX - minX);
+    const maxValue = Math.max(1, maxY - minY);
     return {
       minX, minY, maxX, maxY,
       cx: (minX + maxX) / 2,
       cy: (minY + maxY) / 2,
-      hx: w / 2,
-      hy: h / 2,
-      w, h
+      hx: computePathBoundsMax / 2,
+      hy: maxValue / 2,
+      w: computePathBoundsMax, h: maxValue
     };
   }
 
@@ -4052,15 +4052,15 @@
     if (!points || !points.length) return [];
     const cmds = [];
     cmds.push(['M', points[0].x, points[0].y]);
-    for (let i = 1; i < points.length; i++) {
-      const prev = points[i - 1];
-      const curr = points[i];
+    for (let pointsToCommandsNumber = 1; pointsToCommandsNumber < points.length; pointsToCommandsNumber++) {
+      const prev = points[pointsToCommandsNumber - 1];
+      const curr = points[pointsToCommandsNumber];
       if (prev.type === 'curved' || curr.type === 'curved') {
-        const cp1x = prev.out ? prev.out[0] : prev.x;
-        const cp1y = prev.out ? prev.out[1] : prev.y;
-        const cp2x = curr.in ? curr.in[0] : curr.x;
-        const cp2y = curr.in ? curr.in[1] : curr.y;
-        cmds.push(['C', cp1x, cp1y, cp2x, cp2y, curr.x, curr.y]);
+        const pointsToCommandsValue = prev.out ? prev.out[0] : prev.x;
+        const pointsToCommandsValueRaw = prev.out ? prev.out[1] : prev.y;
+        const pointsToCommandsRaw = curr.in ? curr.in[0] : curr.x;
+        const pointsToCommandsValueParsed = curr.in ? curr.in[1] : curr.y;
+        cmds.push(['C', pointsToCommandsValue, pointsToCommandsValueRaw, pointsToCommandsRaw, pointsToCommandsValueParsed, curr.x, curr.y]);
       } else {
         cmds.push(['L', curr.x, curr.y]);
       }
@@ -4069,11 +4069,11 @@
       const last = points[points.length - 1];
       const first = points[0];
       if (last.type === 'curved' || first.type === 'curved') {
-        const cp1x = last.out ? last.out[0] : last.x;
-        const cp1y = last.out ? last.out[1] : last.y;
-        const cp2x = first.in ? first.in[0] : first.x;
-        const cp2y = first.in ? first.in[1] : first.y;
-        cmds.push(['C', cp1x, cp1y, cp2x, cp2y, first.x, first.y]);
+        const pointsToCommandsParsed = last.out ? last.out[0] : last.x;
+        const pointsToCommandsValueClamped = last.out ? last.out[1] : last.y;
+        const pointsToCommandsClamped = first.in ? first.in[0] : first.x;
+        const pointsToCommandsValueScoped = first.in ? first.in[1] : first.y;
+        cmds.push(['C', pointsToCommandsParsed, pointsToCommandsValueClamped, pointsToCommandsClamped, pointsToCommandsValueScoped, first.x, first.y]);
       } else {
         cmds.push(['L', first.x, first.y]);
       }
@@ -4086,22 +4086,22 @@
     const points = [];
     let isClosed = false;
     let prevPt = null;
-    for (let i = 0; i < commands.length; i++) {
-      const cmd = commands[i];
-      const type = cmd[0];
+    for (let commandsToPointsNumber = 0; commandsToPointsNumber < commands.length; commandsToPointsNumber++) {
+      const commandsToPointsI = commands[commandsToPointsNumber];
+      const type = commandsToPointsI[0];
       if (type === 'M' || type === 'L') {
-        const pt = { x: cmd[1], y: cmd[2], type: 'corner', in: [cmd[1], cmd[2]], out: [cmd[1], cmd[2]] };
-        points.push(pt);
-        prevPt = pt;
+        const commandsToPointsResult = { x: commandsToPointsI[1], y: commandsToPointsI[2], type: 'corner', in: [commandsToPointsI[1], commandsToPointsI[2]], out: [commandsToPointsI[1], commandsToPointsI[2]] };
+        points.push(commandsToPointsResult);
+        prevPt = commandsToPointsResult;
       } else if (type === 'C') {
-        const cp1x = cmd[1], cp1y = cmd[2], cp2x = cmd[3], cp2y = cmd[4], x = cmd[5], y = cmd[6];
+        const commandsToPointsValueParsed = commandsToPointsI[1], commandsToPointsParsed = commandsToPointsI[2], commandsToPointsValueRaw = commandsToPointsI[3], commandsToPointsRaw = commandsToPointsI[4], commandsToPointsValue = commandsToPointsI[5], commandsToPointsArg = commandsToPointsI[6];
         if (prevPt) {
           prevPt.type = 'curved';
-          prevPt.out = [cp1x, cp1y];
+          prevPt.out = [commandsToPointsValueParsed, commandsToPointsParsed];
         }
-        const pt = { x, y, type: 'curved', in: [cp2x, cp2y], out: [x + (x - cp2x), y + (y - cp2y)] };
-        points.push(pt);
-        prevPt = pt;
+        const commandsToPointsRecord = { x: commandsToPointsValue, y: commandsToPointsArg, type: 'curved', in: [commandsToPointsValueRaw, commandsToPointsRaw], out: [commandsToPointsValue + (commandsToPointsValue - commandsToPointsValueRaw), commandsToPointsArg + (commandsToPointsArg - commandsToPointsRaw)] };
+        points.push(commandsToPointsRecord);
+        prevPt = commandsToPointsRecord;
       } else if (type === 'Z') {
         isClosed = true;
       }
@@ -4110,53 +4110,53 @@
   }
 
   function defaultPointsForLayer(layer) {
-    const st = (layer.shapeType || '').replace('com.alightcreative.shapes.', '').replace('.', '');
-    const w = ((layer.size && layer.size.value && layer.size.value[0]) || 100) / 2;
-    const h = ((layer.size && layer.size.value && layer.size.value[1]) || 100) / 2;
+    const defaultPointsForLayerResult = (layer.shapeType || '').replace('com.alightcreative.shapes.', '').replace('.', '');
+    const defaultPointsForLayerValue = ((layer.size && layer.size.value && layer.size.value[0]) || 100) / 2;
+    const defaultPointsForLayerParsed = ((layer.size && layer.size.value && layer.size.value[1]) || 100) / 2;
 
-    if (st === 'circle' || st === 'ellipse') {
-      const cw = w * 0.551915;
-      const ch = h * 0.551915;
+    if (defaultPointsForLayerResult === 'circle' || defaultPointsForLayerResult === 'ellipse') {
+      const defaultPointsForValue = defaultPointsForLayerValue * 0.551915;
+      const defaultPointsForLayerValueRaw = defaultPointsForLayerParsed * 0.551915;
       return {
         isClosed: true,
         points: [
-          { x: 0, y: -h, type: 'curved', in: [-cw, -h], out: [cw, -h] },
-          { x: w, y: 0, type: 'curved', in: [w, -ch], out: [w, ch] },
-          { x: 0, y: h, type: 'curved', in: [cw, h], out: [-cw, h] },
-          { x: -w, y: 0, type: 'curved', in: [-w, ch], out: [-w, -ch] }
+          { x: 0, y: -defaultPointsForLayerParsed, type: 'curved', in: [-defaultPointsForValue, -defaultPointsForLayerParsed], out: [defaultPointsForValue, -defaultPointsForLayerParsed] },
+          { x: defaultPointsForLayerValue, y: 0, type: 'curved', in: [defaultPointsForLayerValue, -defaultPointsForLayerValueRaw], out: [defaultPointsForLayerValue, defaultPointsForLayerValueRaw] },
+          { x: 0, y: defaultPointsForLayerParsed, type: 'curved', in: [defaultPointsForValue, defaultPointsForLayerParsed], out: [-defaultPointsForValue, defaultPointsForLayerParsed] },
+          { x: -defaultPointsForLayerValue, y: 0, type: 'curved', in: [-defaultPointsForLayerValue, defaultPointsForLayerValueRaw], out: [-defaultPointsForLayerValue, -defaultPointsForLayerValueRaw] }
         ]
       };
     }
-    if (st === 'star') {
-      const pts = [];
-      const outerR = Math.max(w, h);
+    if (defaultPointsForLayerResult === 'star') {
+      const defaultPointsForItems = [];
+      const outerR = Math.max(defaultPointsForLayerValue, defaultPointsForLayerParsed);
       const innerR = outerR * 0.5;
       const count = 5;
-      for (let i = 0; i < count; i++) {
-        const a1 = (i * 2 * Math.PI) / count - Math.PI / 2;
-        pts.push({ x: Math.round(outerR * Math.cos(a1)), y: Math.round(outerR * Math.sin(a1)), type: 'corner', in: null, out: null });
-        const a2 = a1 + Math.PI / count;
-        pts.push({ x: Math.round(innerR * Math.cos(a2)), y: Math.round(innerR * Math.sin(a2)), type: 'corner', in: null, out: null });
+      for (let defaultPointsForLayerNumber = 0; defaultPointsForLayerNumber < count; defaultPointsForLayerNumber++) {
+        const defaultPointsForLayerRaw = (defaultPointsForLayerNumber * 2 * Math.PI) / count - Math.PI / 2;
+        defaultPointsForItems.push({ x: Math.round(outerR * Math.cos(defaultPointsForLayerRaw)), y: Math.round(outerR * Math.sin(defaultPointsForLayerRaw)), type: 'corner', in: null, out: null });
+        const defaultPointsForLayerValueParsed = defaultPointsForLayerRaw + Math.PI / count;
+        defaultPointsForItems.push({ x: Math.round(innerR * Math.cos(defaultPointsForLayerValueParsed)), y: Math.round(innerR * Math.sin(defaultPointsForLayerValueParsed)), type: 'corner', in: null, out: null });
       }
-      return { isClosed: true, points: pts };
+      return { isClosed: true, points: defaultPointsForItems };
     }
-    if (st === 'triangle') {
+    if (defaultPointsForLayerResult === 'triangle') {
       return {
         isClosed: true,
         points: [
-          { x: 0, y: -h, type: 'corner', in: null, out: null },
-          { x: w, y: h, type: 'corner', in: null, out: null },
-          { x: -w, y: h, type: 'corner', in: null, out: null }
+          { x: 0, y: -defaultPointsForLayerParsed, type: 'corner', in: null, out: null },
+          { x: defaultPointsForLayerValue, y: defaultPointsForLayerParsed, type: 'corner', in: null, out: null },
+          { x: -defaultPointsForLayerValue, y: defaultPointsForLayerParsed, type: 'corner', in: null, out: null }
         ]
       };
     }
     return {
       isClosed: true,
       points: [
-        { x: -w, y: -h, type: 'corner', in: null, out: null },
-        { x: w, y: -h, type: 'corner', in: null, out: null },
-        { x: w, y: h, type: 'corner', in: null, out: null },
-        { x: -w, y: h, type: 'corner', in: null, out: null }
+        { x: -defaultPointsForLayerValue, y: -defaultPointsForLayerParsed, type: 'corner', in: null, out: null },
+        { x: defaultPointsForLayerValue, y: -defaultPointsForLayerParsed, type: 'corner', in: null, out: null },
+        { x: defaultPointsForLayerValue, y: defaultPointsForLayerParsed, type: 'corner', in: null, out: null },
+        { x: -defaultPointsForLayerValue, y: defaultPointsForLayerParsed, type: 'corner', in: null, out: null }
       ]
     };
   }
@@ -4185,14 +4185,14 @@
 
   function getShapeDef(layer) {
     if (!layer) return AM_SHAPE_CATALOG["rect"];
-    const st = (layer.shapeType || ".rect").replace("com.alightcreative.shapes.", "").replace(".", "");
-    return AM_SHAPE_CATALOG[st] || AM_SHAPE_CATALOG["rect"];
+    const getShapeDefValue = (layer.shapeType || ".rect").replace("com.alightcreative.shapes.", "").replace(".", "");
+    return AM_SHAPE_CATALOG[getShapeDefValue] || AM_SHAPE_CATALOG["rect"];
   }
 
   function openLiveShape(layer) {
     if (!layer) return;
     activeLiveShapeLayer = layer;
-    liveShapeSnapBefore = I.sceneSnapshot ? I.sceneSnapshot() : null;
+    liveShapeSnapBefore = toggleBookmark.sceneSnapshot ? toggleBookmark.sceneSnapshot() : null;
 
     const navDefault = document.getElementById("am-navbar-default");
     const navElem = document.getElementById("am-navbar-element");
@@ -4224,7 +4224,7 @@
     const btnLsCenter = document.getElementById("am-btn-liveshape-center");
     const imgLsCenter = document.getElementById("am-img-liveshape-center");
 
-    const hasSizeParam = shapeDef.params.some(p => p.tag === "point" && (p.id === "size" || p.type === "size"));
+    const hasSizeParam = shapeDef.params.some(openLiveShapeTag => openLiveShapeTag.tag === "point" && (openLiveShapeTag.id === "size" || openLiveShapeTag.type === "size"));
     if (btnLsAspect) {
       btnLsAspect.style.display = hasSizeParam ? "flex" : "none";
       btnLsAspect.classList.toggle("active", isShapeRatioLocked);
@@ -4233,7 +4233,7 @@
         isShapeRatioLocked = !isShapeRatioLocked;
         btnLsAspect.classList.toggle("active", isShapeRatioLocked);
         if (imgLsAspect) imgLsAspect.src = isShapeRatioLocked ? "./icons/ic_shape_aspect_lock.svg" : "./icons/ic_shape_aspect_unlock.svg";
-        if (I.handle9) I.handle9(isShapeRatioLocked ? "[BENTUK] Kunci Rasio Aspek Aktif" : "[BENTUK] Kunci Rasio Aspek Nonaktif");
+        if (toggleBookmark.handle9) toggleBookmark.handle9(isShapeRatioLocked ? "[BENTUK] Kunci Rasio Aspek Aktif" : "[BENTUK] Kunci Rasio Aspek Nonaktif");
       };
     }
     if (btnLsCenter) {
@@ -4242,7 +4242,7 @@
       btnLsCenter.onclick = () => {
         isShapeFromCenter = !isShapeFromCenter;
         btnLsCenter.classList.toggle("active", isShapeFromCenter);
-        if (I.handle9) I.handle9(isShapeFromCenter ? "[BENTUK] Ubah Ukuran Dari Tengah" : "[BENTUK] Ubah Ukuran Bebas");
+        if (toggleBookmark.handle9) toggleBookmark.handle9(isShapeFromCenter ? "[BENTUK] Ubah Ukuran Dari Tengah" : "[BENTUK] Ubah Ukuran Bebas");
       };
     }
     if (btnLsBack) btnLsBack.onclick = () => closeLiveShape(true);
@@ -4263,10 +4263,10 @@
     if (currentSelectedLayer && elemPanel) elemPanel.style.display = "flex";
 
     if (commit) {
-      if (liveShapeSnapBefore && I.pushUndo) I.pushUndo(liveShapeSnapBefore);
-      if (I.omScheduleSave) I.omScheduleSave();
-      I.V = true;
-      if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+      if (liveShapeSnapBefore && toggleBookmark.pushUndo) toggleBookmark.pushUndo(liveShapeSnapBefore);
+      if (toggleBookmark.omScheduleSave) toggleBookmark.omScheduleSave();
+      toggleBookmark.V = true;
+      if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) toggleBookmark.val2.renderAt(toggleBookmark.H);
     }
     activeLiveShapeLayer = null;
     liveShapeSnapBefore = null;
@@ -4288,70 +4288,70 @@
       return layer.cornerRadius !== undefined ? layer.cornerRadius : defVal;
     }
     if (layer.shapeProps && layer.shapeProps[paramId]) {
-      const p = layer.shapeProps[paramId];
-      if (p.channel && Array.isArray(p.channel.value)) return p.channel.value[0];
-      if (Array.isArray(p.value)) return p.value[0];
-      if (typeof p === "number") return p;
+      const getShapeParamId = layer.shapeProps[paramId];
+      if (getShapeParamId.channel && Array.isArray(getShapeParamId.channel.value)) return getShapeParamId.channel.value[0];
+      if (Array.isArray(getShapeParamId.value)) return getShapeParamId.value[0];
+      if (typeof getShapeParamId === "number") return getShapeParamId;
     }
     return defVal;
   }
 
-  function setShapeParam(layer, paramId, val) {
+  function setShapeParam(layer, paramId, cornerRadius) {
     if (!layer) return;
     if (paramId === "size.x" || paramId === "sizeX") {
       if (!layer.size) layer.size = { value: [100, 100], kfs: [] };
       if (!Array.isArray(layer.size.value)) layer.size.value = [100, 100];
-      layer.size.value[0] = val;
+      layer.size.value[0] = cornerRadius;
       if (layer.size.kfs && layer.size.kfs.length) {
-        const tt = (I.H || 0) / 1000;
-        const idx = layer.size.kfs.findIndex(x => Math.abs(x.t - tt) < 0.001);
-        if (idx >= 0) layer.size.kfs[idx].v = layer.size.value.slice();
+        const setShapeParamValue = (toggleBookmark.H || 0) / 1000;
+        const setShapeParamResult = layer.size.kfs.findIndex(setShapeParamT => Math.abs(setShapeParamT.t - setShapeParamValue) < 0.001);
+        if (setShapeParamResult >= 0) layer.size.kfs[setShapeParamResult].v = layer.size.value.slice();
         else {
-          layer.size.kfs.push({ t: tt, v: layer.size.value.slice() });
-          layer.size.kfs.sort((a, b) => a.t - b.t);
+          layer.size.kfs.push({ t: setShapeParamValue, v: layer.size.value.slice() });
+          layer.size.kfs.sort((setShapeParamArg, setShapeParamArgValue) => setShapeParamArg.t - setShapeParamArgValue.t);
         }
       }
     } else if (paramId === "size.y" || paramId === "sizeY") {
       if (!layer.size) layer.size = { value: [100, 100], kfs: [] };
       if (!Array.isArray(layer.size.value)) layer.size.value = [100, 100];
-      layer.size.value[1] = val;
+      layer.size.value[1] = cornerRadius;
       if (layer.size.kfs && layer.size.kfs.length) {
-        const tt = (I.H || 0) / 1000;
-        const idx = layer.size.kfs.findIndex(x => Math.abs(x.t - tt) < 0.001);
-        if (idx >= 0) layer.size.kfs[idx].v = layer.size.value.slice();
+        const setShapeParamValueRaw = (toggleBookmark.H || 0) / 1000;
+        const setShapeParamRaw = layer.size.kfs.findIndex(setShapeParamArgRaw => Math.abs(setShapeParamArgRaw.t - setShapeParamValueRaw) < 0.001);
+        if (setShapeParamRaw >= 0) layer.size.kfs[setShapeParamRaw].v = layer.size.value.slice();
         else {
-          layer.size.kfs.push({ t: tt, v: layer.size.value.slice() });
-          layer.size.kfs.sort((a, b) => a.t - b.t);
+          layer.size.kfs.push({ t: setShapeParamValueRaw, v: layer.size.value.slice() });
+          layer.size.kfs.sort((setShapeParamArgParsed, setShapeParamArgClamped) => setShapeParamArgParsed.t - setShapeParamArgClamped.t);
         }
       }
     } else if (paramId === "cornerRadius") {
-      layer.cornerRadius = val;
-      if (!layer.cornerRadiusKeyable) layer.cornerRadiusKeyable = { value: [val], kfs: [] };
-      layer.cornerRadiusKeyable.value = [val];
+      layer.cornerRadius = cornerRadius;
+      if (!layer.cornerRadiusKeyable) layer.cornerRadiusKeyable = { value: [cornerRadius], kfs: [] };
+      layer.cornerRadiusKeyable.value = [cornerRadius];
       if (layer.cornerRadiusKeyable.kfs && layer.cornerRadiusKeyable.kfs.length) {
-        const tt = (I.H || 0) / 1000;
-        const idx = layer.cornerRadiusKeyable.kfs.findIndex(x => Math.abs(x.t - tt) < 0.001);
-        if (idx >= 0) layer.cornerRadiusKeyable.kfs[idx].v = [val];
+        const setShapeParamValueParsed = (toggleBookmark.H || 0) / 1000;
+        const setShapeParamParsed = layer.cornerRadiusKeyable.kfs.findIndex(setShapeParamClamped => Math.abs(setShapeParamClamped.t - setShapeParamValueParsed) < 0.001);
+        if (setShapeParamParsed >= 0) layer.cornerRadiusKeyable.kfs[setShapeParamParsed].v = [cornerRadius];
         else {
-          layer.cornerRadiusKeyable.kfs.push({ t: tt, v: [val] });
-          layer.cornerRadiusKeyable.kfs.sort((a, b) => a.t - b.t);
+          layer.cornerRadiusKeyable.kfs.push({ t: setShapeParamValueParsed, v: [cornerRadius] });
+          layer.cornerRadiusKeyable.kfs.sort((setShapeParamArgScoped, argScoped) => setShapeParamArgScoped.t - argScoped.t);
         }
       }
     } else {
       if (!layer.shapeProps) layer.shapeProps = {};
       if (!layer.shapeProps[paramId]) {
-        layer.shapeProps[paramId] = { channel: { value: [val], kfs: [] } };
+        layer.shapeProps[paramId] = { channel: { value: [cornerRadius], kfs: [] } };
       } else {
-        const p = layer.shapeProps[paramId];
-        const ch = p.channel || p;
-        ch.value = [val];
-        if (ch.kfs && ch.kfs.length) {
-          const tt = (I.H || 0) / 1000;
-          const idx = ch.kfs.findIndex(x => Math.abs(x.t - tt) < 0.001);
-          if (idx >= 0) ch.kfs[idx].v = [val];
+        const setShapeParamId = layer.shapeProps[paramId];
+        const setShapeParamKfs = setShapeParamId.channel || setShapeParamId;
+        setShapeParamKfs.value = [cornerRadius];
+        if (setShapeParamKfs.kfs && setShapeParamKfs.kfs.length) {
+          const setShapeParamValueClamped = (toggleBookmark.H || 0) / 1000;
+          const valueClamped = setShapeParamKfs.kfs.findIndex(setShapeParamScoped => Math.abs(setShapeParamScoped.t - setShapeParamValueClamped) < 0.001);
+          if (valueClamped >= 0) setShapeParamKfs.kfs[valueClamped].v = [cornerRadius];
           else {
-            ch.kfs.push({ t: tt, v: [val] });
-            ch.kfs.sort((a, b) => a.t - b.t);
+            setShapeParamKfs.kfs.push({ t: setShapeParamValueClamped, v: [cornerRadius] });
+            setShapeParamKfs.kfs.sort((setShapeParamArgLocal, argLocal) => setShapeParamArgLocal.t - argLocal.t);
           }
         }
       }
@@ -4359,8 +4359,8 @@
     delete layer.mt;
     delete layer.an;
     delete layer.tn;
-    I.V = true;
-    if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+    toggleBookmark.V = true;
+    if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) toggleBookmark.val2.renderAt(toggleBookmark.H);
   }
 
   function getShapeKeyable(layer, paramId) {
@@ -4371,74 +4371,74 @@
     }
     if (paramId === "cornerRadius") {
       if (!layer.cornerRadiusKeyable) {
-        const cur = layer.cornerRadius !== undefined ? layer.cornerRadius : 25;
-        layer.cornerRadiusKeyable = { value: [cur], kfs: [] };
+        const getShapeKeyableValue = layer.cornerRadius !== undefined ? layer.cornerRadius : 25;
+        layer.cornerRadiusKeyable = { value: [getShapeKeyableValue], kfs: [] };
       }
       return layer.cornerRadiusKeyable;
     }
     if (!layer.shapeProps) layer.shapeProps = {};
     if (!layer.shapeProps[paramId]) {
-      const def = 100;
-      layer.shapeProps[paramId] = { channel: { value: [def], kfs: [] } };
+      const getShapeKeyableNumber = 100;
+      layer.shapeProps[paramId] = { channel: { value: [getShapeKeyableNumber], kfs: [] } };
     }
     return layer.shapeProps[paramId].channel || layer.shapeProps[paramId];
   }
 
   function hasShapeKfAtPlayhead(layer, paramId) {
     if (!layer) return false;
-    const tt = (I.H || 0) / 1000;
+    const hasShapeKfAtPlayValue = (toggleBookmark.H || 0) / 1000;
     if (paramId.startsWith("size")) {
-      return !!(layer.size && layer.size.kfs && layer.size.kfs.some(x => Math.abs(x.t - tt) < 0.001));
+      return !!(layer.size && layer.size.kfs && layer.size.kfs.some(hasShapeKfAtPlayheadT => Math.abs(hasShapeKfAtPlayheadT.t - hasShapeKfAtPlayValue) < 0.001));
     }
     if (paramId === "cornerRadius") {
-      return !!(layer.cornerRadiusKeyable && layer.cornerRadiusKeyable.kfs && layer.cornerRadiusKeyable.kfs.some(x => Math.abs(x.t - tt) < 0.001));
+      return !!(layer.cornerRadiusKeyable && layer.cornerRadiusKeyable.kfs && layer.cornerRadiusKeyable.kfs.some(hasShapeKfAtPlayheadArg => Math.abs(hasShapeKfAtPlayheadArg.t - hasShapeKfAtPlayValue) < 0.001));
     }
     if (layer.shapeProps && layer.shapeProps[paramId]) {
-      const p = layer.shapeProps[paramId];
-      const ch = p.channel || p;
-      return !!(ch && ch.kfs && ch.kfs.some(x => Math.abs(x.t - tt) < 0.001));
+      const hasShapeKfAtPlayheadParamId = layer.shapeProps[paramId];
+      const hasShapeKfAtPlayheadValue = hasShapeKfAtPlayheadParamId.channel || hasShapeKfAtPlayheadParamId;
+      return !!(hasShapeKfAtPlayheadValue && hasShapeKfAtPlayheadValue.kfs && hasShapeKfAtPlayheadValue.kfs.some(hasShapeKfAtPlayheadArgValue => Math.abs(hasShapeKfAtPlayheadArgValue.t - hasShapeKfAtPlayValue) < 0.001));
     }
     return false;
   }
 
   function toggleShapeKf(layer, paramId) {
     if (!layer) return;
-    const tt = (I.H || 0) / 1000;
+    const toggleShapeKfValue = (toggleBookmark.H || 0) / 1000;
     if (paramId.startsWith("size")) {
       if (!layer.size) layer.size = { value: [100, 100], kfs: [] };
       if (!layer.size.kfs) layer.size.kfs = [];
-      const idx = layer.size.kfs.findIndex(x => Math.abs(x.t - tt) < 0.001);
-      if (idx >= 0) {
-        layer.size.kfs.splice(idx, 1);
+      const toggleShapeKfResult = layer.size.kfs.findIndex(toggleShapeKfT => Math.abs(toggleShapeKfT.t - toggleShapeKfValue) < 0.001);
+      if (toggleShapeKfResult >= 0) {
+        layer.size.kfs.splice(toggleShapeKfResult, 1);
       } else {
-        layer.size.kfs.push({ t: tt, v: layer.size.value.slice() });
-        layer.size.kfs.sort((a, b) => a.t - b.t);
+        layer.size.kfs.push({ t: toggleShapeKfValue, v: layer.size.value.slice() });
+        layer.size.kfs.sort((toggleShapeKfArg, toggleShapeKfArgValue) => toggleShapeKfArg.t - toggleShapeKfArgValue.t);
       }
     } else if (paramId === "cornerRadius") {
       if (!layer.cornerRadiusKeyable) layer.cornerRadiusKeyable = { value: [layer.cornerRadius || 25], kfs: [] };
       if (!layer.cornerRadiusKeyable.kfs) layer.cornerRadiusKeyable.kfs = [];
-      const idx = layer.cornerRadiusKeyable.kfs.findIndex(x => Math.abs(x.t - tt) < 0.001);
-      if (idx >= 0) {
-        layer.cornerRadiusKeyable.kfs.splice(idx, 1);
+      const toggleShapeKfValueRaw = layer.cornerRadiusKeyable.kfs.findIndex(toggleShapeKfArgRaw => Math.abs(toggleShapeKfArgRaw.t - toggleShapeKfValue) < 0.001);
+      if (toggleShapeKfValueRaw >= 0) {
+        layer.cornerRadiusKeyable.kfs.splice(toggleShapeKfValueRaw, 1);
       } else {
-        layer.cornerRadiusKeyable.kfs.push({ t: tt, v: [layer.cornerRadius || 25] });
-        layer.cornerRadiusKeyable.kfs.sort((a, b) => a.t - b.t);
+        layer.cornerRadiusKeyable.kfs.push({ t: toggleShapeKfValue, v: [layer.cornerRadius || 25] });
+        layer.cornerRadiusKeyable.kfs.sort((toggleShapeKfArgParsed, toggleShapeKfParsed) => toggleShapeKfArgParsed.t - toggleShapeKfParsed.t);
       }
     } else {
       if (!layer.shapeProps) layer.shapeProps = {};
       if (!layer.shapeProps[paramId]) layer.shapeProps[paramId] = { channel: { value: [100], kfs: [] } };
-      const ch = layer.shapeProps[paramId].channel || layer.shapeProps[paramId];
-      if (!ch.kfs) ch.kfs = [];
-      const idx = ch.kfs.findIndex(x => Math.abs(x.t - tt) < 0.001);
-      if (idx >= 0) {
-        ch.kfs.splice(idx, 1);
+      const toggleShapeKfKfs = layer.shapeProps[paramId].channel || layer.shapeProps[paramId];
+      if (!toggleShapeKfKfs.kfs) toggleShapeKfKfs.kfs = [];
+      const toggleShapeKfRaw = toggleShapeKfKfs.kfs.findIndex(toggleShapeKfArgClamped => Math.abs(toggleShapeKfArgClamped.t - toggleShapeKfValue) < 0.001);
+      if (toggleShapeKfRaw >= 0) {
+        toggleShapeKfKfs.kfs.splice(toggleShapeKfRaw, 1);
       } else {
-        ch.kfs.push({ t: tt, v: ch.value ? ch.value.slice() : [100] });
-        ch.kfs.sort((a, b) => a.t - b.t);
+        toggleShapeKfKfs.kfs.push({ t: toggleShapeKfValue, v: toggleShapeKfKfs.value ? toggleShapeKfKfs.value.slice() : [100] });
+        toggleShapeKfKfs.kfs.sort((toggleShapeKfClamped, toggleShapeKfArgScoped) => toggleShapeKfClamped.t - toggleShapeKfArgScoped.t);
       }
     }
-    I.V = true;
-    if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+    toggleBookmark.V = true;
+    if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) toggleBookmark.val2.renderAt(toggleBookmark.H);
   }
 
   // 1:1 ValueSpinner canvas engine (horizontal scrolling tick-mark ruler with needle)
@@ -4451,55 +4451,55 @@
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const w = Math.round((rect.width || 120) * dpr);
-      const h = Math.round((rect.height || 45) * dpr);
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
+      const resizeValue = window.devicePixelRatio || 1;
+      const resizeRound = Math.round((rect.width || 120) * resizeValue);
+      const roundValue = Math.round((rect.height || 45) * resizeValue);
+      if (canvas.width !== resizeRound || canvas.height !== roundValue) {
+        canvas.width = resizeRound;
+        canvas.height = roundValue;
       }
       draw();
     }
 
     function draw() {
       if (!ctx) return;
-      const w = canvas.width;
-      const h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-      if (!w || !h) return;
+      const drawWidth = canvas.width;
+      const height = canvas.height;
+      ctx.clearRect(0, 0, drawWidth, height);
+      if (!drawWidth || !height) return;
 
-      const dpr = window.devicePixelRatio || 1;
-      const cx = w / 2;
-      const tickSpacing = 5.5 * dpr;
-      const tickWidth = 1 * dpr;
-      const needleWidth = 1.5 * dpr;
+      const drawValue = window.devicePixelRatio || 1;
+      const drawScoped = drawWidth / 2;
+      const tickSpacing = 5.5 * drawValue;
+      const tickWidth = 1 * drawValue;
+      const needleWidth = 1.5 * drawValue;
       const step = opts.step || 1;
       const curVal = opts.getVal();
       const offset = (curVal / step) * tickSpacing;
 
-      const halfTicks = Math.ceil(cx / tickSpacing) + 2;
+      const halfTicks = Math.ceil(drawScoped / tickSpacing) + 2;
       const centerIndex = Math.round(curVal / step);
 
       ctx.lineWidth = tickWidth;
       ctx.lineCap = "round";
 
-      for (let i = centerIndex - halfTicks; i <= centerIndex + halfTicks; i++) {
-        const x = cx + (i * tickSpacing - offset);
-        if (x < 0 || x > w) continue;
+      for (let drawValueRaw = centerIndex - halfTicks; drawValueRaw <= centerIndex + halfTicks; drawValueRaw++) {
+        const drawCoord = drawScoped + (drawValueRaw * tickSpacing - offset);
+        if (drawCoord < 0 || drawCoord > drawWidth) continue;
 
-        const dist = Math.abs(x - cx);
-        const alpha = Math.max(0, 1.0 - (dist / cx));
-        const isMajor = (i % 10 === 0) || (i === 0);
+        const dist = Math.abs(drawCoord - drawScoped);
+        const alpha = Math.max(0, 1.0 - (dist / drawScoped));
+        const isMajor = (drawValueRaw % 10 === 0) || (drawValueRaw === 0);
 
         ctx.beginPath();
         if (isMajor) {
           ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
-          ctx.moveTo(x, 6 * dpr);
-          ctx.lineTo(x, h - 6 * dpr);
+          ctx.moveTo(drawCoord, 6 * drawValue);
+          ctx.lineTo(drawCoord, height - 6 * drawValue);
         } else {
           ctx.strokeStyle = `rgba(112, 121, 140, ${alpha * 0.65})`;
-          ctx.moveTo(x, 14 * dpr);
-          ctx.lineTo(x, h - 14 * dpr);
+          ctx.moveTo(drawCoord, 14 * drawValue);
+          ctx.lineTo(drawCoord, height - 14 * drawValue);
         }
         ctx.stroke();
       }
@@ -4508,28 +4508,28 @@
       ctx.beginPath();
       ctx.strokeStyle = "#00e5ff";
       ctx.lineWidth = needleWidth;
-      ctx.moveTo(cx, 0);
-      ctx.lineTo(cx, h);
+      ctx.moveTo(drawScoped, 0);
+      ctx.lineTo(drawScoped, height);
       ctx.stroke();
     }
 
-    const ro = new ResizeObserver(() => resize());
-    ro.observe(canvas);
+    const observe = new ResizeObserver(() => resize());
+    observe.observe(canvas);
     setTimeout(resize, 0);
 
-    canvas.addEventListener("pointerdown", (e) => {
+    canvas.addEventListener("pointerdown", (createValueSpinnerClientX) => {
       isDragging = true;
-      startX = e.clientX;
+      startX = createValueSpinnerClientX.clientX;
       startVal = opts.getVal();
-      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+      try { canvas.setPointerCapture(createValueSpinnerClientX.pointerId); } catch (createValueSpinnerValue) {}
     });
 
-    canvas.addEventListener("pointermove", (e) => {
+    canvas.addEventListener("pointermove", (createValueSpinnerArg) => {
       if (!isDragging) return;
-      const dx = e.clientX - startX;
+      const createValueSpinnValue = createValueSpinnerArg.clientX - startX;
       const step = opts.step || 1;
       const sensitivity = opts.isAngle ? 0.5 : 0.8;
-      const dVal = -dx * step * sensitivity;
+      const dVal = -createValueSpinnValue * step * sensitivity;
       let newVal = startVal + dVal;
       if (opts.min !== undefined) newVal = Math.max(opts.min, newVal);
       if (opts.max !== undefined) newVal = Math.min(opts.max, newVal);
@@ -4540,10 +4540,10 @@
       if (opts.onChange) opts.onChange(newVal);
     });
 
-    const onUp = (e) => {
+    const onUp = (createValueSpinnerPointerId) => {
       if (!isDragging) return;
       isDragging = false;
-      try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+      try { canvas.releasePointerCapture(createValueSpinnerPointerId.pointerId); } catch (createValueSpinnerResult) {}
       draw();
       if (opts.onEnd) opts.onEnd(opts.getVal());
     };
@@ -4564,27 +4564,27 @@
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const w = Math.round((rect.width || 180) * dpr);
-      const h = Math.round((rect.height || 180) * dpr);
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
+      const resizeValueRaw = window.devicePixelRatio || 1;
+      const resizeWidth = Math.round((rect.width || 180) * resizeValueRaw);
+      const resizeHeight = Math.round((rect.height || 180) * resizeValueRaw);
+      if (canvas.width !== resizeWidth || canvas.height !== resizeHeight) {
+        canvas.width = resizeWidth;
+        canvas.height = resizeHeight;
       }
       draw();
     }
 
     function draw() {
       if (!ctx) return;
-      const w = canvas.width;
-      const h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-      if (!w || !h) return;
+      const widthValue = canvas.width;
+      const drawHeight = canvas.height;
+      ctx.clearRect(0, 0, widthValue, drawHeight);
+      if (!widthValue || !drawHeight) return;
 
-      const dpr = window.devicePixelRatio || 1;
-      const cx = w / 2;
-      const cy = h / 2;
-      const radius = Math.min(cx, cy) - (20 * dpr);
+      const drawValueScoped = window.devicePixelRatio || 1;
+      const coordValue = widthValue / 2;
+      const drawClamped = drawHeight / 2;
+      const radius = Math.min(coordValue, drawClamped) - (20 * drawValueScoped);
       if (radius <= 0) return;
 
       const curAngle = opts.getVal();
@@ -4592,9 +4592,9 @@
 
       // 1. Background Track Circle (@color/Bl1_a30: rgba(255, 255, 255, 0.12))
       ctx.beginPath();
-      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.arc(coordValue, drawClamped, radius, 0, Math.PI * 2);
       ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
-      ctx.lineWidth = 3.5 * dpr;
+      ctx.lineWidth = 3.5 * drawValueScoped;
       ctx.stroke();
 
       // 2. Active Arc (@color/C1: #00e5ff)
@@ -4602,44 +4602,44 @@
         ctx.beginPath();
         const startRad = -Math.PI / 2;
         const angleRad = (curAngle * Math.PI) / 180;
-        ctx.arc(cx, cy, radius, startRad, startRad + angleRad, curAngle < 0);
+        ctx.arc(coordValue, drawClamped, radius, startRad, startRad + angleRad, curAngle < 0);
         ctx.strokeStyle = "#00e5ff";
-        ctx.lineWidth = (turns > 0 ? 5.5 : 3.5) * dpr;
+        ctx.lineWidth = (turns > 0 ? 5.5 : 3.5) * drawValueScoped;
         ctx.lineCap = "round";
         ctx.stroke();
       }
 
       // 3. Outer needle/knob at current angle
       const headRad = -Math.PI / 2 + (curAngle * Math.PI) / 180;
-      const hx = cx + radius * Math.cos(headRad);
-      const hy = cy + radius * Math.sin(headRad);
+      const drawRaw = coordValue + radius * Math.cos(headRad);
+      const drawValueParsed = drawClamped + radius * Math.sin(headRad);
 
       ctx.beginPath();
-      ctx.arc(hx, hy, 7 * dpr, 0, Math.PI * 2);
+      ctx.arc(drawRaw, drawValueParsed, 7 * drawValueScoped, 0, Math.PI * 2);
       ctx.fillStyle = "#00e5ff";
       ctx.shadowColor = "rgba(0, 229, 255, 0.5)";
-      ctx.shadowBlur = 8 * dpr;
+      ctx.shadowBlur = 8 * drawValueScoped;
       ctx.fill();
       ctx.shadowBlur = 0;
 
       ctx.beginPath();
-      ctx.arc(hx, hy, 3.5 * dpr, 0, Math.PI * 2);
+      ctx.arc(drawRaw, drawValueParsed, 3.5 * drawValueScoped, 0, Math.PI * 2);
       ctx.fillStyle = "#ffffff";
       ctx.fill();
 
       // 4. Center Rounded Rect Badge (@color/S9: #1e222d)
-      const badgeW = 90 * dpr;
-      const badgeH = 32 * dpr;
-      const bx = cx - badgeW / 2;
-      const by = cy - badgeH / 2;
-      const bRad = 6 * dpr;
+      const badgeW = 90 * drawValueScoped;
+      const badgeH = 32 * drawValueScoped;
+      const drawParsed = coordValue - badgeW / 2;
+      const drawValueClamped = drawClamped - badgeH / 2;
+      const bRad = 6 * drawValueScoped;
 
       ctx.beginPath();
-      ctx.roundRect(bx, by, badgeW, badgeH, bRad);
+      ctx.roundRect(drawParsed, drawValueClamped, badgeW, badgeH, bRad);
       ctx.fillStyle = "#1e222d";
       ctx.fill();
       ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-      ctx.lineWidth = 1 * dpr;
+      ctx.lineWidth = 1 * drawValueScoped;
       ctx.stroke();
 
       // 5. Center Text (@color/Y1: #00ffa8, @color/P6: #8c93a7)
@@ -4649,53 +4649,53 @@
       if (turns > 0) {
         const sign = curAngle < 0 ? "-" : "+";
         const turnStr = `${sign}${turns}× `;
-        ctx.font = `bold ${10 * dpr}px 'Space Grotesk', -apple-system, sans-serif`;
+        ctx.font = `bold ${10 * drawValueScoped}px 'Space Grotesk', -apple-system, sans-serif`;
         const turnW = ctx.measureText(turnStr).width;
 
-        ctx.font = `bold ${12 * dpr}px 'Space Grotesk', -apple-system, sans-serif`;
+        ctx.font = `bold ${12 * drawValueScoped}px 'Space Grotesk', -apple-system, sans-serif`;
         const remStr = `${Math.abs(Math.round((curAngle % 360) * 10) / 10).toFixed(1)}°`;
         const remW = ctx.measureText(remStr).width;
 
         const totalW = turnW + remW;
-        const startX = cx - totalW / 2;
+        const startX = coordValue - totalW / 2;
 
         ctx.textAlign = "left";
         ctx.fillStyle = "#8c93a7";
-        ctx.font = `bold ${10 * dpr}px 'Space Grotesk', -apple-system, sans-serif`;
-        ctx.fillText(turnStr, startX, cy);
+        ctx.font = `bold ${10 * drawValueScoped}px 'Space Grotesk', -apple-system, sans-serif`;
+        ctx.fillText(turnStr, startX, drawClamped);
 
         ctx.fillStyle = "#00ffa8";
-        ctx.font = `bold ${12 * dpr}px 'Space Grotesk', -apple-system, sans-serif`;
-        ctx.fillText(remStr, startX + turnW, cy);
+        ctx.font = `bold ${12 * drawValueScoped}px 'Space Grotesk', -apple-system, sans-serif`;
+        ctx.fillText(remStr, startX + turnW, drawClamped);
       } else {
         ctx.textAlign = "center";
-        ctx.font = `bold ${12 * dpr}px 'Space Grotesk', -apple-system, sans-serif`;
+        ctx.font = `bold ${12 * drawValueScoped}px 'Space Grotesk', -apple-system, sans-serif`;
         ctx.fillStyle = "#00ffa8";
-        ctx.fillText(angleDisplay, cx, cy);
+        ctx.fillText(angleDisplay, coordValue, drawClamped);
       }
     }
 
-    const ro = new ResizeObserver(() => resize());
-    ro.observe(canvas);
+    const resizeObserver = new ResizeObserver(() => resize());
+    resizeObserver.observe(canvas);
     setTimeout(resize, 0);
 
-    canvas.addEventListener("pointerdown", (e) => {
+    canvas.addEventListener("pointerdown", (createRotateViewPointerId) => {
       isDragging = true;
-      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+      try { canvas.setPointerCapture(createRotateViewPointerId.pointerId); } catch (createRotateViewParsed) {}
       const rect = canvas.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      startAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * (180 / Math.PI);
+      const createRotateViewValue = rect.left + rect.width / 2;
+      const createRotateViewResult = rect.top + rect.height / 2;
+      startAngle = Math.atan2(createRotateViewPointerId.clientY - createRotateViewResult, createRotateViewPointerId.clientX - createRotateViewValue) * (180 / Math.PI);
       initAngle = opts.getVal();
     });
 
-    canvas.addEventListener("pointermove", (e) => {
+    canvas.addEventListener("pointermove", (createRotateViewClientY) => {
       if (!isDragging) return;
       const rect = canvas.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const cur = Math.atan2(e.clientY - cy, e.clientX - cx) * (180 / Math.PI);
-      let diff = cur - startAngle;
+      const createRotateViewValueRaw = rect.left + rect.width / 2;
+      const createRotateViewRaw = rect.top + rect.height / 2;
+      const createRotateViewValueParsed = Math.atan2(createRotateViewClientY.clientY - createRotateViewRaw, createRotateViewClientY.clientX - createRotateViewValueRaw) * (180 / Math.PI);
+      let diff = createRotateViewValueParsed - startAngle;
       if (diff > 180) diff -= 360;
       else if (diff < -180) diff += 360;
 
@@ -4705,10 +4705,10 @@
       if (opts.onChange) opts.onChange(newAngle);
     });
 
-    const onUp = (e) => {
+    const onUp = (pointerIdArg) => {
       if (!isDragging) return;
       isDragging = false;
-      try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+      try { canvas.releasePointerCapture(pointerIdArg.pointerId); } catch (createRotateViewValueClamped) {}
       draw();
       if (opts.onEnd) opts.onEnd(opts.getVal());
     };
@@ -4725,7 +4725,7 @@
 
     const shapeDef = getShapeDef(layer);
     const params = shapeDef.params || [];
-    if (!selectedLiveShapeParamId || !params.some(p => p.id === selectedLiveShapeParamId)) {
+    if (!selectedLiveShapeParamId || !params.some(renderLiveShapeSettingsId => renderLiveShapeSettingsId.id === selectedLiveShapeParamId)) {
       selectedLiveShapeParamId = params[0] ? params[0].id : "size";
     }
 
@@ -4750,14 +4750,14 @@
         railImgKf.src = activeHasKf ? "./icons/ic_keyframe_del.svg" : "./icons/ac_ic_add_keyframe.svg";
       }
 
-      container.querySelectorAll(".am-ls-row").forEach(r => {
-        const pid = r.dataset.paramId;
-        const isSel = pid === selectedLiveShapeParamId;
-        r.classList.toggle("selected", isSel);
-        const lbl = r.querySelector(".am-ls-prop-label");
-        if (lbl) lbl.classList.toggle("active", isSel);
-        const ind = r.querySelector(".am-ls-kf-indicator");
-        if (ind) ind.classList.toggle("has-kf", hasShapeKfAtPlayhead(layer, pid));
+      container.querySelectorAll(".am-ls-row").forEach(updateRailAndRowElement => {
+        const updateRailAndRowsParamId = updateRailAndRowElement.dataset.paramId;
+        const isSel = updateRailAndRowsParamId === selectedLiveShapeParamId;
+        updateRailAndRowElement.classList.toggle("selected", isSel);
+        const updateRailAndRowAmLsPropLabelEl = updateRailAndRowElement.querySelector(".am-ls-prop-label");
+        if (updateRailAndRowAmLsPropLabelEl) updateRailAndRowAmLsPropLabelEl.classList.toggle("active", isSel);
+        const updateRailAndRowAmLsKfIndicatorEl = updateRailAndRowElement.querySelector(".am-ls-kf-indicator");
+        if (updateRailAndRowAmLsKfIndicatorEl) updateRailAndRowAmLsKfIndicatorEl.classList.toggle("has-kf", hasShapeKfAtPlayhead(layer, updateRailAndRowsParamId));
       });
     }
 
@@ -4789,26 +4789,26 @@
     }
     if (railBtnOverflow) {
       railBtnOverflow.onclick = () => {
-        if (I.handle9) I.handle9("[BENTUK] Opsi: Nilai Parameter Direset");
+        if (toggleBookmark.handle9) toggleBookmark.handle9("[BENTUK] Opsi: Nilai Parameter Direset");
       };
     }
 
-    params.forEach(p => {
-      const isSel = p.id === selectedLiveShapeParamId;
+    params.forEach(paramDef => {
+      const isSel = paramDef.id === selectedLiveShapeParamId;
 
       // ── TYPE 1: POINT / SIZE (effect_setting_pos.xml) ──
-      if (p.tag === "point" || p.type === "size") {
-        const curX = Math.round(getShapeParam(layer, p.id === "size" ? "size.x" : p.id + ".x", p.default ? p.default[0] : 100));
-        const curY = Math.round(getShapeParam(layer, p.id === "size" ? "size.y" : p.id + ".y", p.default ? p.default[1] : 100));
-        const hasKf = hasShapeKfAtPlayhead(layer, p.id === "size" ? "size.x" : p.id);
+      if (paramDef.tag === "point" || paramDef.type === "size") {
+        const curX = Math.round(getShapeParam(layer, paramDef.id === "size" ? "size.x" : paramDef.id + ".x", paramDef.default ? paramDef.default[0] : 100));
+        const curY = Math.round(getShapeParam(layer, paramDef.id === "size" ? "size.y" : paramDef.id + ".y", paramDef.default ? paramDef.default[1] : 100));
+        const hasKf = hasShapeKfAtPlayhead(layer, paramDef.id === "size" ? "size.x" : paramDef.id);
 
-        const row = document.createElement("div");
-        row.className = `am-ls-row am-ls-row-pos ${isSel ? 'selected' : ''}`;
-        row.dataset.paramId = p.id;
-        row.innerHTML = `
+        const renderLiveShapeSDivEl = document.createElement("div");
+        renderLiveShapeSDivEl.className = `am-ls-row am-ls-row-pos ${isSel ? 'selected' : ''}`;
+        renderLiveShapeSDivEl.dataset.paramId = paramDef.id;
+        renderLiveShapeSDivEl.innerHTML = `
           <button type="button" class="am-ls-prop-label ${isSel ? 'active' : ''}">
             <img class="am-ls-kf-indicator ${hasKf ? 'has-kf' : ''}" src="./icons/ic_keyframe_sign.svg" alt="KF">
-            <span>${p.label || "Ukuran"}</span>
+            <span>${paramDef.label || "Ukuran"}</span>
           </button>
           <div class="am-ls-spinner-wrap">
             <canvas class="am-ls-spinner-canvas"></canvas>
@@ -4825,13 +4825,13 @@
           </div>
         `;
 
-        const propLabel = row.querySelector(".am-ls-prop-label");
-        const btnX = row.querySelector('.am-pos-val-btn[data-axis="x"]');
-        const btnY = row.querySelector('.am-pos-val-btn[data-axis="y"]');
-        const canvas = row.querySelector(".am-ls-spinner-canvas");
+        const propLabel = renderLiveShapeSDivEl.querySelector(".am-ls-prop-label");
+        const btnX = renderLiveShapeSDivEl.querySelector('.am-pos-val-btn[data-axis="x"]');
+        const btnY = renderLiveShapeSDivEl.querySelector('.am-pos-val-btn[data-axis="y"]');
+        const canvas = renderLiveShapeSDivEl.querySelector(".am-ls-spinner-canvas");
 
         function updateAxisSelection(axis) {
-          selectedLiveShapeParamId = p.id;
+          selectedLiveShapeParamId = paramDef.id;
           selectedLiveShapeSubAxis = axis;
           btnX.classList.toggle("selected", axis === "x");
           btnY.classList.toggle("selected", axis === "y");
@@ -4839,10 +4839,10 @@
         }
 
         propLabel.addEventListener("click", () => updateAxisSelection(selectedLiveShapeSubAxis));
-        btnX.addEventListener("click", (e) => { e.stopPropagation(); updateAxisSelection("x"); });
-        btnY.addEventListener("click", (e) => { e.stopPropagation(); updateAxisSelection("y"); });
+        btnX.addEventListener("click", (renderLiveShapeSettingsStopPropagation) => { renderLiveShapeSettingsStopPropagation.stopPropagation(); updateAxisSelection("x"); });
+        btnY.addEventListener("click", (renderLiveShapeSettingsArgValue) => { renderLiveShapeSettingsArgValue.stopPropagation(); updateAxisSelection("y"); });
 
-        row.addEventListener("click", () => updateAxisSelection(selectedLiveShapeSubAxis));
+        renderLiveShapeSDivEl.addEventListener("click", () => updateAxisSelection(selectedLiveShapeSubAxis));
 
         createValueSpinner(canvas, {
           min: 1,
@@ -4850,26 +4850,26 @@
           step: 1,
           getVal: () => {
             const axis = selectedLiveShapeSubAxis === "y" ? "size.y" : "size.x";
-            return Math.round(getShapeParam(layer, p.id === "size" ? axis : p.id + "." + selectedLiveShapeSubAxis, 100));
+            return Math.round(getShapeParam(layer, paramDef.id === "size" ? axis : paramDef.id + "." + selectedLiveShapeSubAxis, 100));
           },
-          setVal: (v) => {
-            const curOld = getShapeParam(layer, p.id === "size" ? (selectedLiveShapeSubAxis === "y" ? "size.y" : "size.x") : p.id + "." + selectedLiveShapeSubAxis, 100);
-            const ratio = curOld > 0 ? v / curOld : 1;
+          setVal: (renderLiveShapeSValue) => {
+            const curOld = getShapeParam(layer, paramDef.id === "size" ? (selectedLiveShapeSubAxis === "y" ? "size.y" : "size.x") : paramDef.id + "." + selectedLiveShapeSubAxis, 100);
+            const ratio = curOld > 0 ? renderLiveShapeSValue / curOld : 1;
 
             if (selectedLiveShapeSubAxis === "x") {
-              setShapeParam(layer, p.id === "size" ? "size.x" : p.id + ".x", v);
-              btnX.textContent = `${Math.round(v)} px`;
+              setShapeParam(layer, paramDef.id === "size" ? "size.x" : paramDef.id + ".x", renderLiveShapeSValue);
+              btnX.textContent = `${Math.round(renderLiveShapeSValue)} px`;
               if (isShapeRatioLocked) {
-                const otherVal = Math.round(getShapeParam(layer, p.id === "size" ? "size.y" : p.id + ".y", 100) * ratio);
-                setShapeParam(layer, p.id === "size" ? "size.y" : p.id + ".y", Math.max(1, otherVal));
+                const otherVal = Math.round(getShapeParam(layer, paramDef.id === "size" ? "size.y" : paramDef.id + ".y", 100) * ratio);
+                setShapeParam(layer, paramDef.id === "size" ? "size.y" : paramDef.id + ".y", Math.max(1, otherVal));
                 btnY.textContent = `${otherVal} px`;
               }
             } else {
-              setShapeParam(layer, p.id === "size" ? "size.y" : p.id + ".y", v);
-              btnY.textContent = `${Math.round(v)} px`;
+              setShapeParam(layer, paramDef.id === "size" ? "size.y" : paramDef.id + ".y", renderLiveShapeSValue);
+              btnY.textContent = `${Math.round(renderLiveShapeSValue)} px`;
               if (isShapeRatioLocked) {
-                const otherVal = Math.round(getShapeParam(layer, p.id === "size" ? "size.x" : p.id + ".x", 100) * ratio);
-                setShapeParam(layer, p.id === "size" ? "size.x" : p.id + ".x", Math.max(1, otherVal));
+                const otherVal = Math.round(getShapeParam(layer, paramDef.id === "size" ? "size.x" : paramDef.id + ".x", 100) * ratio);
+                setShapeParam(layer, paramDef.id === "size" ? "size.x" : paramDef.id + ".x", Math.max(1, otherVal));
                 btnX.textContent = `${otherVal} px`;
               }
             }
@@ -4877,22 +4877,22 @@
           onChange: () => updateRailAndRows()
         });
 
-        container.appendChild(row);
+        container.appendChild(renderLiveShapeSDivEl);
       }
 
       // ── TYPE 2: SPINNER / ANGLE (effect_setting_spinner.xml) ──
-      else if (p.tag === "spinner" || p.isAngle) {
-        const curVal = Math.round(getShapeParam(layer, p.id, p.default !== undefined ? Number(p.default) : 100));
-        const hasKf = hasShapeKfAtPlayhead(layer, p.id);
-        const unit = p.unit || (p.isAngle ? "°" : "px");
+      else if (paramDef.tag === "spinner" || paramDef.isAngle) {
+        const curVal = Math.round(getShapeParam(layer, paramDef.id, paramDef.default !== undefined ? Number(paramDef.default) : 100));
+        const hasKf = hasShapeKfAtPlayhead(layer, paramDef.id);
+        const unit = paramDef.unit || (paramDef.isAngle ? "°" : "px");
 
-        const row = document.createElement("div");
-        row.className = `am-ls-row am-ls-row-spinner ${isSel ? 'selected' : ''}`;
-        row.dataset.paramId = p.id;
-        row.innerHTML = `
+        const divEl = document.createElement("div");
+        divEl.className = `am-ls-row am-ls-row-spinner ${isSel ? 'selected' : ''}`;
+        divEl.dataset.paramId = paramDef.id;
+        divEl.innerHTML = `
           <button type="button" class="am-ls-prop-label ${isSel ? 'active' : ''}">
             <img class="am-ls-kf-indicator ${hasKf ? 'has-kf' : ''}" src="./icons/ic_keyframe_sign.svg" alt="KF">
-            <span>${p.label || p.id}</span>
+            <span>${paramDef.label || paramDef.id}</span>
           </button>
           <div class="am-ls-spinner-wrap">
             <canvas class="am-ls-spinner-canvas"></canvas>
@@ -4900,103 +4900,103 @@
           <div class="am-ls-prop-value">${curVal}${unit ? ' ' + unit : ''}</div>
         `;
 
-        const propLabel = row.querySelector(".am-ls-prop-label");
-        const valBox = row.querySelector(".am-ls-prop-value");
-        const canvas = row.querySelector(".am-ls-spinner-canvas");
+        const propLabel = divEl.querySelector(".am-ls-prop-label");
+        const valBox = divEl.querySelector(".am-ls-prop-value");
+        const canvas = divEl.querySelector(".am-ls-spinner-canvas");
 
         propLabel.addEventListener("click", () => {
-          selectedLiveShapeParamId = p.id;
+          selectedLiveShapeParamId = paramDef.id;
           updateRailAndRows();
         });
-        row.addEventListener("click", () => {
-          selectedLiveShapeParamId = p.id;
+        divEl.addEventListener("click", () => {
+          selectedLiveShapeParamId = paramDef.id;
           updateRailAndRows();
         });
 
         createValueSpinner(canvas, {
-          min: p.min !== undefined ? Number(p.min) : 0,
-          max: p.max !== undefined ? Number(p.max) : 3600,
-          step: p.step ? Number(p.step) : 1,
-          isAngle: !!p.isAngle,
-          getVal: () => Math.round(getShapeParam(layer, p.id, Number(p.default || 0))),
-          setVal: (v) => {
-            setShapeParam(layer, p.id, v);
-            valBox.textContent = `${v}${unit ? ' ' + unit : ''}`;
+          min: paramDef.min !== undefined ? Number(paramDef.min) : 0,
+          max: paramDef.max !== undefined ? Number(paramDef.max) : 3600,
+          step: paramDef.step ? Number(paramDef.step) : 1,
+          isAngle: !!paramDef.isAngle,
+          getVal: () => Math.round(getShapeParam(layer, paramDef.id, Number(paramDef.default || 0))),
+          setVal: (renderLiveShapeSettingsArg) => {
+            setShapeParam(layer, paramDef.id, renderLiveShapeSettingsArg);
+            valBox.textContent = `${renderLiveShapeSettingsArg}${unit ? ' ' + unit : ''}`;
           },
           onChange: () => updateRailAndRows()
         });
 
-        container.appendChild(row);
+        container.appendChild(divEl);
       }
 
       // ── TYPE 3: SLIDER / INTEGER (effect_setting_slider.xml) ──
-      else if (p.tag === "slider" || p.type === "integer") {
-        const minVal = p.min !== undefined ? Number(p.min) : 3;
-        const maxVal = p.max !== undefined ? Number(p.max) : 32;
-        const curVal = Math.round(getShapeParam(layer, p.id, p.default ? Number(p.default) : 5));
-        const hasKf = hasShapeKfAtPlayhead(layer, p.id);
+      else if (paramDef.tag === "slider" || paramDef.type === "integer") {
+        const minVal = paramDef.min !== undefined ? Number(paramDef.min) : 3;
+        const maxVal = paramDef.max !== undefined ? Number(paramDef.max) : 32;
+        const curVal = Math.round(getShapeParam(layer, paramDef.id, paramDef.default ? Number(paramDef.default) : 5));
+        const hasKf = hasShapeKfAtPlayhead(layer, paramDef.id);
 
-        const row = document.createElement("div");
-        row.className = `am-ls-row am-ls-row-slider ${isSel ? 'selected' : ''}`;
-        row.dataset.paramId = p.id;
-        row.innerHTML = `
+        const renderLiveShapeSettingsDivEl = document.createElement("div");
+        renderLiveShapeSettingsDivEl.className = `am-ls-row am-ls-row-slider ${isSel ? 'selected' : ''}`;
+        renderLiveShapeSettingsDivEl.dataset.paramId = paramDef.id;
+        renderLiveShapeSettingsDivEl.innerHTML = `
           <button type="button" class="am-ls-prop-label ${isSel ? 'active' : ''}">
             <img class="am-ls-kf-indicator ${hasKf ? 'has-kf' : ''}" src="./icons/ic_keyframe_sign.svg" alt="KF">
-            <span>${p.label || p.id}</span>
+            <span>${paramDef.label || paramDef.id}</span>
           </button>
           <div class="am-ls-slider-wrap">
-            <input type="range" class="am-ls-slider" min="${minVal}" max="${maxVal}" step="${p.step || 1}" value="${curVal}">
+            <input type="range" class="am-ls-slider" min="${minVal}" max="${maxVal}" step="${paramDef.step || 1}" value="${curVal}">
           </div>
           <div class="am-ls-prop-value">${curVal}</div>
         `;
 
-        const propLabel = row.querySelector(".am-ls-prop-label");
-        const slider = row.querySelector(".am-ls-slider");
-        const valBox = row.querySelector(".am-ls-prop-value");
+        const propLabel = renderLiveShapeSettingsDivEl.querySelector(".am-ls-prop-label");
+        const slider = renderLiveShapeSettingsDivEl.querySelector(".am-ls-slider");
+        const valBox = renderLiveShapeSettingsDivEl.querySelector(".am-ls-prop-value");
 
         propLabel.addEventListener("click", () => {
-          selectedLiveShapeParamId = p.id;
+          selectedLiveShapeParamId = paramDef.id;
           updateRailAndRows();
         });
-        row.addEventListener("click", (e) => {
-          if (e.target !== slider) {
-            selectedLiveShapeParamId = p.id;
+        renderLiveShapeSettingsDivEl.addEventListener("click", (renderLiveShapeSettingsTarget) => {
+          if (renderLiveShapeSettingsTarget.target !== slider) {
+            selectedLiveShapeParamId = paramDef.id;
             updateRailAndRows();
           }
         });
         slider.addEventListener("input", () => {
-          selectedLiveShapeParamId = p.id;
-          const v = Number(slider.value);
-          valBox.textContent = v;
-          setShapeParam(layer, p.id, v);
+          selectedLiveShapeParamId = paramDef.id;
+          const renderLiveShapeSNumber = Number(slider.value);
+          valBox.textContent = renderLiveShapeSNumber;
+          setShapeParam(layer, paramDef.id, renderLiveShapeSNumber);
           updateRailAndRows();
         });
 
-        container.appendChild(row);
+        container.appendChild(renderLiveShapeSettingsDivEl);
       }
 
       // ── TYPE 4: SWITCH (effect_setting_switch.xml) ──
-      else if (p.tag === "switch") {
-        const curChecked = !!getShapeParam(layer, p.id, p.default === "true" || p.default === true);
+      else if (paramDef.tag === "switch") {
+        const curChecked = !!getShapeParam(layer, paramDef.id, paramDef.default === "true" || paramDef.default === true);
 
-        const row = document.createElement("div");
-        row.className = `am-ls-row am-ls-row-switch ${isSel ? 'selected' : ''}`;
-        row.dataset.paramId = p.id;
-        row.innerHTML = `
+        const divElValue = document.createElement("div");
+        divElValue.className = `am-ls-row am-ls-row-switch ${isSel ? 'selected' : ''}`;
+        divElValue.dataset.paramId = paramDef.id;
+        divElValue.innerHTML = `
           <div class="am-ls-prop-label ${isSel ? 'active' : ''}">
-            <span>${p.label || p.id}</span>
+            <span>${paramDef.label || paramDef.id}</span>
           </div>
           <div class="am-ls-switch-wrap">
             <input type="checkbox" class="am-ls-switch" ${curChecked ? 'checked' : ''}>
           </div>
         `;
 
-        const sw = row.querySelector(".am-ls-switch");
-        sw.addEventListener("change", () => {
-          setShapeParam(layer, p.id, sw.checked);
+        const renderLiveShapeSAmLsSwitchEl = divElValue.querySelector(".am-ls-switch");
+        renderLiveShapeSAmLsSwitchEl.addEventListener("change", () => {
+          setShapeParam(layer, paramDef.id, renderLiveShapeSAmLsSwitchEl.checked);
         });
 
-        container.appendChild(row);
+        container.appendChild(divElValue);
       }
     });
 
@@ -5014,16 +5014,16 @@
   function openEditPoints(layer) {
     if (!layer) return;
     activeEditPointsLayer = layer;
-    editPointsSnapBefore = I.sceneSnapshot ? I.sceneSnapshot() : null;
+    editPointsSnapBefore = toggleBookmark.sceneSnapshot ? toggleBookmark.sceneSnapshot() : null;
 
     if (layer.path && layer.path.commands && layer.path.commands.length) {
       const parsed = commandsToPoints(layer.path.commands);
       epPoints = parsed.points;
       epIsClosed = parsed.isClosed;
     } else {
-      const def = defaultPointsForLayer(layer);
-      epPoints = def.points;
-      epIsClosed = def.isClosed;
+      const openEditPointsDefaultPointsForLayer = defaultPointsForLayer(layer);
+      epPoints = openEditPointsDefaultPointsForLayer.points;
+      epIsClosed = openEditPointsDefaultPointsForLayer.isClosed;
       applyPointsToLayer();
     }
     epActiveIdx = 0;
@@ -5063,8 +5063,8 @@
     delete activeEditPointsLayer.mt;
     delete activeEditPointsLayer.an;
     delete activeEditPointsLayer.tn;
-    I.V = true;
-    if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+    toggleBookmark.V = true;
+    if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) toggleBookmark.val2.renderAt(toggleBookmark.H);
   }
 
   function closeEditPoints(commit) {
@@ -5083,10 +5083,10 @@
 
     if (commit) {
       applyPointsToLayer();
-      if (editPointsSnapBefore && I.pushUndo) I.pushUndo(editPointsSnapBefore);
-      if (I.omScheduleSave) I.omScheduleSave();
-      I.V = true;
-      if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+      if (editPointsSnapBefore && toggleBookmark.pushUndo) toggleBookmark.pushUndo(editPointsSnapBefore);
+      if (toggleBookmark.omScheduleSave) toggleBookmark.omScheduleSave();
+      toggleBookmark.V = true;
+      if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) toggleBookmark.val2.renderAt(toggleBookmark.H);
     }
     activeEditPointsLayer = null;
     editPointsSnapBefore = null;
@@ -5115,17 +5115,17 @@
 
     if (scroller) {
       scroller.innerHTML = "";
-      epPoints.forEach((pt, i) => {
+      epPoints.forEach((updateEditPointsUiArgValue, updateEditPointsUiArg) => {
         const node = document.createElement("div");
-        node.className = `am-ep-point-node ${i === epActiveIdx ? "active" : ""}`;
-        node.textContent = String(i + 1);
+        node.className = `am-ep-point-node ${updateEditPointsUiArg === epActiveIdx ? "active" : ""}`;
+        node.textContent = String(updateEditPointsUiArg + 1);
         node.addEventListener("click", () => {
-          epActiveIdx = i;
+          epActiveIdx = updateEditPointsUiArg;
           updateEditPointsUI();
           renderCanvasOverlay();
         });
         scroller.appendChild(node);
-        if (i === epActiveIdx) {
+        if (updateEditPointsUiArg === epActiveIdx) {
           node.scrollIntoView({ block: "nearest", behavior: "smooth" });
         }
       });
@@ -5158,51 +5158,51 @@
     const canvasEl = document.getElementById("view") || (stage ? stage.querySelector("canvas") : null);
     if (!stage || !canvasEl) return;
 
-    const cr = canvasEl.getBoundingClientRect();
-    const sr = stage.getBoundingClientRect();
-    const sceneW = (I.val && I.val.width) || 1280;
-    const canvasScale = cr.width / sceneW;
+    const getBoundingClientRect = canvasEl.getBoundingClientRect();
+    const renderCanvasOverlayGetBoundingClientRect = stage.getBoundingClientRect();
+    const sceneW = (toggleBookmark.val && toggleBookmark.val.width) || 1280;
+    const canvasScale = getBoundingClientRect.width / sceneW;
 
     const layerX = (activeEditPointsLayer.transform && activeEditPointsLayer.transform.location && activeEditPointsLayer.transform.location.value[0]) || 0;
     const layerY = (activeEditPointsLayer.transform && activeEditPointsLayer.transform.location && activeEditPointsLayer.transform.location.value[1]) || 0;
 
-    function toScreen(px, py) {
+    function toScreen(toScreenText, toScreenArg) {
       return {
-        x: (cr.left - sr.left) + (cr.width / 2) + (layerX + px) * canvasScale,
-        y: (cr.top - sr.top) + (cr.height / 2) + (layerY + py) * canvasScale
+        x: (getBoundingClientRect.left - renderCanvasOverlayGetBoundingClientRect.left) + (getBoundingClientRect.width / 2) + (layerX + toScreenText) * canvasScale,
+        y: (getBoundingClientRect.top - renderCanvasOverlayGetBoundingClientRect.top) + (getBoundingClientRect.height / 2) + (layerY + toScreenArg) * canvasScale
       };
     }
 
-    let d = "";
-    epPoints.forEach((pt, i) => {
-      const sp = toScreen(pt.x, pt.y);
-      if (i === 0) d += `M ${sp.x} ${sp.y} `;
+    let renderCanvasOverText = "";
+    epPoints.forEach((xArg, renderCanvasOverlayArg) => {
+      const renderCanvasOverlayToScreen = toScreen(xArg.x, xArg.y);
+      if (renderCanvasOverlayArg === 0) renderCanvasOverText += `M ${renderCanvasOverlayToScreen.x} ${renderCanvasOverlayToScreen.y} `;
       else {
-        const prev = epPoints[i - 1];
-        if (prev.type === "curved" || pt.type === "curved") {
-          const cp1 = toScreen(prev.out ? prev.out[0] : prev.x, prev.out ? prev.out[1] : prev.y);
-          const cp2 = toScreen(pt.in ? pt.in[0] : pt.x, pt.in ? pt.in[1] : pt.y);
-          d += `C ${cp1.x} ${cp1.y}, ${cp2.x} ${cp2.y}, ${sp.x} ${sp.y} `;
+        const prev = epPoints[renderCanvasOverlayArg - 1];
+        if (prev.type === "curved" || xArg.type === "curved") {
+          const renderCanvasOverlayValue = toScreen(prev.out ? prev.out[0] : prev.x, prev.out ? prev.out[1] : prev.y);
+          const renderCanvasOverlayResult = toScreen(xArg.in ? xArg.in[0] : xArg.x, xArg.in ? xArg.in[1] : xArg.y);
+          renderCanvasOverText += `C ${renderCanvasOverlayValue.x} ${renderCanvasOverlayValue.y}, ${renderCanvasOverlayResult.x} ${renderCanvasOverlayResult.y}, ${renderCanvasOverlayToScreen.x} ${renderCanvasOverlayToScreen.y} `;
         } else {
-          d += `L ${sp.x} ${sp.y} `;
+          renderCanvasOverText += `L ${renderCanvasOverlayToScreen.x} ${renderCanvasOverlayToScreen.y} `;
         }
       }
     });
     if (epIsClosed && epPoints.length > 2) {
       const last = epPoints[epPoints.length - 1];
       const first = epPoints[0];
-      const sp = toScreen(first.x, first.y);
+      const toScreenValue = toScreen(first.x, first.y);
       if (last.type === "curved" || first.type === "curved") {
-        const cp1 = toScreen(last.out ? last.out[0] : last.x, last.out ? last.out[1] : last.y);
-        const cp2 = toScreen(first.in ? first.in[0] : first.x, first.in ? first.in[1] : first.y);
-        d += `C ${cp1.x} ${cp1.y}, ${cp2.x} ${cp2.y}, ${sp.x} ${sp.y} Z`;
+        const renderCanvasOverlayValueRaw = toScreen(last.out ? last.out[0] : last.x, last.out ? last.out[1] : last.y);
+        const renderCanvasOverlayRaw = toScreen(first.in ? first.in[0] : first.x, first.in ? first.in[1] : first.y);
+        renderCanvasOverText += `C ${renderCanvasOverlayValueRaw.x} ${renderCanvasOverlayValueRaw.y}, ${renderCanvasOverlayRaw.x} ${renderCanvasOverlayRaw.y}, ${toScreenValue.x} ${toScreenValue.y} Z`;
       } else {
-        d += `L ${sp.x} ${sp.y} Z`;
+        renderCanvasOverText += `L ${toScreenValue.x} ${toScreenValue.y} Z`;
       }
     }
 
     const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    pathEl.setAttribute("d", d);
+    pathEl.setAttribute("d", renderCanvasOverText);
     pathEl.setAttribute("fill", "none");
     pathEl.setAttribute("stroke", "#00ffa8");
     pathEl.setAttribute("stroke-width", "2");
@@ -5211,28 +5211,28 @@
 
     const actPt = epPoints[epActiveIdx];
     if (actPt && actPt.type === "curved") {
-      const sp = toScreen(actPt.x, actPt.y);
+      const xValue = toScreen(actPt.x, actPt.y);
       if (actPt.in) {
-        const sin = toScreen(actPt.in[0], actPt.in[1]);
+        const renderCanvasOverlayY = toScreen(actPt.in[0], actPt.in[1]);
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", sp.x); line.setAttribute("y1", sp.y);
-        line.setAttribute("x2", sin.x); line.setAttribute("y2", sin.y);
+        line.setAttribute("x1", xValue.x); line.setAttribute("y1", xValue.y);
+        line.setAttribute("x2", renderCanvasOverlayY.x); line.setAttribute("y2", renderCanvasOverlayY.y);
         line.setAttribute("stroke", "#ffffff"); line.setAttribute("stroke-width", "1.5");
         epOverlayEl.appendChild(line);
 
-        const sq = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        sq.setAttribute("x", sin.x - 4); sq.setAttribute("y", sin.y - 4);
-        sq.setAttribute("width", "8"); sq.setAttribute("height", "8");
-        sq.setAttribute("fill", "#00ffa8"); sq.setAttribute("stroke", "#ffffff"); sq.setAttribute("stroke-width", "1");
-        sq.style.cursor = "crosshair"; sq.style.pointerEvents = "auto";
-        sq.addEventListener("pointerdown", (e) => {
-          e.stopPropagation();
-          let sx = e.clientX, sy = e.clientY;
+        const renderCanvasOverRectEl = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        renderCanvasOverRectEl.setAttribute("x", renderCanvasOverlayY.x - 4); renderCanvasOverRectEl.setAttribute("y", renderCanvasOverlayY.y - 4);
+        renderCanvasOverRectEl.setAttribute("width", "8"); renderCanvasOverRectEl.setAttribute("height", "8");
+        renderCanvasOverRectEl.setAttribute("fill", "#00ffa8"); renderCanvasOverRectEl.setAttribute("stroke", "#ffffff"); renderCanvasOverRectEl.setAttribute("stroke-width", "1");
+        renderCanvasOverRectEl.style.cursor = "crosshair"; renderCanvasOverRectEl.style.pointerEvents = "auto";
+        renderCanvasOverRectEl.addEventListener("pointerdown", (renderCanvasOverlayStopPropagation) => {
+          renderCanvasOverlayStopPropagation.stopPropagation();
+          let renderCanvasOverlayClientX = renderCanvasOverlayStopPropagation.clientX, renderCanvasOverlayClientY = renderCanvasOverlayStopPropagation.clientY;
           function onHMove(ev) {
-            const dx = (ev.clientX - sx) / canvasScale;
-            const dy = (ev.clientY - sy) / canvasScale;
-            sx = ev.clientX; sy = ev.clientY;
-            actPt.in[0] += dx; actPt.in[1] += dy;
+            const onHMoveValue = (ev.clientX - renderCanvasOverlayClientX) / canvasScale;
+            const onHMoveResult = (ev.clientY - renderCanvasOverlayClientY) / canvasScale;
+            renderCanvasOverlayClientX = ev.clientX; renderCanvasOverlayClientY = ev.clientY;
+            actPt.in[0] += onHMoveValue; actPt.in[1] += onHMoveResult;
             applyPointsToLayer();
             renderCanvasOverlay();
           }
@@ -5243,29 +5243,29 @@
           window.addEventListener("pointermove", onHMove);
           window.addEventListener("pointerup", onHUp);
         });
-        epOverlayEl.appendChild(sq);
+        epOverlayEl.appendChild(renderCanvasOverRectEl);
       }
       if (actPt.out) {
         const sout = toScreen(actPt.out[0], actPt.out[1]);
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", sp.x); line.setAttribute("y1", sp.y);
+        line.setAttribute("x1", xValue.x); line.setAttribute("y1", xValue.y);
         line.setAttribute("x2", sout.x); line.setAttribute("y2", sout.y);
         line.setAttribute("stroke", "#ffffff"); line.setAttribute("stroke-width", "1.5");
         epOverlayEl.appendChild(line);
 
-        const sq = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        sq.setAttribute("x", sout.x - 4); sq.setAttribute("y", sout.y - 4);
-        sq.setAttribute("width", "8"); sq.setAttribute("height", "8");
-        sq.setAttribute("fill", "#00ffa8"); sq.setAttribute("stroke", "#ffffff"); sq.setAttribute("stroke-width", "1");
-        sq.style.cursor = "crosshair"; sq.style.pointerEvents = "auto";
-        sq.addEventListener("pointerdown", (e) => {
-          e.stopPropagation();
-          let sx = e.clientX, sy = e.clientY;
+        const createElementNs = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        createElementNs.setAttribute("x", sout.x - 4); createElementNs.setAttribute("y", sout.y - 4);
+        createElementNs.setAttribute("width", "8"); createElementNs.setAttribute("height", "8");
+        createElementNs.setAttribute("fill", "#00ffa8"); createElementNs.setAttribute("stroke", "#ffffff"); createElementNs.setAttribute("stroke-width", "1");
+        createElementNs.style.cursor = "crosshair"; createElementNs.style.pointerEvents = "auto";
+        createElementNs.addEventListener("pointerdown", (stopPropagationArg) => {
+          stopPropagationArg.stopPropagation();
+          let clientXValue = stopPropagationArg.clientX, clientYValue = stopPropagationArg.clientY;
           function onHMove(ev) {
-            const dx = (ev.clientX - sx) / canvasScale;
-            const dy = (ev.clientY - sy) / canvasScale;
-            sx = ev.clientX; sy = ev.clientY;
-            actPt.out[0] += dx; actPt.out[1] += dy;
+            const onHMoveValueRaw = (ev.clientX - clientXValue) / canvasScale;
+            const onHMoveRaw = (ev.clientY - clientYValue) / canvasScale;
+            clientXValue = ev.clientX; clientYValue = ev.clientY;
+            actPt.out[0] += onHMoveValueRaw; actPt.out[1] += onHMoveRaw;
             applyPointsToLayer();
             renderCanvasOverlay();
           }
@@ -5276,37 +5276,37 @@
           window.addEventListener("pointermove", onHMove);
           window.addEventListener("pointerup", onHUp);
         });
-        epOverlayEl.appendChild(sq);
+        epOverlayEl.appendChild(createElementNs);
       }
     }
 
-    epPoints.forEach((pt, i) => {
-      const sp = toScreen(pt.x, pt.y);
-      const isAct = i === epActiveIdx;
-      const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      c.setAttribute("cx", sp.x);
-      c.setAttribute("cy", sp.y);
-      c.setAttribute("r", isAct ? "8" : "6");
-      c.setAttribute("fill", isAct ? "#00ffa8" : "#ffffff");
-      c.setAttribute("stroke", isAct ? "#ffffff" : "#11131c");
-      c.setAttribute("stroke-width", "2");
-      c.style.cursor = "pointer";
-      c.style.pointerEvents = "auto";
+    epPoints.forEach((renderCanvasOverlayX, renderCanvasOverlayArgValue) => {
+      const renderCanvasOverlayValueParsed = toScreen(renderCanvasOverlayX.x, renderCanvasOverlayX.y);
+      const isAct = renderCanvasOverlayArgValue === epActiveIdx;
+      const renderCanvasOverCircleEl = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      renderCanvasOverCircleEl.setAttribute("cx", renderCanvasOverlayValueParsed.x);
+      renderCanvasOverCircleEl.setAttribute("cy", renderCanvasOverlayValueParsed.y);
+      renderCanvasOverCircleEl.setAttribute("r", isAct ? "8" : "6");
+      renderCanvasOverCircleEl.setAttribute("fill", isAct ? "#00ffa8" : "#ffffff");
+      renderCanvasOverCircleEl.setAttribute("stroke", isAct ? "#ffffff" : "#11131c");
+      renderCanvasOverCircleEl.setAttribute("stroke-width", "2");
+      renderCanvasOverCircleEl.style.cursor = "pointer";
+      renderCanvasOverCircleEl.style.pointerEvents = "auto";
 
-      c.addEventListener("pointerdown", (e) => {
-        e.stopPropagation();
-        epActiveIdx = i;
+      renderCanvasOverCircleEl.addEventListener("pointerdown", (clientXArg) => {
+        clientXArg.stopPropagation();
+        epActiveIdx = renderCanvasOverlayArgValue;
         updateEditPointsUI();
         renderCanvasOverlay();
 
-        let sx = e.clientX, sy = e.clientY;
+        let renderCanvasOverlayParsed = clientXArg.clientX, renderCanvasOverlayValueClamped = clientXArg.clientY;
         function onPointMove(ev) {
-          const dx = (ev.clientX - sx) / canvasScale;
-          const dy = (ev.clientY - sy) / canvasScale;
-          sx = ev.clientX; sy = ev.clientY;
-          pt.x += dx; pt.y += dy;
-          if (pt.in) { pt.in[0] += dx; pt.in[1] += dy; }
-          if (pt.out) { pt.out[0] += dx; pt.out[1] += dy; }
+          const onPointMoveValue = (ev.clientX - renderCanvasOverlayParsed) / canvasScale;
+          const onPointMoveY = (ev.clientY - renderCanvasOverlayValueClamped) / canvasScale;
+          renderCanvasOverlayParsed = ev.clientX; renderCanvasOverlayValueClamped = ev.clientY;
+          renderCanvasOverlayX.x += onPointMoveValue; renderCanvasOverlayX.y += onPointMoveY;
+          if (renderCanvasOverlayX.in) { renderCanvasOverlayX.in[0] += onPointMoveValue; renderCanvasOverlayX.in[1] += onPointMoveY; }
+          if (renderCanvasOverlayX.out) { renderCanvasOverlayX.out[0] += onPointMoveValue; renderCanvasOverlayX.out[1] += onPointMoveY; }
           applyPointsToLayer();
           renderCanvasOverlay();
         }
@@ -5317,7 +5317,7 @@
         window.addEventListener("pointermove", onPointMove);
         window.addEventListener("pointerup", onPointUp);
       });
-      epOverlayEl.appendChild(c);
+      epOverlayEl.appendChild(renderCanvasOverCircleEl);
     });
   }
 
@@ -5346,98 +5346,98 @@
   function rdpPoints(points, epsilon) {
     if (!points || points.length <= 2) return points || [];
     let maxDist = 0;
-    let index = 0;
-    const p1 = points[0];
-    const p2 = points[points.length - 1];
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
-    const lenSq = dx * dx + dy * dy;
+    let rdpPointsNumber = 0;
+    const rdpPointsX = points[0];
+    const rdpPointsY = points[points.length - 1];
+    const rdpPointsValue = rdpPointsY.x - rdpPointsX.x;
+    const rdpPointsResult = rdpPointsY.y - rdpPointsX.y;
+    const lenSq = rdpPointsValue * rdpPointsValue + rdpPointsResult * rdpPointsResult;
 
-    for (let i = 1; i < points.length - 1; i++) {
-      const p = points[i];
+    for (let rdpPointsValueRaw = 1; rdpPointsValueRaw < points.length - 1; rdpPointsValueRaw++) {
+      const rdpPointsI = points[rdpPointsValueRaw];
       let dist;
       if (lenSq === 0) {
-        dist = Math.hypot(p.x - p1.x, p.y - p1.y);
+        dist = Math.hypot(rdpPointsI.x - rdpPointsX.x, rdpPointsI.y - rdpPointsX.y);
       } else {
-        const u = Math.max(0, Math.min(1, ((p.x - p1.x) * dx + (p.y - p1.y) * dy) / lenSq));
-        dist = Math.hypot(p.x - (p1.x + u * dx), p.y - (p1.y + u * dy));
+        const rdpPointsMax = Math.max(0, Math.min(1, ((rdpPointsI.x - rdpPointsX.x) * rdpPointsValue + (rdpPointsI.y - rdpPointsX.y) * rdpPointsResult) / lenSq));
+        dist = Math.hypot(rdpPointsI.x - (rdpPointsX.x + rdpPointsMax * rdpPointsValue), rdpPointsI.y - (rdpPointsX.y + rdpPointsMax * rdpPointsResult));
       }
       if (dist > maxDist) {
         maxDist = dist;
-        index = i;
+        rdpPointsNumber = rdpPointsValueRaw;
       }
     }
     if (maxDist > epsilon) {
-      const left = rdpPoints(points.slice(0, index + 1), epsilon);
-      const right = rdpPoints(points.slice(index), epsilon);
+      const left = rdpPoints(points.slice(0, rdpPointsNumber + 1), epsilon);
+      const right = rdpPoints(points.slice(rdpPointsNumber), epsilon);
       return left.slice(0, -1).concat(right);
     }
-    return [p1, p2];
+    return [rdpPointsX, rdpPointsY];
   }
 
-  function pointsToSmoothCommands(pts, isClosed) {
-    if (!pts || !pts.length) return [];
-    if (pts.length === 1) {
-      return [['M', pts[0].x, pts[0].y], ['L', pts[0].x + 0.1, pts[0].y]];
+  function pointsToSmoothCommands(pointsToSmoothCommandsArg, isClosed) {
+    if (!pointsToSmoothCommandsArg || !pointsToSmoothCommandsArg.length) return [];
+    if (pointsToSmoothCommandsArg.length === 1) {
+      return [['M', pointsToSmoothCommandsArg[0].x, pointsToSmoothCommandsArg[0].y], ['L', pointsToSmoothCommandsArg[0].x + 0.1, pointsToSmoothCommandsArg[0].y]];
     }
-    if (pts.length === 2) {
-      return [['M', pts[0].x, pts[0].y], ['L', pts[1].x, pts[1].y]];
+    if (pointsToSmoothCommandsArg.length === 2) {
+      return [['M', pointsToSmoothCommandsArg[0].x, pointsToSmoothCommandsArg[0].y], ['L', pointsToSmoothCommandsArg[1].x, pointsToSmoothCommandsArg[1].y]];
     }
-    const cmds = [['M', pts[0].x, pts[0].y]];
-    const n = pts.length;
-    const maxIdx = isClosed ? n : n - 1;
-    for (let i = 0; i < maxIdx; i++) {
-      const p0 = pts[(i - 1 + n) % n];
-      const p1 = pts[i];
-      const p2 = pts[(i + 1) % n];
-      const p3 = pts[(i + 2) % n];
+    const cmds = [['M', pointsToSmoothCommandsArg[0].x, pointsToSmoothCommandsArg[0].y]];
+    const pointsToSmoothCoLength = pointsToSmoothCommandsArg.length;
+    const maxIdx = isClosed ? pointsToSmoothCoLength : pointsToSmoothCoLength - 1;
+    for (let pointsToSmoothCommandsNumber = 0; pointsToSmoothCommandsNumber < maxIdx; pointsToSmoothCommandsNumber++) {
+      const pointsToSmoothCommandsY = pointsToSmoothCommandsArg[(pointsToSmoothCommandsNumber - 1 + pointsToSmoothCoLength) % pointsToSmoothCoLength];
+      const pointsToSmoothCommandsI = pointsToSmoothCommandsArg[pointsToSmoothCommandsNumber];
+      const pointsToSmoothCommandsX = pointsToSmoothCommandsArg[(pointsToSmoothCommandsNumber + 1) % pointsToSmoothCoLength];
+      const yValue = pointsToSmoothCommandsArg[(pointsToSmoothCommandsNumber + 2) % pointsToSmoothCoLength];
 
-      const cp1x = p1.x + (p2.x - (isClosed ? p0.x : (i === 0 ? p1.x : p0.x))) / 6;
-      const cp1y = p1.y + (p2.y - (isClosed ? p0.y : (i === 0 ? p1.y : p0.y))) / 6;
-      const cp2x = p2.x - ((isClosed ? p3.x : (i + 1 === n - 1 ? p2.x : p3.x)) - p1.x) / 6;
-      const cp2y = p2.y - ((isClosed ? p3.y : (i + 1 === n - 1 ? p2.y : p3.y)) - p1.y) / 6;
+      const pointsToSmoothCommandsValue = pointsToSmoothCommandsI.x + (pointsToSmoothCommandsX.x - (isClosed ? pointsToSmoothCommandsY.x : (pointsToSmoothCommandsNumber === 0 ? pointsToSmoothCommandsI.x : pointsToSmoothCommandsY.x))) / 6;
+      const pointsToSmoothCommandsValueRaw = pointsToSmoothCommandsI.y + (pointsToSmoothCommandsX.y - (isClosed ? pointsToSmoothCommandsY.y : (pointsToSmoothCommandsNumber === 0 ? pointsToSmoothCommandsI.y : pointsToSmoothCommandsY.y))) / 6;
+      const pointsToSmoothCommandsRaw = pointsToSmoothCommandsX.x - ((isClosed ? yValue.x : (pointsToSmoothCommandsNumber + 1 === pointsToSmoothCoLength - 1 ? pointsToSmoothCommandsX.x : yValue.x)) - pointsToSmoothCommandsI.x) / 6;
+      const pointsToSmoothCommandsValueParsed = pointsToSmoothCommandsX.y - ((isClosed ? yValue.y : (pointsToSmoothCommandsNumber + 1 === pointsToSmoothCoLength - 1 ? pointsToSmoothCommandsX.y : yValue.y)) - pointsToSmoothCommandsI.y) / 6;
 
       cmds.push([
         'C',
-        Math.round(cp1x * 100) / 100, Math.round(cp1y * 100) / 100,
-        Math.round(cp2x * 100) / 100, Math.round(cp2y * 100) / 100,
-        Math.round(p2.x * 100) / 100, Math.round(p2.y * 100) / 100
+        Math.round(pointsToSmoothCommandsValue * 100) / 100, Math.round(pointsToSmoothCommandsValueRaw * 100) / 100,
+        Math.round(pointsToSmoothCommandsRaw * 100) / 100, Math.round(pointsToSmoothCommandsValueParsed * 100) / 100,
+        Math.round(pointsToSmoothCommandsX.x * 100) / 100, Math.round(pointsToSmoothCommandsX.y * 100) / 100
       ]);
     }
     if (isClosed) cmds.push(['Z']);
     return cmds;
   }
 
-  function screenToSceneDraw(e) {
+  function screenToSceneDraw(pressure) {
     const stage = document.getElementById("am-preview-stage");
     const canvasEl = document.getElementById("view") || (stage ? stage.querySelector("canvas") : null);
     if (!stage || !canvasEl) return { x: 0, y: 0, p: 0.5 };
-    const cr = canvasEl.getBoundingClientRect();
-    const sceneW = (I.val && I.val.width) || 1280;
-    const canvasScale = cr.width / sceneW;
-    const cx = cr.left + cr.width / 2;
-    const cy = cr.top + cr.height / 2;
-    const p = typeof e.pressure === "number" && e.pressure > 0 ? e.pressure : 0.5;
+    const screenToSceneDrawGetBoundingClientRect = canvasEl.getBoundingClientRect();
+    const sceneW = (toggleBookmark.val && toggleBookmark.val.width) || 1280;
+    const canvasScale = screenToSceneDrawGetBoundingClientRect.width / sceneW;
+    const screenToSceneDraValue = screenToSceneDrawGetBoundingClientRect.left + screenToSceneDrawGetBoundingClientRect.width / 2;
+    const screenToSceneDrawResult = screenToSceneDrawGetBoundingClientRect.top + screenToSceneDrawGetBoundingClientRect.height / 2;
+    const screenToSceneDrawValueRaw = typeof pressure.pressure === "number" && pressure.pressure > 0 ? pressure.pressure : 0.5;
     return {
-      x: (e.clientX - cx) / canvasScale,
-      y: (e.clientY - cy) / canvasScale,
-      p
+      x: (pressure.clientX - screenToSceneDraValue) / canvasScale,
+      y: (pressure.clientY - screenToSceneDrawResult) / canvasScale,
+      p: screenToSceneDrawValueRaw
     };
   }
 
-  function sceneToScreenDraw(px, py) {
+  function sceneToScreenDraw(sceneToScreenDraValue, sceneToScreenDrawArg) {
     const stage = document.getElementById("am-preview-stage");
     const canvasEl = document.getElementById("view") || (stage ? stage.querySelector("canvas") : null);
     if (!stage || !canvasEl) return { x: 0, y: 0, scale: 1 };
-    const cr = canvasEl.getBoundingClientRect();
-    const sr = stage.getBoundingClientRect();
-    const sceneW = (I.val && I.val.width) || 1280;
-    const canvasScale = cr.width / sceneW;
-    const cx = (cr.left - sr.left) + (cr.width / 2);
-    const cy = (cr.top - sr.top) + (cr.height / 2);
+    const sceneToScreenDrawGetBoundingClientRect = canvasEl.getBoundingClientRect();
+    const getBoundingClientRectValue = stage.getBoundingClientRect();
+    const sceneW = (toggleBookmark.val && toggleBookmark.val.width) || 1280;
+    const canvasScale = sceneToScreenDrawGetBoundingClientRect.width / sceneW;
+    const sceneToScreenDrawResult = (sceneToScreenDrawGetBoundingClientRect.left - getBoundingClientRectValue.left) + (sceneToScreenDrawGetBoundingClientRect.width / 2);
+    const sceneToScreenDrawValueRaw = (sceneToScreenDrawGetBoundingClientRect.top - getBoundingClientRectValue.top) + (sceneToScreenDrawGetBoundingClientRect.height / 2);
     return {
-      x: cx + px * canvasScale,
-      y: cy + py * canvasScale,
+      x: sceneToScreenDrawResult + sceneToScreenDraValue * canvasScale,
+      y: sceneToScreenDrawValueRaw + sceneToScreenDrawArg * canvasScale,
       scale: canvasScale
     };
   }
@@ -5447,107 +5447,107 @@
     const stage = document.getElementById("am-preview-stage");
     if (!stage) return;
     const rect = stage.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    activeDrawingCanvas.width = Math.round(rect.width * dpr);
-    activeDrawingCanvas.height = Math.round(rect.height * dpr);
+    const resizeDrawingCanValue = window.devicePixelRatio || 1;
+    activeDrawingCanvas.width = Math.round(rect.width * resizeDrawingCanValue);
+    activeDrawingCanvas.height = Math.round(rect.height * resizeDrawingCanValue);
     activeDrawingCanvas.style.width = rect.width + "px";
     activeDrawingCanvas.style.height = rect.height + "px";
     activeDrawingCtx = activeDrawingCanvas.getContext("2d");
-    activeDrawingCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    activeDrawingCtx.setTransform(resizeDrawingCanValue, 0, 0, resizeDrawingCanValue, 0, 0);
     renderAllStrokesToCanvas();
   }
 
-  function drawSingleStroke(ctx, s) {
-    if (!s || !s.points || s.points.length === 0) return;
-    const pts = s.points;
-    const sp0 = sceneToScreenDraw(pts[0].x, pts[0].y);
-    const scale = sp0.scale;
-    const strokeWidth = Math.max(1, s.width * scale);
+  function drawSingleStroke(ctx, pointsArg) {
+    if (!pointsArg || !pointsArg.points || pointsArg.points.length === 0) return;
+    const drawSingleStrokePoints = pointsArg.points;
+    const drawSingleStrokeSceneToScreenDraw = sceneToScreenDraw(drawSingleStrokePoints[0].x, drawSingleStrokePoints[0].y);
+    const scale = drawSingleStrokeSceneToScreenDraw.scale;
+    const strokeWidth = Math.max(1, pointsArg.width * scale);
 
     ctx.save();
-    if (s.tool === "fill") {
+    if (pointsArg.tool === "fill") {
       ctx.beginPath();
-      ctx.moveTo(sp0.x, sp0.y);
-      for (let i = 1; i < pts.length; i++) {
-        const sp = sceneToScreenDraw(pts[i].x, pts[i].y);
-        ctx.lineTo(sp.x, sp.y);
+      ctx.moveTo(drawSingleStrokeSceneToScreenDraw.x, drawSingleStrokeSceneToScreenDraw.y);
+      for (let drawSingleStrokeValueRaw = 1; drawSingleStrokeValueRaw < drawSingleStrokePoints.length; drawSingleStrokeValueRaw++) {
+        const sceneToScreenDrawValue = sceneToScreenDraw(drawSingleStrokePoints[drawSingleStrokeValueRaw].x, drawSingleStrokePoints[drawSingleStrokeValueRaw].y);
+        ctx.lineTo(sceneToScreenDrawValue.x, sceneToScreenDrawValue.y);
       }
       ctx.closePath();
-      ctx.fillStyle = s.color;
+      ctx.fillStyle = pointsArg.color;
       ctx.fill();
-      ctx.strokeStyle = s.color;
+      ctx.strokeStyle = pointsArg.color;
       ctx.lineWidth = Math.max(1, strokeWidth * 0.5);
       ctx.stroke();
-    } else if (s.tool === "brush") {
-      const count = pts.length;
+    } else if (pointsArg.tool === "brush") {
+      const count = drawSingleStrokePoints.length;
       if (count === 1) {
         ctx.beginPath();
-        const r = (strokeWidth * (pts[0].p || 0.5)) / 2;
-        ctx.arc(sp0.x, sp0.y, Math.max(1, r), 0, Math.PI * 2);
-        ctx.fillStyle = s.color;
+        const drawSingleStrokeValue = (strokeWidth * (drawSingleStrokePoints[0].p || 0.5)) / 2;
+        ctx.arc(drawSingleStrokeSceneToScreenDraw.x, drawSingleStrokeSceneToScreenDraw.y, Math.max(1, drawSingleStrokeValue), 0, Math.PI * 2);
+        ctx.fillStyle = pointsArg.color;
         ctx.fill();
       } else {
-        const scrPts = pts.map(p => {
-          const sp = sceneToScreenDraw(p.x, p.y);
-          return { x: sp.x, y: sp.y, p: p.p || 0.5 };
+        const scrPts = drawSingleStrokePoints.map(drawSingleStrokeX => {
+          const drawSingleStrokeY = sceneToScreenDraw(drawSingleStrokeX.x, drawSingleStrokeX.y);
+          return { x: drawSingleStrokeY.x, y: drawSingleStrokeY.y, p: drawSingleStrokeX.p || 0.5 };
         });
         ctx.beginPath();
-        for (let i = 0; i < count; i++) {
-          const p = scrPts[i];
-          const prev = scrPts[Math.max(0, i - 1)];
-          const next = scrPts[Math.min(count - 1, i + 1)];
-          let dx = next.x - prev.x;
-          let dy = next.y - prev.y;
-          const dist = Math.hypot(dx, dy) || 1;
-          dx /= dist;
-          dy /= dist;
-          const halfW = (strokeWidth * p.p) / 2;
-          const nx = -dy * halfW;
-          const ny = dx * halfW;
-          if (i === 0) ctx.moveTo(p.x + nx, p.y + ny);
-          else ctx.lineTo(p.x + nx, p.y + ny);
+        for (let numberValue = 0; numberValue < count; numberValue++) {
+          const drawSingleStrokeI = scrPts[numberValue];
+          const prev = scrPts[Math.max(0, numberValue - 1)];
+          const next = scrPts[Math.min(count - 1, numberValue + 1)];
+          let forwardTangentX = next.x - prev.x;
+          let forwardTangentY = next.y - prev.y;
+          const dist = Math.hypot(forwardTangentX, forwardTangentY) || 1;
+          forwardTangentX /= dist;
+          forwardTangentY /= dist;
+          const halfW = (strokeWidth * drawSingleStrokeI.p) / 2;
+          const forwardEdgeOffsetX = -forwardTangentY * halfW;
+          const forwardEdgeOffsetY = forwardTangentX * halfW;
+          if (numberValue === 0) ctx.moveTo(drawSingleStrokeI.x + forwardEdgeOffsetX, drawSingleStrokeI.y + forwardEdgeOffsetY);
+          else ctx.lineTo(drawSingleStrokeI.x + forwardEdgeOffsetX, drawSingleStrokeI.y + forwardEdgeOffsetY);
         }
-        for (let i = count - 1; i >= 0; i--) {
-          const p = scrPts[i];
-          const prev = scrPts[Math.max(0, i - 1)];
-          const next = scrPts[Math.min(count - 1, i + 1)];
-          let dx = next.x - prev.x;
-          let dy = next.y - prev.y;
-          const dist = Math.hypot(dx, dy) || 1;
-          dx /= dist;
-          dy /= dist;
-          const halfW = (strokeWidth * p.p) / 2;
-          const nx = -dy * halfW;
-          const ny = dx * halfW;
-          ctx.lineTo(p.x - nx, p.y - ny);
+        for (let drawSingleStrokeResult = count - 1; drawSingleStrokeResult >= 0; drawSingleStrokeResult--) {
+          const iValue = scrPts[drawSingleStrokeResult];
+          const prev = scrPts[Math.max(0, drawSingleStrokeResult - 1)];
+          const next = scrPts[Math.min(count - 1, drawSingleStrokeResult + 1)];
+          let reverseTangentX = next.x - prev.x;
+          let reverseTangentY = next.y - prev.y;
+          const dist = Math.hypot(reverseTangentX, reverseTangentY) || 1;
+          reverseTangentX /= dist;
+          reverseTangentY /= dist;
+          const halfW = (strokeWidth * iValue.p) / 2;
+          const reverseEdgeOffsetX = -reverseTangentY * halfW;
+          const reverseEdgeOffsetY = reverseTangentX * halfW;
+          ctx.lineTo(iValue.x - reverseEdgeOffsetX, iValue.y - reverseEdgeOffsetY);
         }
         ctx.closePath();
-        ctx.fillStyle = s.color;
+        ctx.fillStyle = pointsArg.color;
         ctx.fill();
       }
     } else {
       ctx.beginPath();
-      ctx.strokeStyle = s.color;
+      ctx.strokeStyle = pointsArg.color;
       ctx.lineWidth = strokeWidth;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
 
-      if (pts.length === 1) {
-        ctx.arc(sp0.x, sp0.y, Math.max(0.5, strokeWidth / 4), 0, Math.PI * 2);
-        ctx.fillStyle = s.color;
+      if (drawSingleStrokePoints.length === 1) {
+        ctx.arc(drawSingleStrokeSceneToScreenDraw.x, drawSingleStrokeSceneToScreenDraw.y, Math.max(0.5, strokeWidth / 4), 0, Math.PI * 2);
+        ctx.fillStyle = pointsArg.color;
         ctx.fill();
-      } else if (pts.length === 2) {
-        const sp1 = sceneToScreenDraw(pts[1].x, pts[1].y);
-        ctx.moveTo(sp0.x, sp0.y);
-        ctx.lineTo(sp1.x, sp1.y);
+      } else if (drawSingleStrokePoints.length === 2) {
+        const drawSingleStrokeRaw = sceneToScreenDraw(drawSingleStrokePoints[1].x, drawSingleStrokePoints[1].y);
+        ctx.moveTo(drawSingleStrokeSceneToScreenDraw.x, drawSingleStrokeSceneToScreenDraw.y);
+        ctx.lineTo(drawSingleStrokeRaw.x, drawSingleStrokeRaw.y);
         ctx.stroke();
       } else {
-        const scrPts = pts.map(p => sceneToScreenDraw(p.x, p.y));
+        const scrPts = drawSingleStrokePoints.map(yArg => sceneToScreenDraw(yArg.x, yArg.y));
         ctx.moveTo(scrPts[0].x, scrPts[0].y);
-        for (let i = 1; i < scrPts.length - 1; i++) {
-          const midX = (scrPts[i].x + scrPts[i + 1].x) / 2;
-          const midY = (scrPts[i].y + scrPts[i + 1].y) / 2;
-          ctx.quadraticCurveTo(scrPts[i].x, scrPts[i].y, midX, midY);
+        for (let drawSingleStrokeNumber = 1; drawSingleStrokeNumber < scrPts.length - 1; drawSingleStrokeNumber++) {
+          const midX = (scrPts[drawSingleStrokeNumber].x + scrPts[drawSingleStrokeNumber + 1].x) / 2;
+          const midY = (scrPts[drawSingleStrokeNumber].y + scrPts[drawSingleStrokeNumber + 1].y) / 2;
+          ctx.quadraticCurveTo(scrPts[drawSingleStrokeNumber].x, scrPts[drawSingleStrokeNumber].y, midX, midY);
         }
         const last = scrPts[scrPts.length - 1];
         ctx.lineTo(last.x, last.y);
@@ -5559,14 +5559,14 @@
 
   function renderAllStrokesToCanvas() {
     if (!activeDrawingCtx || !activeDrawingCanvas) return;
-    const dpr = window.devicePixelRatio || 1;
+    const renderAllStrokesValue = window.devicePixelRatio || 1;
     activeDrawingCtx.save();
     activeDrawingCtx.setTransform(1, 0, 0, 1, 0, 0);
     activeDrawingCtx.clearRect(0, 0, activeDrawingCanvas.width, activeDrawingCanvas.height);
     activeDrawingCtx.restore();
 
-    for (const s of drawingStrokes) {
-      drawSingleStroke(activeDrawingCtx, s);
+    for (const renderAllStrokesToCanvasValue of drawingStrokes) {
+      drawSingleStroke(activeDrawingCtx, renderAllStrokesToCanvasValue);
     }
     if (currentStroke) {
       drawSingleStroke(activeDrawingCtx, currentStroke);
@@ -5580,15 +5580,15 @@
     if (btnRedo) btnRedo.disabled = drawingRedoStrokes.length === 0;
   }
 
-  function eraseStrokesNear(pt) {
+  function eraseStrokesNear(eraseStrokesNearY) {
     const radius = Math.max(12, currentStrokeWidth / 2);
     let erased = false;
-    for (let i = drawingStrokes.length - 1; i >= 0; i--) {
-      const s = drawingStrokes[i];
-      const threshold = radius + (s.width || 0) / 2;
-      for (const p of s.points) {
-        if (Math.hypot(p.x - pt.x, p.y - pt.y) <= threshold) {
-          drawingRedoStrokes.push(drawingStrokes.splice(i, 1)[0]);
+    for (let eraseStrokesNearValue = drawingStrokes.length - 1; eraseStrokesNearValue >= 0; eraseStrokesNearValue--) {
+      const eraseStrokesNearI = drawingStrokes[eraseStrokesNearValue];
+      const threshold = radius + (eraseStrokesNearI.width || 0) / 2;
+      for (const eraseStrokesNearX of eraseStrokesNearI.points) {
+        if (Math.hypot(eraseStrokesNearX.x - eraseStrokesNearY.x, eraseStrokesNearX.y - eraseStrokesNearY.y) <= threshold) {
+          drawingRedoStrokes.push(drawingStrokes.splice(eraseStrokesNearValue, 1)[0]);
           erased = true;
           break;
         }
@@ -5611,15 +5611,15 @@
     resizeDrawingCanvas();
     window.addEventListener("resize", resizeDrawingCanvas);
 
-    activeDrawingCanvas.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      activeDrawingCanvas.setPointerCapture(e.pointerId);
+    activeDrawingCanvas.addEventListener("pointerdown", (preventDefault) => {
+      preventDefault.preventDefault();
+      preventDefault.stopPropagation();
+      activeDrawingCanvas.setPointerCapture(preventDefault.pointerId);
       isPointerDownOnDrawing = true;
-      const pt = screenToSceneDraw(e);
+      const screenToSceneDrawValue = screenToSceneDraw(preventDefault);
 
       if (currentDrawTool === "eraser") {
-        eraseStrokesNear(pt);
+        eraseStrokesNear(screenToSceneDrawValue);
         return;
       }
 
@@ -5628,34 +5628,34 @@
         color: currentDrawColor,
         width: currentStrokeWidth,
         smoothing: currentSmoothing,
-        points: [pt]
+        points: [screenToSceneDrawValue]
       };
       renderAllStrokesToCanvas();
     });
 
-    activeDrawingCanvas.addEventListener("pointermove", (e) => {
+    activeDrawingCanvas.addEventListener("pointermove", (initDrawingCanvasPreventDefault) => {
       if (!isPointerDownOnDrawing) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const pt = screenToSceneDraw(e);
+      initDrawingCanvasPreventDefault.preventDefault();
+      initDrawingCanvasPreventDefault.stopPropagation();
+      const initDrawingCanvasScreenToSceneDraw = screenToSceneDraw(initDrawingCanvasPreventDefault);
 
       if (currentDrawTool === "eraser") {
-        eraseStrokesNear(pt);
+        eraseStrokesNear(initDrawingCanvasScreenToSceneDraw);
         return;
       }
 
       if (!currentStroke) return;
       const last = currentStroke.points[currentStroke.points.length - 1];
-      if (last && Math.hypot(pt.x - last.x, pt.y - last.y) < 1.0) return;
-      currentStroke.points.push(pt);
+      if (last && Math.hypot(initDrawingCanvasScreenToSceneDraw.x - last.x, initDrawingCanvasScreenToSceneDraw.y - last.y) < 1.0) return;
+      currentStroke.points.push(initDrawingCanvasScreenToSceneDraw);
       renderAllStrokesToCanvas();
     });
 
-    const onPointerEnd = (e) => {
+    const onPointerEnd = (initDrawingCanvasPointerId) => {
       if (!isPointerDownOnDrawing) return;
       isPointerDownOnDrawing = false;
       try {
-        activeDrawingCanvas.releasePointerCapture(e.pointerId);
+        activeDrawingCanvas.releasePointerCapture(initDrawingCanvasPointerId.pointerId);
       } catch {}
 
       if (currentDrawTool === "eraser") {
@@ -5665,8 +5665,8 @@
 
       if (currentStroke && currentStroke.points && currentStroke.points.length > 0) {
         if (currentSmoothing > 0 && currentStroke.points.length > 2) {
-          const eps = 0.5 + (currentSmoothing / 100) * 3.5;
-          currentStroke.points = rdpPoints(currentStroke.points, eps);
+          const onPointerEndValue = 0.5 + (currentSmoothing / 100) * 3.5;
+          currentStroke.points = rdpPoints(currentStroke.points, onPointerEndValue);
         }
         drawingStrokes.push(currentStroke);
         drawingRedoStrokes = [];
@@ -5756,13 +5756,13 @@
     ];
 
     toolBtns.forEach(({ id, tool }) => {
-      const btn = document.getElementById(id);
-      if (btn) {
-        btn.addEventListener("click", () => {
+      const initDrawingUiElement = document.getElementById(id);
+      if (initDrawingUiElement) {
+        initDrawingUiElement.addEventListener("click", () => {
           currentDrawTool = tool;
-          toolBtns.forEach(t => {
-            const b = document.getElementById(t.id);
-            if (b) b.classList.toggle("active", t.tool === tool);
+          toolBtns.forEach(initDrawingUiId => {
+            const getElementById = document.getElementById(initDrawingUiId.id);
+            if (getElementById) getElementById.classList.toggle("active", initDrawingUiId.tool === tool);
           });
         });
       }
@@ -5773,27 +5773,27 @@
 
     if (swatchesContainer) {
       swatchesContainer.innerHTML = "";
-      DRAWING_PRESET_COLORS.forEach(c => {
-        const sw = document.createElement("div");
-        sw.className = "am-draw-swatch" + (c === currentDrawColor ? " active" : "");
-        sw.style.backgroundColor = c;
-        sw.dataset.color = c;
-        sw.addEventListener("click", () => {
-          currentDrawColor = c;
-          swatchesContainer.querySelectorAll(".am-draw-swatch").forEach(s => s.classList.remove("active"));
-          sw.classList.add("active");
-          if (colorPicker) colorPicker.value = c;
+      DRAWING_PRESET_COLORS.forEach(backgroundColor => {
+        const initDrawingUiDivEl = document.createElement("div");
+        initDrawingUiDivEl.className = "am-draw-swatch" + (backgroundColor === currentDrawColor ? " active" : "");
+        initDrawingUiDivEl.style.backgroundColor = backgroundColor;
+        initDrawingUiDivEl.dataset.color = backgroundColor;
+        initDrawingUiDivEl.addEventListener("click", () => {
+          currentDrawColor = backgroundColor;
+          swatchesContainer.querySelectorAll(".am-draw-swatch").forEach(initDrawingUiArg => initDrawingUiArg.classList.remove("active"));
+          initDrawingUiDivEl.classList.add("active");
+          if (colorPicker) colorPicker.value = backgroundColor;
         });
-        swatchesContainer.appendChild(sw);
+        swatchesContainer.appendChild(initDrawingUiDivEl);
       });
     }
 
     if (colorPicker) {
-      colorPicker.addEventListener("input", (e) => {
-        currentDrawColor = e.target.value;
+      colorPicker.addEventListener("input", (initDrawingUiTarget) => {
+        currentDrawColor = initDrawingUiTarget.target.value;
         if (swatchesContainer) {
-          swatchesContainer.querySelectorAll(".am-draw-swatch").forEach(s => {
-            s.classList.toggle("active", s.dataset.color.toLowerCase() === currentDrawColor.toLowerCase());
+          swatchesContainer.querySelectorAll(".am-draw-swatch").forEach(initDrawingUiClassList => {
+            initDrawingUiClassList.classList.toggle("active", initDrawingUiClassList.dataset.color.toLowerCase() === currentDrawColor.toLowerCase());
           });
         }
       });
@@ -5808,12 +5808,12 @@
     currentStroke = null;
 
     if (existingLayer && Array.isArray(existingLayer.strokes)) {
-      drawingStrokes = existingLayer.strokes.map(s => ({
-        tool: s.type || "pen",
-        color: typeof s.color === "string" ? s.color : "#00ffa8",
-        width: s.width || 12,
+      drawingStrokes = existingLayer.strokes.map(openDrawingModeColor => ({
+        tool: openDrawingModeColor.type || "pen",
+        color: typeof openDrawingModeColor.color === "string" ? openDrawingModeColor.color : "#00ffa8",
+        width: openDrawingModeColor.width || 12,
         smoothing: 35,
-        points: (s.points || []).map(p => ({ x: p[0], y: p[1], p: p[2] != null ? p[2] : 0.5 }))
+        points: (openDrawingModeColor.points || []).map(openDrawingModeArg => ({ x: openDrawingModeArg[0], y: openDrawingModeArg[1], p: openDrawingModeArg[2] != null ? openDrawingModeArg[2] : 0.5 }))
       }));
     }
 
@@ -5881,12 +5881,12 @@
       return;
     }
 
-    const I = window.__AM_INTERNAL;
-    if (!I || !I.val) {
+    const finishDrawingAndCommitAmInternal = window.__AM_INTERNAL;
+    if (!finishDrawingAndCommitAmInternal || !finishDrawingAndCommitAmInternal.val) {
       closeDrawingMode(false);
       return;
     }
-    const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
+    const snap = finishDrawingAndCommitAmInternal.sceneSnapshot ? finishDrawingAndCommitAmInternal.sceneSnapshot() : null;
 
     let allCommands = [];
     let isAnyFill = false;
@@ -5895,8 +5895,8 @@
       if (!stroke.points || stroke.points.length === 0) continue;
       if (stroke.tool === "fill") isAnyFill = true;
 
-      const eps = 0.5 + (stroke.smoothing / 100) * 3.5;
-      const simplified = rdpPoints(stroke.points, eps);
+      const finishDrawingAndValue = 0.5 + (stroke.smoothing / 100) * 3.5;
+      const simplified = rdpPoints(stroke.points, finishDrawingAndValue);
       const isClosed = stroke.tool === "fill";
       const strokeCmds = pointsToSmoothCommands(simplified, isClosed);
       allCommands = allCommands.concat(strokeCmds);
@@ -5908,22 +5908,22 @@
     }
 
     const rawBounds = computePathBounds(allCommands);
-    const cx = rawBounds.cx;
-    const cy = rawBounds.cy;
+    const finishDrawingAndCommitCx = rawBounds.cx;
+    const finishDrawingAndCommitCy = rawBounds.cy;
 
-    const centeredCmds = allCommands.map(cmd => {
-      const type = cmd[0];
+    const centeredCmds = allCommands.map(finishDrawingAndCommitArg => {
+      const type = finishDrawingAndCommitArg[0];
       if (type === 'M' || type === 'L') {
-        return [type, Math.round((cmd[1] - cx) * 100) / 100, Math.round((cmd[2] - cy) * 100) / 100];
+        return [type, Math.round((finishDrawingAndCommitArg[1] - finishDrawingAndCommitCx) * 100) / 100, Math.round((finishDrawingAndCommitArg[2] - finishDrawingAndCommitCy) * 100) / 100];
       } else if (type === 'C') {
         return [
           'C',
-          Math.round((cmd[1] - cx) * 100) / 100, Math.round((cmd[2] - cy) * 100) / 100,
-          Math.round((cmd[3] - cx) * 100) / 100, Math.round((cmd[4] - cy) * 100) / 100,
-          Math.round((cmd[5] - cx) * 100) / 100, Math.round((cmd[6] - cy) * 100) / 100
+          Math.round((finishDrawingAndCommitArg[1] - finishDrawingAndCommitCx) * 100) / 100, Math.round((finishDrawingAndCommitArg[2] - finishDrawingAndCommitCy) * 100) / 100,
+          Math.round((finishDrawingAndCommitArg[3] - finishDrawingAndCommitCx) * 100) / 100, Math.round((finishDrawingAndCommitArg[4] - finishDrawingAndCommitCy) * 100) / 100,
+          Math.round((finishDrawingAndCommitArg[5] - finishDrawingAndCommitCx) * 100) / 100, Math.round((finishDrawingAndCommitArg[6] - finishDrawingAndCommitCy) * 100) / 100
         ];
       }
-      return cmd;
+      return finishDrawingAndCommitArg;
     });
 
     const centeredBounds = computePathBounds(centeredCmds);
@@ -5933,27 +5933,27 @@
     const strokeColor = lastStroke ? lastStroke.color : currentDrawColor;
     const strokeWidth = lastStroke ? lastStroke.width : currentStrokeWidth;
 
-    const layerCount = I.val.layers ? I.val.layers.length : 0;
+    const layerCount = finishDrawingAndCommitAmInternal.val.layers ? finishDrawingAndCommitAmInternal.val.layers.length : 0;
     const newLayer = {
       id: "vector_" + Date.now().toString(36),
       tag: "shape",
       shapeType: "vector",
       label: "Gambar Vektor " + (layerCount + 1),
-      startTime: I.H || 0,
-      endTime: (I.H || 0) + 3000,
+      startTime: finishDrawingAndCommitAmInternal.H || 0,
+      endTime: (finishDrawingAndCommitAmInternal.H || 0) + 3000,
       path: {
         commands: centeredCmds,
         bounds: centeredBounds
       },
       points: parsed.points,
-      strokes: drawingStrokes.map(s => ({
-        type: s.tool,
-        color: s.color,
-        width: s.width,
-        points: s.points.map(p => [
-          Math.round((p.x - cx) * 100) / 100,
-          Math.round((p.y - cy) * 100) / 100,
-          p.p != null ? Math.round(p.p * 100) / 100 : 1
+      strokes: drawingStrokes.map(finishDrawingAndCommitTool => ({
+        type: finishDrawingAndCommitTool.tool,
+        color: finishDrawingAndCommitTool.color,
+        width: finishDrawingAndCommitTool.width,
+        points: finishDrawingAndCommitTool.points.map(finishDrawingAndCommitX => [
+          Math.round((finishDrawingAndCommitX.x - finishDrawingAndCommitCx) * 100) / 100,
+          Math.round((finishDrawingAndCommitX.y - finishDrawingAndCommitCy) * 100) / 100,
+          finishDrawingAndCommitX.p != null ? Math.round(finishDrawingAndCommitX.p * 100) / 100 : 1
         ])
       })),
       pathStroke: {
@@ -5967,7 +5967,7 @@
       fillColor: strokeColor,
       color: strokeColor,
       transform: {
-        location: { value: [Math.round(cx), Math.round(cy), 0], kfs: [] },
+        location: { value: [Math.round(finishDrawingAndCommitCx), Math.round(finishDrawingAndCommitCy), 0], kfs: [] },
         scale: { value: [100, 100], kfs: [] },
         rotation: { value: [0], kfs: [] },
         opacity: { value: [1], kfs: [] }
@@ -5975,13 +5975,13 @@
       effects: []
     };
 
-    if (I.val.layers) {
-      I.val.layers.push(newLayer);
-      if (snap && I.pushUndo) I.pushUndo(snap);
-      I.V = true;
-      if (I.bind4) I.bind4();
-      if (I.selectLayer) I.selectLayer(newLayer);
-      if (I.val2) I.val2.renderAt(I.H);
+    if (finishDrawingAndCommitAmInternal.val.layers) {
+      finishDrawingAndCommitAmInternal.val.layers.push(newLayer);
+      if (snap && finishDrawingAndCommitAmInternal.pushUndo) finishDrawingAndCommitAmInternal.pushUndo(snap);
+      finishDrawingAndCommitAmInternal.V = true;
+      if (finishDrawingAndCommitAmInternal.bind4) finishDrawingAndCommitAmInternal.bind4();
+      if (finishDrawingAndCommitAmInternal.selectLayer) finishDrawingAndCommitAmInternal.selectLayer(newLayer);
+      if (finishDrawingAndCommitAmInternal.val2) finishDrawingAndCommitAmInternal.val2.renderAt(finishDrawingAndCommitAmInternal.H);
     }
 
     currentSelectedLayer = newLayer;
@@ -5995,7 +5995,7 @@
   if (window.__AM_INTERNAL) window.__AM_INTERNAL.openDrawingMode = openDrawingMode;
 
   function renderBorderShadow(contentEl, layer) {
-    const I = window.__AM_INTERNAL || {};
+    const renderBorderShadValue = window.__AM_INTERNAL || {};
     if (!layer) return;
 
     if (layer.strokeEnabled === undefined && layer.border) {
@@ -6003,16 +6003,16 @@
       layer.strokeWidth = layer.border.size !== undefined ? layer.border.size : 10;
       layer.strokePosition = layer.border.direction || "outside";
       if (layer.border.color) {
-        const c = I.omHexFrom ? I.omHexFrom(layer.border.color) : "#ffffff";
-        layer.strokeColor = (/^#[0-9a-f]{8}$/i.test(c) || /^#[0-9a-f]{9}$/i.test(c)) ? "#" + c.slice(3) : c;
+        const renderBorderShadowFlag = renderBorderShadValue.omHexFrom ? renderBorderShadValue.omHexFrom(layer.border.color) : "#ffffff";
+        layer.strokeColor = (/^#[0-9a-f]{8}$/i.test(renderBorderShadowFlag) || /^#[0-9a-f]{9}$/i.test(renderBorderShadowFlag)) ? "#" + renderBorderShadowFlag.slice(3) : renderBorderShadowFlag;
       }
     }
     if (layer.shadowEnabled === undefined && layer.shadow) {
       layer.shadowEnabled = layer.shadow.enabled !== false && (layer.shadow.size > 0 || (layer.shadow.offset && (layer.shadow.offset[0] || layer.shadow.offset[1])));
       layer.shadowRadius = layer.shadow.size !== undefined ? layer.shadow.size : 25;
       if (layer.shadow.color) {
-        const c2 = I.omHexFrom ? I.omHexFrom(layer.shadow.color) : "#000000";
-        layer.shadowColor = (/^#[0-9a-f]{8}$/i.test(c2) || /^#[0-9a-f]{9}$/i.test(c2)) ? "#" + c2.slice(3) : c2;
+        const flagValue = renderBorderShadValue.omHexFrom ? renderBorderShadValue.omHexFrom(layer.shadow.color) : "#000000";
+        layer.shadowColor = (/^#[0-9a-f]{8}$/i.test(flagValue) || /^#[0-9a-f]{9}$/i.test(flagValue)) ? "#" + flagValue.slice(3) : flagValue;
         layer.shadowAlpha = Math.round((layer.shadow.color[3] !== undefined ? layer.shadow.color[3] : 0.6) * 100);
       }
       if (layer.shadow.offset) {
@@ -6036,24 +6036,24 @@
     let snapBefore = null;
 
     function beginChange() {
-      if (!snapBefore && I.sceneSnapshot) {
-        snapBefore = I.sceneSnapshot();
+      if (!snapBefore && renderBorderShadValue.sceneSnapshot) {
+        snapBefore = renderBorderShadValue.sceneSnapshot();
       }
     }
 
     function commitChange() {
-      if (snapBefore && I.pushUndo) {
-        I.pushUndo(snapBefore);
+      if (snapBefore && renderBorderShadValue.pushUndo) {
+        renderBorderShadValue.pushUndo(snapBefore);
         snapBefore = null;
       }
-      if (typeof I.omScheduleSave === "function") {
-        I.omScheduleSave();
+      if (typeof renderBorderShadValue.omScheduleSave === "function") {
+        renderBorderShadValue.omScheduleSave();
       }
     }
 
     function syncLayerFx() {
       if (layer.strokeEnabled) {
-        const strokeColorArr = I.parseHexColor ? I.parseHexColor(layer.strokeColor || "#ffffff") : [1, 1, 1, 1];
+        const strokeColorArr = renderBorderShadValue.parseHexColor ? renderBorderShadValue.parseHexColor(layer.strokeColor || "#ffffff") : [1, 1, 1, 1];
         layer.border = {
           direction: layer.strokePosition || "outside",
           color: strokeColorArr,
@@ -6067,7 +6067,7 @@
       }
 
       if (layer.shadowEnabled) {
-        const shColArr = (I.parseHexColor ? I.parseHexColor(layer.shadowColor || "#000000") : [0, 0, 0, 1]).slice();
+        const shColArr = (renderBorderShadValue.parseHexColor ? renderBorderShadValue.parseHexColor(layer.shadowColor || "#000000") : [0, 0, 0, 1]).slice();
         shColArr[3] = (layer.shadowAlpha !== undefined ? Number(layer.shadowAlpha) : 60) / 100;
         layer.shadow = {
           enabled: true,
@@ -6084,8 +6084,8 @@
       }
 
       layer.userTouched = true;
-      I.V = true;
-      if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+      renderBorderShadValue.V = true;
+      if (renderBorderShadValue.val2 && renderBorderShadValue.val2.renderAt) renderBorderShadValue.val2.renderAt(renderBorderShadValue.H);
     }
 
     const paletteColors = [
@@ -6096,11 +6096,11 @@
     function checkHasKeyframe() {
       const propKey = activeTab === "border" ? "stroke" : "shadow";
       const keyable = propKey === "stroke" ? layer.strokeKeyable : layer.shadowKeyable;
-      const tSec = ((I.H || 0) / 1000);
-      return !!(keyable && keyable.kfs && keyable.kfs.some(k => Math.abs(Number(k.t) - tSec) < 0.002));
+      const tSec = ((renderBorderShadValue.H || 0) / 1000);
+      return !!(keyable && keyable.kfs && keyable.kfs.some(checkHasKeyframeArg => Math.abs(Number(checkHasKeyframeArg.t) - tSec) < 0.002));
     }
 
-    function render() {
+    function helperValue() {
       const strokeEnabled = !!layer.strokeEnabled;
       const strokeColor = layer.strokeColor || "#ffffff";
       const strokeWidth = layer.strokeWidth !== undefined ? layer.strokeWidth : 10;
@@ -6243,8 +6243,8 @@
                     <input type="color" id="am-bs-stroke-color-picker" value="${strokeColor}" style="width:28px;height:24px;border:0;background:transparent;cursor:pointer;">
                   </div>
                   <div class="am-bs-palette-grid">
-                    ${paletteColors.map(c => `
-                      <div class="am-bs-palette-chip ${c.toLowerCase() === strokeColor.toLowerCase() ? 'active' : ''}" data-color="${c}" style="background:${c};" title="${c}"></div>
+                    ${paletteColors.map(renderArg => `
+                      <div class="am-bs-palette-chip ${renderArg.toLowerCase() === strokeColor.toLowerCase() ? 'active' : ''}" data-color="${renderArg}" style="background:${renderArg};" title="${renderArg}"></div>
                     `).join('')}
                   </div>
                 </div>
@@ -6311,8 +6311,8 @@
                     <input type="color" id="am-bs-shadow-color-picker" value="${shadowColor}" style="width:28px;height:24px;border:0;background:transparent;cursor:pointer;">
                   </div>
                   <div class="am-bs-palette-grid">
-                    ${paletteColors.map(c => `
-                      <div class="am-bs-palette-chip ${c.toLowerCase() === shadowColor.toLowerCase() ? 'active' : ''}" data-color="${c}" style="background:${c};" title="${c}"></div>
+                    ${paletteColors.map(renderArgValue => `
+                      <div class="am-bs-palette-chip ${renderArgValue.toLowerCase() === shadowColor.toLowerCase() ? 'active' : ''}" data-color="${renderArgValue}" style="background:${renderArgValue};" title="${renderArgValue}"></div>
                     `).join('')}
                   </div>
                 </div>
@@ -6348,8 +6348,8 @@
         btnBack.onclick = () => {
           const subpanel = document.getElementById("am-subpanel-container");
           if (subpanel) subpanel.classList.remove("open");
-          const ep = document.getElementById("am-element-edit-panel");
-          if (ep) ep.style.display = "flex";
+          const renderAmElementEditPanEl = document.getElementById("am-element-edit-panel");
+          if (renderAmElementEditPanEl) renderAmElementEditPanEl.style.display = "flex";
         };
       }
 
@@ -6358,13 +6358,13 @@
         btnKf.onclick = () => {
           const propKey = activeTab === "border" ? "stroke" : "shadow";
           if (hasKf) {
-            if (I.omKfRemoveAt) I.omKfRemoveAt(propKey, layer);
+            if (renderBorderShadValue.omKfRemoveAt) renderBorderShadValue.omKfRemoveAt(propKey, layer);
             else if (typeof window.omKfRemoveAt === "function") window.omKfRemoveAt(propKey, layer);
           } else {
-            if (I.omKfInsert) I.omKfInsert(propKey, layer);
+            if (renderBorderShadValue.omKfInsert) renderBorderShadValue.omKfInsert(propKey, layer);
             else if (typeof window.omKfInsert === "function") window.omKfInsert(propKey, layer);
           }
-          render();
+          helperValue();
         };
       }
 
@@ -6386,8 +6386,8 @@
       // Tab switcher
       const tabBorder = contentEl.querySelector("#am-bs-tab-border");
       const tabShadow = contentEl.querySelector("#am-bs-tab-shadow");
-      if (tabBorder) tabBorder.onclick = () => { activeTab = "border"; render(); };
-      if (tabShadow) tabShadow.onclick = () => { activeTab = "shadow"; render(); };
+      if (tabBorder) tabBorder.onclick = () => { activeTab = "border"; helperValue(); };
+      if (tabShadow) tabShadow.onclick = () => { activeTab = "shadow"; helperValue(); };
 
       // Switch toggle
       const switchToggle = contentEl.querySelector("#color_switch");
@@ -6407,7 +6407,7 @@
           }
           syncLayerFx();
           commitChange();
-          render();
+          helperValue();
         };
       }
 
@@ -6421,13 +6421,13 @@
           } else {
             layer.shadowColor = colorViewInput.value;
           }
-          const cv = contentEl.querySelector("#color_view");
-          if (cv) cv.style.background = colorViewInput.value;
+          const renderColorViewEl = contentEl.querySelector("#color_view");
+          if (renderColorViewEl) renderColorViewEl.style.background = colorViewInput.value;
           syncLayerFx();
         };
         colorViewInput.onchange = () => {
           commitChange();
-          render();
+          helperValue();
         };
       }
 
@@ -6439,9 +6439,9 @@
           max: 200,
           step: 0.5,
           getVal: () => layer.strokeWidth !== undefined ? Number(layer.strokeWidth) : 10,
-          setVal: (v) => {
+          setVal: (renderValue) => {
             beginChange();
-            layer.strokeWidth = Math.round(v * 10) / 10;
+            layer.strokeWidth = Math.round(renderValue * 10) / 10;
             const valBox = contentEl.querySelector("#strokeWidthValue");
             if (valBox) valBox.textContent = layer.strokeWidth + " px";
             syncLayerFx();
@@ -6453,35 +6453,35 @@
       }
 
       // Cap Selector (Butt, Round, Square)
-      contentEl.querySelectorAll("#capSelector button").forEach(btn => {
-        btn.onclick = () => {
+      contentEl.querySelectorAll("#capSelector button").forEach(onclick => {
+        onclick.onclick = () => {
           beginChange();
-          layer.strokeCap = btn.dataset.cap;
+          layer.strokeCap = onclick.dataset.cap;
           syncLayerFx();
           commitChange();
-          render();
+          helperValue();
         };
       });
 
       // Join Selector (Bevel, Round, Miter)
-      contentEl.querySelectorAll("#joinSelector button").forEach(btn => {
-        btn.onclick = () => {
+      contentEl.querySelectorAll("#joinSelector button").forEach(renderOnclick => {
+        renderOnclick.onclick = () => {
           beginChange();
-          layer.strokeJoin = btn.dataset.join;
+          layer.strokeJoin = renderOnclick.dataset.join;
           syncLayerFx();
           commitChange();
-          render();
+          helperValue();
         };
       });
 
       // Stroke Position Buttons
-      contentEl.querySelectorAll(".am-pos-btn").forEach(btn => {
-        btn.onclick = () => {
+      contentEl.querySelectorAll(".am-pos-btn").forEach(onclickArg => {
+        onclickArg.onclick = () => {
           beginChange();
-          layer.strokePosition = btn.dataset.pos;
+          layer.strokePosition = onclickArg.dataset.pos;
           syncLayerFx();
           commitChange();
-          render();
+          helperValue();
         };
       });
 
@@ -6491,13 +6491,13 @@
         strokePicker.oninput = () => {
           beginChange();
           layer.strokeColor = strokePicker.value;
-          const cv = contentEl.querySelector("#color_view");
-          if (cv) cv.style.background = strokePicker.value;
+          const colorViewEl = contentEl.querySelector("#color_view");
+          if (colorViewEl) colorViewEl.style.background = strokePicker.value;
           syncLayerFx();
         };
         strokePicker.onchange = () => {
           commitChange();
-          render();
+          helperValue();
         };
       }
 
@@ -6509,9 +6509,9 @@
           max: 200,
           step: 1,
           getVal: () => layer.shadowRadius !== undefined ? Number(layer.shadowRadius) : 25,
-          setVal: (v) => {
+          setVal: (renderClamped) => {
             beginChange();
-            layer.shadowRadius = Math.round(v);
+            layer.shadowRadius = Math.round(renderClamped);
             const valBox = contentEl.querySelector("#am-bs-shadow-r-val");
             if (valBox) valBox.textContent = layer.shadowRadius + " px";
             syncLayerFx();
@@ -6529,8 +6529,8 @@
         shadowA.oninput = () => {
           beginChange();
           layer.shadowAlpha = Number(shadowA.value);
-          const v = contentEl.querySelector("#am-bs-shadow-a-val");
-          if (v) v.textContent = layer.shadowAlpha + "%";
+          const renderAmBsShadowAValEl = contentEl.querySelector("#am-bs-shadow-a-val");
+          if (renderAmBsShadowAValEl) renderAmBsShadowAValEl.textContent = layer.shadowAlpha + "%";
           syncLayerFx();
         };
         shadowA.onchange = () => {
@@ -6545,8 +6545,8 @@
         shadowXIn.oninput = () => {
           beginChange();
           layer.shadowX = Number(shadowXIn.value);
-          const v = contentEl.querySelector("#am-bs-shadow-x-val");
-          if (v) v.textContent = layer.shadowX + " px";
+          const renderAmBsShadowXValEl = contentEl.querySelector("#am-bs-shadow-x-val");
+          if (renderAmBsShadowXValEl) renderAmBsShadowXValEl.textContent = layer.shadowX + " px";
           syncLayerFx();
         };
         shadowXIn.onchange = () => {
@@ -6561,8 +6561,8 @@
         shadowYIn.oninput = () => {
           beginChange();
           layer.shadowY = Number(shadowYIn.value);
-          const v = contentEl.querySelector("#am-bs-shadow-y-val");
-          if (v) v.textContent = layer.shadowY + " px";
+          const renderAmBsShadowYValEl = contentEl.querySelector("#am-bs-shadow-y-val");
+          if (renderAmBsShadowYValEl) renderAmBsShadowYValEl.textContent = layer.shadowY + " px";
           syncLayerFx();
         };
         shadowYIn.onchange = () => {
@@ -6576,13 +6576,13 @@
         shadowPicker.oninput = () => {
           beginChange();
           layer.shadowColor = shadowPicker.value;
-          const cv = contentEl.querySelector("#color_view");
-          if (cv) cv.style.background = shadowPicker.value;
+          const colorViewElValue = contentEl.querySelector("#color_view");
+          if (colorViewElValue) colorViewElValue.style.background = shadowPicker.value;
           syncLayerFx();
         };
         shadowPicker.onchange = () => {
           commitChange();
-          render();
+          helperValue();
         };
       }
 
@@ -6597,16 +6597,16 @@
           }
           syncLayerFx();
           commitChange();
-          render();
+          helperValue();
         };
       });
     }
 
-    render();
+    helperValue();
   }
 
   function renderAudioVolume(contentEl, layer) {
-    const I = window.__AM_INTERNAL || {};
+    const renderAudioVolumValue = window.__AM_INTERNAL || {};
     if (!layer) return;
 
     const hasAudio = !!(layer.tag === "audio" || layer.tag === "video" || layer.fillType === "media" || layer.src || layer.gain);
@@ -6633,19 +6633,19 @@
     let isMuted = curPercent === 0;
     let prevNonZeroGain = curPercent > 0 ? curPercent : 100;
 
-    function calcDb(p) {
-      if (p <= 0) return "-∞ dB";
-      const db = 20 * Math.log10(p / 100);
-      return (db >= 0 ? "+" : "") + db.toFixed(1) + " dB";
+    function calcDb(calcDbValue) {
+      if (calcDbValue <= 0) return "-∞ dB";
+      const calcDbResult = 20 * Math.log10(calcDbValue / 100);
+      return (calcDbResult >= 0 ? "+" : "") + calcDbResult.toFixed(1) + " dB";
     }
 
     function checkHasKeyframe() {
       const gProp = layer.gain;
-      const tSec = ((I.H || 0) / 1000);
-      return !!(gProp && gProp.kfs && gProp.kfs.some(k => Math.abs(Number(k.t) - tSec) < 0.002));
+      const tSec = ((renderAudioVolumValue.H || 0) / 1000);
+      return !!(gProp && gProp.kfs && gProp.kfs.some(checkHasKeyframeArgValue => Math.abs(Number(checkHasKeyframeArgValue.t) - tSec) < 0.002));
     }
 
-    function render() {
+    function elementHelper() {
       const hasKf = checkHasKeyframe();
       contentEl.innerHTML = `
         <div class="am-vol-custom-base">
@@ -6695,35 +6695,35 @@
 
       if (btnBack) {
         btnBack.addEventListener("click", () => {
-          const sub = document.getElementById("am-subpanel-container");
-          if (sub) sub.classList.remove("open");
-          const ep = document.getElementById("am-element-edit-panel");
-          if (ep && currentSelectedLayer) ep.style.display = "flex";
+          const renderAmSubpanelContaiEl = document.getElementById("am-subpanel-container");
+          if (renderAmSubpanelContaiEl) renderAmSubpanelContaiEl.classList.remove("open");
+          const amElementEditPanelEl = document.getElementById("am-element-edit-panel");
+          if (amElementEditPanelEl && currentSelectedLayer) amElementEditPanelEl.style.display = "flex";
         });
       }
 
-      function applyVolume(val, skipKfUpdate) {
-        curPercent = Math.max(0, Math.min(500, Math.round(Number(val) || 0)));
+      function applyVolume(applyVolumeValue, skipKfUpdate) {
+        curPercent = Math.max(0, Math.min(500, Math.round(Number(applyVolumeValue) || 0)));
         if (curPercent > 0) prevNonZeroGain = curPercent;
         isMuted = curPercent === 0;
-        const g = curPercent / 100;
+        const applyVolumeResult = curPercent / 100;
 
-        if (!layer.gain) layer.gain = { value: [g], kfs: [] };
-        else if (Array.isArray(layer.gain.value)) layer.gain.value[0] = g;
-        else layer.gain = { value: [g], kfs: [] };
+        if (!layer.gain) layer.gain = { value: [applyVolumeResult], kfs: [] };
+        else if (Array.isArray(layer.gain.value)) layer.gain.value[0] = applyVolumeResult;
+        else layer.gain = { value: [applyVolumeResult], kfs: [] };
         layer.userTouched = true;
 
         if (!skipKfUpdate && layer.gain && Array.isArray(layer.gain.kfs)) {
-          const tSec = ((I.H || 0) / 1000);
-          const idx = layer.gain.kfs.findIndex(k => Math.abs(Number(k.t) - tSec) < 0.002);
-          if (idx >= 0) layer.gain.kfs[idx].v = [g];
+          const tSec = ((renderAudioVolumValue.H || 0) / 1000);
+          const applyVolumeValueRaw = layer.gain.kfs.findIndex(applyVolumeT => Math.abs(Number(applyVolumeT.t) - tSec) < 0.002);
+          if (applyVolumeValueRaw >= 0) layer.gain.kfs[applyVolumeValueRaw].v = [applyVolumeResult];
         }
 
-        if (I.omSetAudioGain) {
-          I.omSetAudioGain(layer, g);
+        if (renderAudioVolumValue.omSetAudioGain) {
+          renderAudioVolumValue.omSetAudioGain(layer, applyVolumeResult);
         }
-        I.V = true;
-        if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+        renderAudioVolumValue.V = true;
+        if (renderAudioVolumValue.val2 && renderAudioVolumValue.val2.renderAt) renderAudioVolumValue.val2.renderAt(renderAudioVolumValue.H);
 
         if (slider) slider.value = curPercent;
         if (pctText) pctText.textContent = curPercent + "%";
@@ -6747,29 +6747,29 @@
 
       if (btnKf) {
         btnKf.addEventListener("click", () => {
-          const tSec = ((I.H || 0) / 1000);
-          const has = checkHasKeyframe();
-          if (has) {
-            if (I.omKfRemoveAt) I.omKfRemoveAt("gain", layer);
+          const tSec = ((renderAudioVolumValue.H || 0) / 1000);
+          const renderCheckHasKeyframe = checkHasKeyframe();
+          if (renderCheckHasKeyframe) {
+            if (renderAudioVolumValue.omKfRemoveAt) renderAudioVolumValue.omKfRemoveAt("gain", layer);
             else if (layer.gain && layer.gain.kfs) {
-              const idx = layer.gain.kfs.findIndex(k => Math.abs(Number(k.t) - tSec) < 0.002);
-              if (idx >= 0) layer.gain.kfs.splice(idx, 1);
+              const elementHelperRenderValue = layer.gain.kfs.findIndex(renderT => Math.abs(Number(renderT.t) - tSec) < 0.002);
+              if (elementHelperRenderValue >= 0) layer.gain.kfs.splice(elementHelperRenderValue, 1);
             }
           } else {
-            if (I.omKfInsert) I.omKfInsert("gain", layer);
+            if (renderAudioVolumValue.omKfInsert) renderAudioVolumValue.omKfInsert("gain", layer);
             else {
               if (!layer.gain) layer.gain = { value: [curPercent / 100], kfs: [] };
               layer.gain.kfs = layer.gain.kfs || [];
-              const idx = layer.gain.kfs.findIndex(k => Math.abs(Number(k.t) - tSec) < 0.002);
-              if (idx >= 0) layer.gain.kfs[idx].v = [curPercent / 100];
+              const renderValueRaw = layer.gain.kfs.findIndex(renderArgScoped => Math.abs(Number(renderArgScoped.t) - tSec) < 0.002);
+              if (renderValueRaw >= 0) layer.gain.kfs[renderValueRaw].v = [curPercent / 100];
               else layer.gain.kfs.push({ t: tSec, v: [curPercent / 100], e: null, easing: null });
-              layer.gain.kfs.sort((a, b) => a.t - b.t);
+              layer.gain.kfs.sort((renderScoped, renderArgLocal) => renderScoped.t - renderArgLocal.t);
             }
           }
           layer.userTouched = true;
-          I.V = true;
-          if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
-          render();
+          renderAudioVolumValue.V = true;
+          if (renderAudioVolumValue.val2 && renderAudioVolumValue.val2.renderAt) renderAudioVolumValue.val2.renderAt(renderAudioVolumValue.H);
+          elementHelper();
         });
       }
 
@@ -6790,20 +6790,20 @@
         valBox.addEventListener("click", () => {
           const input = prompt("Masukkan persentase volume (0 - 500%):", curPercent);
           if (input !== null) {
-            const num = parseFloat(input);
-            if (!isNaN(num)) applyVolume(num);
+            const renderNumber = parseFloat(input);
+            if (!isNaN(renderNumber)) applyVolume(renderNumber);
           }
         });
       }
 
     }
 
-    render();
+    elementHelper();
   }
 
   // 1:1 Move & Transform (fragment_move_transform.xml & fragment_settings_base.xml)
   function renderMoveTransform(contentEl, layer) {
-    const I = window.__AM_INTERNAL || {};
+    const renderMoveTransfValue = window.__AM_INTERNAL || {};
     if (!layer) return;
 
     let activeTab = "move";
@@ -6833,36 +6833,36 @@
     }
 
     function checkHasKeyframe() {
-      const t = getTransform();
+      const checkHasKeyframeGetTransform = getTransform();
       const propKey = getPropKey();
       let keyable = null;
-      if (propKey === "loc") keyable = t.location;
-      else if (propKey === "pivot") keyable = t.pivot;
-      else if (propKey === "rot") keyable = t.rotation;
-      else if (propKey === "sc") keyable = t.scale;
-      else if (propKey === "skew") keyable = t.skew;
+      if (propKey === "loc") keyable = checkHasKeyframeGetTransform.location;
+      else if (propKey === "pivot") keyable = checkHasKeyframeGetTransform.pivot;
+      else if (propKey === "rot") keyable = checkHasKeyframeGetTransform.rotation;
+      else if (propKey === "sc") keyable = checkHasKeyframeGetTransform.scale;
+      else if (propKey === "skew") keyable = checkHasKeyframeGetTransform.skew;
 
-      const tSec = ((I.H || 0) / 1000);
-      return !!(keyable && keyable.kfs && keyable.kfs.some(k => Math.abs(Number(k.t) - tSec) < 0.002));
+      const tSec = ((renderMoveTransfValue.H || 0) / 1000);
+      return !!(keyable && keyable.kfs && keyable.kfs.some(checkHasKeyframeArgRaw => Math.abs(Number(checkHasKeyframeArgRaw.t) - tSec) < 0.002));
     }
 
     function commitTransform(propKey) {
       layer.userTouched = true;
-      I.V = true;
-      if (I.render8) I.render8();
-      if (I.bind4) I.bind4();
-      if (I.omScheduleSave) I.omScheduleSave();
+      renderMoveTransfValue.V = true;
+      if (renderMoveTransfValue.render8) renderMoveTransfValue.render8();
+      if (renderMoveTransfValue.bind4) renderMoveTransfValue.bind4();
+      if (renderMoveTransfValue.omScheduleSave) renderMoveTransfValue.omScheduleSave();
     }
 
-    function render() {
-      const t = getTransform();
+    function renderHelperValue() {
+      const transformState = getTransform();
       const hasKf = checkHasKeyframe();
 
-      const locVal = (t.location && Array.isArray(t.location.value)) ? t.location.value : [0, 0, 0];
-      const pvtVal = (t.pivot && Array.isArray(t.pivot.value)) ? t.pivot.value : [0, 0, 0];
-      const rotVal = (t.rotation != null && typeof t.rotation.value === "number") ? t.rotation.value : (Number(t.rotation) || 0);
-      const scVal = (t.scale && Array.isArray(t.scale.value)) ? t.scale.value : [1, 1];
-      const skewVal = (t.skew && Array.isArray(t.skew.value)) ? t.skew.value : [0, 0];
+      const locVal = (transformState.location && Array.isArray(transformState.location.value)) ? transformState.location.value : [0, 0, 0];
+      const pvtVal = (transformState.pivot && Array.isArray(transformState.pivot.value)) ? transformState.pivot.value : [0, 0, 0];
+      const rotVal = (transformState.rotation != null && typeof transformState.rotation.value === "number") ? transformState.rotation.value : (Number(transformState.rotation) || 0);
+      const scVal = (transformState.scale && Array.isArray(transformState.scale.value)) ? transformState.scale.value : [1, 1];
+      const skewVal = (transformState.skew && Array.isArray(transformState.skew.value)) ? transformState.skew.value : [0, 0];
 
       const curX = isPivotMode ? Math.round(pvtVal[0] || 0) : Math.round(locVal[0] || 0);
       const curY = isPivotMode ? Math.round(pvtVal[1] || 0) : Math.round(locVal[1] || 0);
@@ -7059,10 +7059,10 @@
 
       if (btnBack) {
         btnBack.addEventListener("click", () => {
-          const sub = document.getElementById("am-subpanel-container");
-          if (sub) sub.classList.remove("open");
-          const ep = document.getElementById("am-element-edit-panel");
-          if (ep) ep.style.display = "flex";
+          const amSubpanelContainerEl = document.getElementById("am-subpanel-container");
+          if (amSubpanelContainerEl) amSubpanelContainerEl.classList.remove("open");
+          const renderAmElementEditPanelEl = document.getElementById("am-element-edit-panel");
+          if (renderAmElementEditPanelEl) renderAmElementEditPanelEl.style.display = "flex";
         });
       }
 
@@ -7071,10 +7071,10 @@
           const propKey = getPropKey();
           if (typeof window.omKfInsert === "function") {
             window.omKfInsert(propKey, layer);
-          } else if (I.omKfInsert) {
-            I.omKfInsert(propKey, layer);
+          } else if (renderMoveTransfValue.omKfInsert) {
+            renderMoveTransfValue.omKfInsert(propKey, layer);
           }
-          render();
+          renderHelperValue();
         });
       }
 
@@ -7099,32 +7099,32 @@
           } else {
             activeTab = "move";
           }
-          render();
+          renderHelperValue();
         });
       }
       if (tabRotate) {
         tabRotate.addEventListener("click", () => {
           activeTab = "rotate";
-          render();
+          renderHelperValue();
         });
       }
       if (tabScale) {
         tabScale.addEventListener("click", () => {
           activeTab = "scale";
-          render();
+          renderHelperValue();
         });
       }
       if (tabSkew) {
         tabSkew.addEventListener("click", () => {
           activeTab = "skew";
-          render();
+          renderHelperValue();
         });
       }
 
       if (btnLink) {
         btnLink.addEventListener("click", () => {
           isScaleLinked = !isScaleLinked;
-          render();
+          renderHelperValue();
         });
       }
 
@@ -7134,13 +7134,13 @@
       if (pillXY) {
         pillXY.addEventListener("click", () => {
           isZMode = false;
-          render();
+          renderHelperValue();
         });
       }
       if (pillZ) {
         pillZ.addEventListener("click", () => {
           isZMode = true;
-          render();
+          renderHelperValue();
         });
       }
 
@@ -7149,45 +7149,45 @@
         let startX = 0, startY = 0, initX = 0, initY = 0, initZ = 0;
         let isDragging = false;
 
-        trackpad.addEventListener("pointerdown", e => {
+        trackpad.addEventListener("pointerdown", renderPointerId => {
           isDragging = true;
-          trackpad.setPointerCapture(e.pointerId);
-          startX = e.clientX;
-          startY = e.clientY;
+          trackpad.setPointerCapture(renderPointerId.pointerId);
+          startX = renderPointerId.clientX;
+          startY = renderPointerId.clientY;
           const targetArr = isPivotMode ? pvtVal : locVal;
           initX = targetArr[0] || 0;
           initY = targetArr[1] || 0;
           initZ = targetArr[2] || 0;
         });
 
-        trackpad.addEventListener("pointermove", e => {
+        trackpad.addEventListener("pointermove", renderClientX => {
           if (!isDragging) return;
-          const dx = e.clientX - startX;
-          const dy = e.clientY - startY;
-          const targetKeyable = isPivotMode ? (t.pivot || { value: [0, 0, 0] }) : (t.location || { value: [0, 0, 0] });
+          const renderValueParsed = renderClientX.clientX - startX;
+          const renderRaw = renderClientX.clientY - startY;
+          const targetKeyable = isPivotMode ? (transformState.pivot || { value: [0, 0, 0] }) : (transformState.location || { value: [0, 0, 0] });
           if (!targetKeyable.value) targetKeyable.value = [0, 0, 0];
 
           if (isZMode) {
-            targetKeyable.value[2] = Math.round(initZ - dy * 2);
-            const rz = document.getElementById("am-mt-val-z");
-            if (rz) rz.textContent = targetKeyable.value[2];
+            targetKeyable.value[2] = Math.round(initZ - renderRaw * 2);
+            const renderAmMtValZEl = document.getElementById("am-mt-val-z");
+            if (renderAmMtValZEl) renderAmMtValZEl.textContent = targetKeyable.value[2];
           } else {
-            targetKeyable.value[0] = Math.round(initX + dx);
-            targetKeyable.value[1] = Math.round(initY + dy);
-            const rx = document.getElementById("am-mt-val-x");
-            const ry = document.getElementById("am-mt-val-y");
-            if (rx) rx.textContent = targetKeyable.value[0];
-            if (ry) ry.textContent = targetKeyable.value[1];
+            targetKeyable.value[0] = Math.round(initX + renderValueParsed);
+            targetKeyable.value[1] = Math.round(initY + renderRaw);
+            const renderAmMtValXEl = document.getElementById("am-mt-val-x");
+            const renderAmMtValYEl = document.getElementById("am-mt-val-y");
+            if (renderAmMtValXEl) renderAmMtValXEl.textContent = targetKeyable.value[0];
+            if (renderAmMtValYEl) renderAmMtValYEl.textContent = targetKeyable.value[1];
           }
 
           commitTransform(isPivotMode ? "pivot" : "loc");
         });
 
-        const stopDrag = e => {
+        const stopDrag = renderLocal => {
           if (!isDragging) return;
           isDragging = false;
-          try { trackpad.releasePointerCapture(e.pointerId); } catch (_) {}
-          render();
+          try { trackpad.releasePointerCapture(renderLocal.pointerId); } catch (renderValueClamped) {}
+          renderHelperValue();
         };
         trackpad.addEventListener("pointerup", stopDrag);
         trackpad.addEventListener("pointercancel", stopDrag);
@@ -7198,17 +7198,17 @@
       if (rotCanvas) {
         createRotateView(rotCanvas, {
           getVal: () => {
-            const r = (t.rotation != null && typeof t.rotation.value === "number") ? t.rotation.value : (Number(t.rotation) || 0);
-            return r;
+            const renderParsed = (transformState.rotation != null && typeof transformState.rotation.value === "number") ? transformState.rotation.value : (Number(transformState.rotation) || 0);
+            return renderParsed;
           },
-          setVal: (v) => {
-            if (t.rotation == null || typeof t.rotation === "number") {
-              t.rotation = { value: v, kfs: [] };
+          setVal: (argValue) => {
+            if (transformState.rotation == null || typeof transformState.rotation === "number") {
+              transformState.rotation = { value: argValue, kfs: [] };
             } else {
-              t.rotation.value = v;
+              transformState.rotation.value = argValue;
             }
             const valEl = document.getElementById("am-mt-val-rot");
-            if (valEl) valEl.textContent = (Math.round(v * 10) / 10).toFixed(1) + "°";
+            if (valEl) valEl.textContent = (Math.round(argValue * 10) / 10).toFixed(1) + "°";
             commitTransform("rot");
           }
         });
@@ -7224,14 +7224,14 @@
               max: 5000,
               step: 1,
               getVal: () => Math.round((scVal[0] || 1) * 100),
-              setVal: (v) => {
-                const norm = Math.max(0.01, v / 100);
-                if (!t.scale) t.scale = { value: [1, 1], kfs: [] };
-                t.scale.value = [norm, norm];
-                const rx = document.getElementById("am-mt-val-sx");
-                const ry = document.getElementById("am-mt-val-sy");
-                if (rx) rx.textContent = Math.round(v) + " px";
-                if (ry) ry.textContent = Math.round(v) + " px";
+              setVal: (renderArgRaw) => {
+                const norm = Math.max(0.01, renderArgRaw / 100);
+                if (!transformState.scale) transformState.scale = { value: [1, 1], kfs: [] };
+                transformState.scale.value = [norm, norm];
+                const renderAmMtValSxEl = document.getElementById("am-mt-val-sx");
+                const renderAmMtValSyEl = document.getElementById("am-mt-val-sy");
+                if (renderAmMtValSxEl) renderAmMtValSxEl.textContent = Math.round(renderArgRaw) + " px";
+                if (renderAmMtValSyEl) renderAmMtValSyEl.textContent = Math.round(renderArgRaw) + " px";
                 commitTransform("sc");
               }
             });
@@ -7245,12 +7245,12 @@
               max: 5000,
               step: 1,
               getVal: () => Math.round((scVal[0] || 1) * 100),
-              setVal: (v) => {
-                const norm = Math.max(0.01, v / 100);
-                if (!t.scale) t.scale = { value: [1, 1], kfs: [] };
-                t.scale.value[0] = norm;
-                const rx = document.getElementById("am-mt-val-sx");
-                if (rx) rx.textContent = Math.round(v) + " px";
+              setVal: (renderArgParsed) => {
+                const norm = Math.max(0.01, renderArgParsed / 100);
+                if (!transformState.scale) transformState.scale = { value: [1, 1], kfs: [] };
+                transformState.scale.value[0] = norm;
+                const amMtValSxEl = document.getElementById("am-mt-val-sx");
+                if (amMtValSxEl) amMtValSxEl.textContent = Math.round(renderArgParsed) + " px";
                 commitTransform("sc");
               }
             });
@@ -7261,12 +7261,12 @@
               max: 5000,
               step: 1,
               getVal: () => Math.round((scVal[1] || 1) * 100),
-              setVal: (v) => {
-                const norm = Math.max(0.01, v / 100);
-                if (!t.scale) t.scale = { value: [1, 1], kfs: [] };
-                t.scale.value[1] = norm;
-                const ry = document.getElementById("am-mt-val-sy");
-                if (ry) ry.textContent = Math.round(v) + " px";
+              setVal: (argParsed) => {
+                const norm = Math.max(0.01, argParsed / 100);
+                if (!transformState.scale) transformState.scale = { value: [1, 1], kfs: [] };
+                transformState.scale.value[1] = norm;
+                const amMtValSyEl = document.getElementById("am-mt-val-sy");
+                if (amMtValSyEl) amMtValSyEl.textContent = Math.round(argParsed) + " px";
                 commitTransform("sc");
               }
             });
@@ -7285,11 +7285,11 @@
             step: 0.5,
             isAngle: true,
             getVal: () => (Math.round((skewVal[0] || 0) * 10) / 10),
-            setVal: (v) => {
-              if (!t.skew) t.skew = { value: [0, 0], kfs: [] };
-              t.skew.value[0] = v;
-              const rx = document.getElementById("am-mt-val-skewx");
-              if (rx) rx.textContent = v.toFixed(1) + "°";
+            setVal: (renderArgClamped) => {
+              if (!transformState.skew) transformState.skew = { value: [0, 0], kfs: [] };
+              transformState.skew.value[0] = renderArgClamped;
+              const renderAmMtValSkewxEl = document.getElementById("am-mt-val-skewx");
+              if (renderAmMtValSkewxEl) renderAmMtValSkewxEl.textContent = renderArgClamped.toFixed(1) + "°";
               commitTransform("skew");
             }
           });
@@ -7301,11 +7301,11 @@
             step: 0.5,
             isAngle: true,
             getVal: () => (Math.round((skewVal[1] || 0) * 10) / 10),
-            setVal: (v) => {
-              if (!t.skew) t.skew = { value: [0, 0], kfs: [] };
-              t.skew.value[1] = v;
-              const ry = document.getElementById("am-mt-val-skewy");
-              if (ry) ry.textContent = v.toFixed(1) + "°";
+            setVal: (argClamped) => {
+              if (!transformState.skew) transformState.skew = { value: [0, 0], kfs: [] };
+              transformState.skew.value[1] = argClamped;
+              const renderAmMtValSkewyEl = document.getElementById("am-mt-val-skewy");
+              if (renderAmMtValSkewyEl) renderAmMtValSkewyEl.textContent = argClamped.toFixed(1) + "°";
               commitTransform("skew");
             }
           });
@@ -7313,7 +7313,7 @@
       }
     }
 
-    render();
+    renderHelperValue();
   }
 
   function drawFrustumCanvas(canvas, layer) {
@@ -7322,40 +7322,40 @@
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    const w = rect.width || canvas.width || 300;
-    const h = rect.height || canvas.height || 72;
+    const drawFrustumCanvaValue = window.devicePixelRatio || 1;
+    const drawFrustumCanvasResult = rect.width || canvas.width || 300;
+    const drawFrustumCanvasValue = rect.height || canvas.height || 72;
 
-    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
+    if (canvas.width !== Math.round(drawFrustumCanvasResult * drawFrustumCanvaValue) || canvas.height !== Math.round(drawFrustumCanvasValue * drawFrustumCanvaValue)) {
+      canvas.width = Math.round(drawFrustumCanvasResult * drawFrustumCanvaValue);
+      canvas.height = Math.round(drawFrustumCanvasValue * drawFrustumCanvaValue);
     }
     ctx.resetTransform();
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, w, h);
+    ctx.scale(drawFrustumCanvaValue, drawFrustumCanvaValue);
+    ctx.clearRect(0, 0, drawFrustumCanvasResult, drawFrustumCanvasValue);
 
     const isPerspective = !layer.cameraType || layer.cameraType === "perspective";
-    const midY = h / 2;
-    const move5dp = 6;
+    const midY = drawFrustumCanvasValue / 2;
+    const drawFrustumCanvasNumber = 6;
     const camX = 28;
-    const endX = w - 16;
+    const endX = drawFrustumCanvasResult - 16;
 
     if (isPerspective) {
-      const fov = (layer.fov && layer.fov > 0) ? layer.fov : 60;
-      const halfRad = (fov / 2) * Math.PI / 180;
+      const drawFrustumCanvasValueRaw = (layer.fov && layer.fov > 0) ? layer.fov : 60;
+      const halfRad = (drawFrustumCanvasValueRaw / 2) * Math.PI / 180;
       const spreadH = Math.min(midY - 6, (endX - camX) * Math.tan(halfRad) * 0.45);
       const topY = Math.max(4, midY - spreadH);
-      const botY = Math.min(h - 4, midY + spreadH);
+      const botY = Math.min(drawFrustumCanvasValue - 4, midY + spreadH);
 
       const grad = ctx.createLinearGradient(camX, midY, endX, midY);
       grad.addColorStop(0, "rgba(0, 255, 168, 0.22)");
       grad.addColorStop(1, "rgba(0, 255, 168, 0.02)");
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.moveTo(camX, midY - move5dp);
+      ctx.moveTo(camX, midY - drawFrustumCanvasNumber);
       ctx.lineTo(endX, topY);
       ctx.lineTo(endX, botY);
-      ctx.lineTo(camX, midY + move5dp);
+      ctx.lineTo(camX, midY + drawFrustumCanvasNumber);
       ctx.closePath();
       ctx.fill();
 
@@ -7363,9 +7363,9 @@
       ctx.lineWidth = 1.8;
       ctx.setLineDash([]);
       ctx.beginPath();
-      ctx.moveTo(camX, midY - move5dp);
+      ctx.moveTo(camX, midY - drawFrustumCanvasNumber);
       ctx.lineTo(endX, topY);
-      ctx.moveTo(camX, midY + move5dp);
+      ctx.moveTo(camX, midY + drawFrustumCanvasNumber);
       ctx.lineTo(endX, botY);
       ctx.stroke();
 
@@ -7413,7 +7413,7 @@
   }
 
   function renderCameraOptions(contentEl, layer) {
-    const I = window.__AM_INTERNAL || {};
+    const renderCameraOptiValue = window.__AM_INTERNAL || {};
     if (!layer) return;
 
     if (!layer.cameraType) layer.cameraType = "perspective";
@@ -7444,21 +7444,21 @@
           layer.transform.location[2] = zVal;
         }
       }
-      I.V = true;
-      if (I.val2 && typeof I.val2.renderAt === "function") {
-        I.val2.renderAt(I.H || 0);
+      renderCameraOptiValue.V = true;
+      if (renderCameraOptiValue.val2 && typeof renderCameraOptiValue.val2.renderAt === "function") {
+        renderCameraOptiValue.val2.renderAt(renderCameraOptiValue.H || 0);
       }
-      if (typeof I.omScheduleSave === "function") I.omScheduleSave();
+      if (typeof renderCameraOptiValue.omScheduleSave === "function") renderCameraOptiValue.omScheduleSave();
     }
 
-    function render() {
+    function renderElement() {
       const isPersp = layer.cameraType !== "orthographic";
       const curFov = Math.round(layer.fov || 60);
       const curZoom = Math.round(layer.cameraZoom || 500);
 
-      const fb = layer.focusBlur;
-      const fg = layer.fog;
-      const fgColorHex = rgbaToHex(fg.color);
+      const focusBlur = layer.focusBlur;
+      const fog = layer.fog;
+      const fgColorHex = rgbaToHex(fog.color);
 
       contentEl.innerHTML = `
         <div class="am-camera-options-container">
@@ -7528,19 +7528,19 @@
                     <div style="font-size:13px;font-weight:700;color:#fff;">Fokus Buram (Depth of Field)</div>
                     <div style="font-size:10px;color:#8c93a7;margin-top:2px;">Mengaburkan objek di luar bidang fokus</div>
                   </div>
-                  <input type="checkbox" id="focusBlurSwitch" class="am-cam-switch" ${fb.enabled ? 'checked' : ''}>
+                  <input type="checkbox" id="focusBlurSwitch" class="am-cam-switch" ${focusBlur.enabled ? 'checked' : ''}>
                 </div>
 
-                ${fb.enabled ? `
+                ${focusBlur.enabled ? `
                   <div class="am-cam-controls-group">
                     <div class="am-camera-param-block">
                       <div class="am-param-header">
                         <span class="am-param-label">Jarak Fokus</span>
-                        <span class="am-val-readout" id="am-fb-dist-text">${Math.round(fb.distance != null ? fb.distance : 500)} px</span>
+                        <span class="am-val-readout" id="am-fb-dist-text">${Math.round(focusBlur.distance != null ? focusBlur.distance : 500)} px</span>
                       </div>
                       <div class="am-val-stepper">
                         <button type="button" class="am-cam-step-btn" id="am-fb-dist-dec">-</button>
-                        <input type="range" id="am-fb-dist-slider" class="am-vol-slider" min="50" max="3000" step="10" value="${Math.round(fb.distance != null ? fb.distance : 500)}">
+                        <input type="range" id="am-fb-dist-slider" class="am-vol-slider" min="50" max="3000" step="10" value="${Math.round(focusBlur.distance != null ? focusBlur.distance : 500)}">
                         <button type="button" class="am-cam-step-btn" id="am-fb-dist-inc">+</button>
                       </div>
                     </div>
@@ -7548,11 +7548,11 @@
                     <div class="am-camera-param-block">
                       <div class="am-param-header">
                         <span class="am-param-label">Kedalaman Bidang (DoF)</span>
-                        <span class="am-val-readout" id="am-fb-dof-text">${Math.round(fb.depthOfField != null ? fb.depthOfField : 100)} px</span>
+                        <span class="am-val-readout" id="am-fb-dof-text">${Math.round(focusBlur.depthOfField != null ? focusBlur.depthOfField : 100)} px</span>
                       </div>
                       <div class="am-val-stepper">
                         <button type="button" class="am-cam-step-btn" id="am-fb-dof-dec">-</button>
-                        <input type="range" id="am-fb-dof-slider" class="am-vol-slider" min="10" max="1000" step="10" value="${Math.round(fb.depthOfField != null ? fb.depthOfField : 100)}">
+                        <input type="range" id="am-fb-dof-slider" class="am-vol-slider" min="10" max="1000" step="10" value="${Math.round(focusBlur.depthOfField != null ? focusBlur.depthOfField : 100)}">
                         <button type="button" class="am-cam-step-btn" id="am-fb-dof-inc">+</button>
                       </div>
                     </div>
@@ -7560,11 +7560,11 @@
                     <div class="am-camera-param-block">
                       <div class="am-param-header">
                         <span class="am-param-label">Kekuatan Buram</span>
-                        <span class="am-val-readout" id="am-fb-str-text">${Number(fb.strength != null ? fb.strength : 0.5).toFixed(2)}x</span>
+                        <span class="am-val-readout" id="am-fb-str-text">${Number(focusBlur.strength != null ? focusBlur.strength : 0.5).toFixed(2)}x</span>
                       </div>
                       <div class="am-val-stepper">
                         <button type="button" class="am-cam-step-btn" id="am-fb-str-dec">-</button>
-                        <input type="range" id="am-fb-str-slider" class="am-vol-slider" min="0" max="2" step="0.05" value="${Number(fb.strength != null ? fb.strength : 0.5)}">
+                        <input type="range" id="am-fb-str-slider" class="am-vol-slider" min="0" max="2" step="0.05" value="${Number(focusBlur.strength != null ? focusBlur.strength : 0.5)}">
                         <button type="button" class="am-cam-step-btn" id="am-fb-str-inc">+</button>
                       </div>
                     </div>
@@ -7580,10 +7580,10 @@
                     <div style="font-size:13px;font-weight:700;color:#fff;">Kabut Atmosferik (Atmospheric Fog)</div>
                     <div style="font-size:10px;color:#8c93a7;margin-top:2px;">Menambahkan kabut kedalaman berdasarkan jarak Z</div>
                   </div>
-                  <input type="checkbox" id="fogSwitch" class="am-cam-switch" ${fg.enabled ? 'checked' : ''}>
+                  <input type="checkbox" id="fogSwitch" class="am-cam-switch" ${fog.enabled ? 'checked' : ''}>
                 </div>
 
-                ${fg.enabled ? `
+                ${fog.enabled ? `
                   <div class="am-cam-controls-group">
                     <div class="am-camera-param-block">
                       <div class="am-param-header">
@@ -7594,8 +7594,8 @@
                         </div>
                       </div>
                       <div class="am-palette-grid" style="grid-template-columns:repeat(8, 1fr);gap:6px;margin-top:6px;">
-                        ${['#ffffff', '#000000', '#888888', '#64b5f6', '#ffb74d', '#ba68c8', '#81c784', '#e57373'].map(c => `
-                          <div class="am-palette-chip ${fgColorHex.toLowerCase() === c.toLowerCase() ? 'active' : ''}" data-color="${c}" style="background-color:${c};"></div>
+                        ${['#ffffff', '#000000', '#888888', '#64b5f6', '#ffb74d', '#ba68c8', '#81c784', '#e57373'].map(argRaw => `
+                          <div class="am-palette-chip ${fgColorHex.toLowerCase() === argRaw.toLowerCase() ? 'active' : ''}" data-color="${argRaw}" style="background-color:${argRaw};"></div>
                         `).join('')}
                       </div>
                     </div>
@@ -7603,11 +7603,11 @@
                     <div class="am-camera-param-block">
                       <div class="am-param-header">
                         <span class="am-param-label">Jarak Awal Z (Near Z)</span>
-                        <span class="am-val-readout" id="am-fog-near-text">${Math.round(fg.nearZ != null ? fg.nearZ : 0)} px</span>
+                        <span class="am-val-readout" id="am-fog-near-text">${Math.round(fog.nearZ != null ? fog.nearZ : 0)} px</span>
                       </div>
                       <div class="am-val-stepper">
                         <button type="button" class="am-cam-step-btn" id="am-fog-near-dec">-</button>
-                        <input type="range" id="am-fog-near-slider" class="am-vol-slider" min="0" max="2000" step="25" value="${Math.round(fg.nearZ != null ? fg.nearZ : 0)}">
+                        <input type="range" id="am-fog-near-slider" class="am-vol-slider" min="0" max="2000" step="25" value="${Math.round(fog.nearZ != null ? fog.nearZ : 0)}">
                         <button type="button" class="am-cam-step-btn" id="am-fog-near-inc">+</button>
                       </div>
                     </div>
@@ -7615,11 +7615,11 @@
                     <div class="am-camera-param-block">
                       <div class="am-param-header">
                         <span class="am-param-label">Jarak Akhir Z (Far Z)</span>
-                        <span class="am-val-readout" id="am-fog-far-text">${Math.round(fg.farZ != null ? fg.farZ : 1500)} px</span>
+                        <span class="am-val-readout" id="am-fog-far-text">${Math.round(fog.farZ != null ? fog.farZ : 1500)} px</span>
                       </div>
                       <div class="am-val-stepper">
                         <button type="button" class="am-cam-step-btn" id="am-fog-far-dec">-</button>
-                        <input type="range" id="am-fog-far-slider" class="am-vol-slider" min="100" max="5000" step="50" value="${Math.round(fg.farZ != null ? fg.farZ : 1500)}">
+                        <input type="range" id="am-fog-far-slider" class="am-vol-slider" min="100" max="5000" step="50" value="${Math.round(fog.farZ != null ? fog.farZ : 1500)}">
                         <button type="button" class="am-cam-step-btn" id="am-fog-far-inc">+</button>
                       </div>
                     </div>
@@ -7631,10 +7631,10 @@
         </div>
       `;
 
-      contentEl.querySelectorAll(".am-camera-tab-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          activeTab = btn.dataset.tab;
-          render();
+      contentEl.querySelectorAll(".am-camera-tab-btn").forEach(renderAddEventListener => {
+        renderAddEventListener.addEventListener("click", () => {
+          activeTab = renderAddEventListener.dataset.tab;
+          renderElement();
         });
       });
 
@@ -7649,7 +7649,7 @@
           btnPersp.addEventListener("click", () => {
             layer.cameraType = layer.cameraType === "orthographic" ? "perspective" : "orthographic";
             commitCamera(false);
-            render();
+            renderElement();
           });
         }
 
@@ -7658,8 +7658,8 @@
         const fovDec = contentEl.querySelector("#am-cam-fov-dec");
         const fovInc = contentEl.querySelector("#am-cam-fov-inc");
 
-        const updateFov = (v) => {
-          const clamped = Math.max(10, Math.min(120, Math.round(v)));
+        const updateFov = (updateFovValue) => {
+          const clamped = Math.max(10, Math.min(120, Math.round(updateFovValue)));
           layer.fov = clamped;
           if (fovSlider) fovSlider.value = clamped;
           if (fovText) fovText.textContent = clamped + "°";
@@ -7682,8 +7682,8 @@
         const zoomDec = contentEl.querySelector("#am-cam-zoom-dec");
         const zoomInc = contentEl.querySelector("#am-cam-zoom-inc");
 
-        const updateZoom = (v) => {
-          const clamped = Math.max(100, Math.min(3000, Math.round(v)));
+        const updateZoom = (updateZoomValue) => {
+          const clamped = Math.max(100, Math.min(3000, Math.round(updateZoomValue)));
           layer.cameraZoom = clamped;
           if (zoomSlider) zoomSlider.value = clamped;
           if (zoomText) zoomText.textContent = clamped + " px";
@@ -7703,12 +7703,12 @@
       }
 
       if (activeTab === "focus_blur") {
-        const sw = contentEl.querySelector("#focusBlurSwitch");
-        if (sw) {
-          sw.addEventListener("change", () => {
-            fb.enabled = sw.checked;
+        const renderFocusBlurSwitchEl = contentEl.querySelector("#focusBlurSwitch");
+        if (renderFocusBlurSwitchEl) {
+          renderFocusBlurSwitchEl.addEventListener("change", () => {
+            focusBlur.enabled = renderFocusBlurSwitchEl.checked;
             commitCamera(false);
-            render();
+            renderElement();
           });
         }
 
@@ -7717,68 +7717,68 @@
         const distDec = contentEl.querySelector("#am-fb-dist-dec");
         const distInc = contentEl.querySelector("#am-fb-dist-inc");
 
-        const updateFbDist = (v) => {
-          const clamped = Math.max(50, Math.min(3000, Math.round(v)));
-          fb.distance = clamped;
+        const updateFbDist = (updateFbDistValue) => {
+          const clamped = Math.max(50, Math.min(3000, Math.round(updateFbDistValue)));
+          focusBlur.distance = clamped;
           if (distSlider) distSlider.value = clamped;
           if (distText) distText.textContent = clamped + " px";
           commitCamera(false);
         };
         if (distSlider) distSlider.addEventListener("input", () => updateFbDist(parseFloat(distSlider.value)));
-        if (distDec) distDec.addEventListener("click", () => updateFbDist((fb.distance || 500) - 50));
-        if (distInc) distInc.addEventListener("click", () => updateFbDist((fb.distance || 500) + 50));
+        if (distDec) distDec.addEventListener("click", () => updateFbDist((focusBlur.distance || 500) - 50));
+        if (distInc) distInc.addEventListener("click", () => updateFbDist((focusBlur.distance || 500) + 50));
 
         const dofSlider = contentEl.querySelector("#am-fb-dof-slider");
         const dofText = contentEl.querySelector("#am-fb-dof-text");
         const dofDec = contentEl.querySelector("#am-fb-dof-dec");
         const dofInc = contentEl.querySelector("#am-fb-dof-inc");
 
-        const updateFbDof = (v) => {
-          const clamped = Math.max(10, Math.min(1000, Math.round(v)));
-          fb.depthOfField = clamped;
+        const updateFbDof = (updateFbDofValue) => {
+          const clamped = Math.max(10, Math.min(1000, Math.round(updateFbDofValue)));
+          focusBlur.depthOfField = clamped;
           if (dofSlider) dofSlider.value = clamped;
           if (dofText) dofText.textContent = clamped + " px";
           commitCamera(false);
         };
         if (dofSlider) dofSlider.addEventListener("input", () => updateFbDof(parseFloat(dofSlider.value)));
-        if (dofDec) dofDec.addEventListener("click", () => updateFbDof((fb.depthOfField || 100) - 10));
-        if (dofInc) dofInc.addEventListener("click", () => updateFbDof((fb.depthOfField || 100) + 10));
+        if (dofDec) dofDec.addEventListener("click", () => updateFbDof((focusBlur.depthOfField || 100) - 10));
+        if (dofInc) dofInc.addEventListener("click", () => updateFbDof((focusBlur.depthOfField || 100) + 10));
 
         const strSlider = contentEl.querySelector("#am-fb-str-slider");
         const strText = contentEl.querySelector("#am-fb-str-text");
         const strDec = contentEl.querySelector("#am-fb-str-dec");
         const strInc = contentEl.querySelector("#am-fb-str-inc");
 
-        const updateFbStr = (v) => {
-          const clamped = Math.max(0, Math.min(2, Math.round(v * 20) / 20));
-          fb.strength = clamped;
+        const updateFbStr = (updateFbStrValue) => {
+          const clamped = Math.max(0, Math.min(2, Math.round(updateFbStrValue * 20) / 20));
+          focusBlur.strength = clamped;
           if (strSlider) strSlider.value = clamped;
           if (strText) strText.textContent = clamped.toFixed(2) + "x";
           commitCamera(false);
         };
         if (strSlider) strSlider.addEventListener("input", () => updateFbStr(parseFloat(strSlider.value)));
-        if (strDec) strDec.addEventListener("click", () => updateFbStr((fb.strength || 0.5) - 0.1));
-        if (strInc) strInc.addEventListener("click", () => updateFbStr((fb.strength || 0.5) + 0.1));
+        if (strDec) strDec.addEventListener("click", () => updateFbStr((focusBlur.strength || 0.5) - 0.1));
+        if (strInc) strInc.addEventListener("click", () => updateFbStr((focusBlur.strength || 0.5) + 0.1));
       }
 
       if (activeTab === "fog") {
-        const sw = contentEl.querySelector("#fogSwitch");
-        if (sw) {
-          sw.addEventListener("change", () => {
-            fg.enabled = sw.checked;
+        const renderFogSwitchEl = contentEl.querySelector("#fogSwitch");
+        if (renderFogSwitchEl) {
+          renderFogSwitchEl.addEventListener("change", () => {
+            fog.enabled = renderFogSwitchEl.checked;
             commitCamera(false);
-            render();
+            renderElement();
           });
         }
 
         const colorInput = contentEl.querySelector("#am-fog-color-native");
         const colorText = contentEl.querySelector("#am-fog-color-text");
-        const applyFogColor = (hex) => {
-          fg.color = hexToRgba(hex);
-          if (colorInput) colorInput.value = hex;
-          if (colorText) colorText.textContent = hex.toUpperCase();
+        const applyFogColor = (valueArg) => {
+          fog.color = hexToRgba(valueArg);
+          if (colorInput) colorInput.value = valueArg;
+          if (colorText) colorText.textContent = valueArg.toUpperCase();
           contentEl.querySelectorAll(".am-palette-chip").forEach(chip => {
-            chip.classList.toggle("active", chip.dataset.color.toLowerCase() === hex.toLowerCase());
+            chip.classList.toggle("active", chip.dataset.color.toLowerCase() === valueArg.toLowerCase());
           });
           commitCamera(false);
         };
@@ -7796,40 +7796,40 @@
         const nearDec = contentEl.querySelector("#am-fog-near-dec");
         const nearInc = contentEl.querySelector("#am-fog-near-inc");
 
-        const updateFogNear = (v) => {
-          const clamped = Math.max(0, Math.min(2000, Math.round(v)));
-          fg.nearZ = clamped;
+        const updateFogNear = (updateFogNearValue) => {
+          const clamped = Math.max(0, Math.min(2000, Math.round(updateFogNearValue)));
+          fog.nearZ = clamped;
           if (nearSlider) nearSlider.value = clamped;
           if (nearText) nearText.textContent = clamped + " px";
           commitCamera(false);
         };
         if (nearSlider) nearSlider.addEventListener("input", () => updateFogNear(parseFloat(nearSlider.value)));
-        if (nearDec) nearDec.addEventListener("click", () => updateFogNear((fg.nearZ || 0) - 25));
-        if (nearInc) nearInc.addEventListener("click", () => updateFogNear((fg.nearZ || 0) + 25));
+        if (nearDec) nearDec.addEventListener("click", () => updateFogNear((fog.nearZ || 0) - 25));
+        if (nearInc) nearInc.addEventListener("click", () => updateFogNear((fog.nearZ || 0) + 25));
 
         const farSlider = contentEl.querySelector("#am-fog-far-slider");
         const farText = contentEl.querySelector("#am-fog-far-text");
         const farDec = contentEl.querySelector("#am-fog-far-dec");
         const farInc = contentEl.querySelector("#am-fog-far-inc");
 
-        const updateFogFar = (v) => {
-          const clamped = Math.max(100, Math.min(5000, Math.round(v)));
-          fg.farZ = clamped;
+        const updateFogFar = (updateFogFarValue) => {
+          const clamped = Math.max(100, Math.min(5000, Math.round(updateFogFarValue)));
+          fog.farZ = clamped;
           if (farSlider) farSlider.value = clamped;
           if (farText) farText.textContent = clamped + " px";
           commitCamera(false);
         };
         if (farSlider) farSlider.addEventListener("input", () => updateFogFar(parseFloat(farSlider.value)));
-        if (farDec) farDec.addEventListener("click", () => updateFogFar((fg.farZ || 1500) - 50));
-        if (farInc) farInc.addEventListener("click", () => updateFogFar((fg.farZ || 1500) + 50));
+        if (farDec) farDec.addEventListener("click", () => updateFogFar((fog.farZ || 1500) - 50));
+        if (farInc) farInc.addEventListener("click", () => updateFogFar((fog.farZ || 1500) + 50));
       }
     }
 
-    render();
+    renderElement();
   }
 
   function renderSpeedControl(contentEl, layer) {
-    const I = window.__AM_INTERNAL || {};
+    const renderSpeedContrValue = window.__AM_INTERNAL || {};
     if (!layer) return;
 
     let curSpeed = (typeof layer.speed === "number" && layer.speed > 0) ? layer.speed : ((typeof layer.timeScale === "number" && layer.timeScale > 0) ? layer.timeScale : 1);
@@ -7840,12 +7840,12 @@
     let isCurveOpen = false;
 
     function getLayerDuration() {
-      const s = layer.startTime || 0;
-      const e = layer.endTime != null ? layer.endTime : (I.val ? I.val.totalTime : 0);
-      return Math.max(0, e - s);
+      const getLayerDurationValue = layer.startTime || 0;
+      const getLayerDurationResult = layer.endTime != null ? layer.endTime : (renderSpeedContrValue.val ? renderSpeedContrValue.val.totalTime : 0);
+      return Math.max(0, getLayerDurationResult - getLayerDurationValue);
     }
 
-    function render() {
+    function renderHelper() {
       const durMs = getLayerDuration();
       const durSec = (durMs / 1000).toFixed(2);
       const origDurSec = layer._origDuration ? (layer._origDuration / 1000).toFixed(2) : durSec;
@@ -7855,7 +7855,7 @@
           <div class="am-retime-section">
             <div class="am-retime-label-row">
               <span class="am-speed-sec-label">Retime ke Playhead</span>
-              <span class="am-retime-ph-val">${(Math.round(I.H || 0) / 1000).toFixed(2)}s</span>
+              <span class="am-retime-ph-val">${(Math.round(renderSpeedContrValue.H || 0) / 1000).toFixed(2)}s</span>
             </div>
             <div class="am-retime-button-group">
               <button type="button" id="am-retime-ext-start" class="am-retime-btn left" title="Perpanjang Mulai ke Playhead">
@@ -7925,8 +7925,8 @@
                 { label: "2x", val: 2.0 },
                 { label: "4x", val: 4.0 },
                 { label: "8x", val: 8.0 }
-              ].map(p => `
-                <button type="button" class="am-speed-pbtn ${Math.abs(curSpeed - p.val) < 0.02 ? 'active' : ''}" data-speed="${p.val}">${p.label}</button>
+              ].map(renderVal => `
+                <button type="button" class="am-speed-pbtn ${Math.abs(curSpeed - renderVal.val) < 0.02 ? 'active' : ''}" data-speed="${renderVal.val}">${renderVal.label}</button>
               `).join('')}
             </div>
           </div>
@@ -7991,12 +7991,12 @@
                   { id: "fast_start", label: "Fast Start", d: "M 4 28 C 4 8 20 4 36 4" },
                   { id: "slow_motion", label: "Slow Motion", d: "M 4 28 C 16 16 24 16 36 4" },
                   { id: "dramatic", label: "Dramatic", d: "M 4 28 C 28 28 32 16 36 4" }
-                ].map(c => `
-                  <button type="button" class="am-speed-curve-item ${curCurve === c.id ? 'active' : ''}" data-curve="${c.id}">
+                ].map(renderId => `
+                  <button type="button" class="am-speed-curve-item ${curCurve === renderId.id ? 'active' : ''}" data-curve="${renderId.id}">
                     <svg viewBox="0 0 40 32" class="am-speed-curve-thumb">
-                      <path d="${c.d}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                      <path d="${renderId.d}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
                     </svg>
-                    <span>${c.label}</span>
+                    <span>${renderId.label}</span>
                   </button>
                 `).join('')}
               </div>
@@ -8016,30 +8016,30 @@
 
       if (btnExtStart) {
         btnExtStart.onclick = () => {
-          if (I.omRetime) I.omRetime("extend_start", layer);
+          if (renderSpeedContrValue.omRetime) renderSpeedContrValue.omRetime("extend_start", layer);
           curSpeed = layer.speed || 1;
-          render();
+          renderHelper();
         };
       }
       if (btnRedStart) {
         btnRedStart.onclick = () => {
-          if (I.omRetime) I.omRetime("reduce_start", layer);
+          if (renderSpeedContrValue.omRetime) renderSpeedContrValue.omRetime("reduce_start", layer);
           curSpeed = layer.speed || 1;
-          render();
+          renderHelper();
         };
       }
       if (btnRedEnd) {
         btnRedEnd.onclick = () => {
-          if (I.omRetime) I.omRetime("reduce_end", layer);
+          if (renderSpeedContrValue.omRetime) renderSpeedContrValue.omRetime("reduce_end", layer);
           curSpeed = layer.speed || 1;
-          render();
+          renderHelper();
         };
       }
       if (btnExtEnd) {
         btnExtEnd.onclick = () => {
-          if (I.omRetime) I.omRetime("extend_end", layer);
+          if (renderSpeedContrValue.omRetime) renderSpeedContrValue.omRetime("extend_end", layer);
           curSpeed = layer.speed || 1;
-          render();
+          renderHelper();
         };
       }
 
@@ -8050,20 +8050,20 @@
       if (slider) {
         slider.oninput = () => {
           let rawVal = Number(slider.value) / 100;
-          for (let sn of snaps) {
-            if (Math.abs(rawVal - sn) <= 0.04) {
-              rawVal = sn;
+          for (let bindEventsValueParsed of snaps) {
+            if (Math.abs(rawVal - bindEventsValueParsed) <= 0.04) {
+              rawVal = bindEventsValueParsed;
               break;
             }
           }
           curSpeed = rawVal;
           if (numDisplay) numDisplay.textContent = curSpeed.toFixed(2) + "x";
-          if (I.omSetLayerSpeed) {
-            I.omSetLayerSpeed(layer, curSpeed, stretchMode === "stretch");
+          if (renderSpeedContrValue.omSetLayerSpeed) {
+            renderSpeedContrValue.omSetLayerSpeed(layer, curSpeed, stretchMode === "stretch");
           }
         };
         slider.onchange = () => {
-          render();
+          renderHelper();
         };
       }
 
@@ -8071,46 +8071,46 @@
       if (resetBtn) {
         resetBtn.onclick = () => {
           curSpeed = 1.0;
-          if (I.omSetLayerSpeed) I.omSetLayerSpeed(layer, 1.0, stretchMode === "stretch");
-          render();
+          if (renderSpeedContrValue.omSetLayerSpeed) renderSpeedContrValue.omSetLayerSpeed(layer, 1.0, stretchMode === "stretch");
+          renderHelper();
         };
       }
 
-      contentEl.querySelectorAll(".am-speed-pbtn").forEach(btn => {
-        btn.onclick = () => {
-          curSpeed = Number(btn.dataset.speed) || 1;
-          if (I.omSetLayerSpeed) {
-            I.omSetLayerSpeed(layer, curSpeed, stretchMode === "stretch");
+      contentEl.querySelectorAll(".am-speed-pbtn").forEach(bindEventsOnclick => {
+        bindEventsOnclick.onclick = () => {
+          curSpeed = Number(bindEventsOnclick.dataset.speed) || 1;
+          if (renderSpeedContrValue.omSetLayerSpeed) {
+            renderSpeedContrValue.omSetLayerSpeed(layer, curSpeed, stretchMode === "stretch");
           }
-          render();
+          renderHelper();
         };
       });
 
-      contentEl.querySelectorAll(".am-speed-mode-btn").forEach(btn => {
-        btn.onclick = () => {
-          stretchMode = btn.dataset.mode;
+      contentEl.querySelectorAll(".am-speed-mode-btn").forEach(bindEventsDataset => {
+        bindEventsDataset.onclick = () => {
+          stretchMode = bindEventsDataset.dataset.mode;
           layer.timeStretchMode = stretchMode;
-          if (I.omSetLayerSpeed) {
-            I.omSetLayerSpeed(layer, curSpeed, stretchMode === "stretch");
+          if (renderSpeedContrValue.omSetLayerSpeed) {
+            renderSpeedContrValue.omSetLayerSpeed(layer, curSpeed, stretchMode === "stretch");
           }
-          render();
+          renderHelper();
         };
       });
 
       const freezeBtn = contentEl.querySelector("#am-speed-freeze-btn");
       if (freezeBtn) {
         freezeBtn.onclick = () => {
-          if (I.omToggleFreezeFrame) I.omToggleFreezeFrame(layer);
+          if (renderSpeedContrValue.omToggleFreezeFrame) renderSpeedContrValue.omToggleFreezeFrame(layer);
           isFrozen = layer.freezeTime != null || !!layer.freezeFrame;
-          render();
+          renderHelper();
         };
       }
       const revBtn = contentEl.querySelector("#am-speed-reverse-btn");
       if (revBtn) {
         revBtn.onclick = () => {
-          if (I.omToggleReverse) I.omToggleReverse(layer);
+          if (renderSpeedContrValue.omToggleReverse) renderSpeedContrValue.omToggleReverse(layer);
           isReversed = !!layer.reversed;
-          render();
+          renderHelper();
         };
       }
 
@@ -8118,35 +8118,35 @@
       if (curveToggle) {
         curveToggle.onclick = () => {
           isCurveOpen = !isCurveOpen;
-          const p = contentEl.querySelector("#am-speed-curve-panel");
-          if (p) p.classList.toggle("open", isCurveOpen);
+          const bindEventsAmSpeedCurvePaneEl = contentEl.querySelector("#am-speed-curve-panel");
+          if (bindEventsAmSpeedCurvePaneEl) bindEventsAmSpeedCurvePaneEl.classList.toggle("open", isCurveOpen);
         };
       }
-      contentEl.querySelectorAll(".am-speed-curve-item").forEach(item => {
-        item.onclick = () => {
-          curCurve = item.dataset.curve;
-          if (I.omSetSpeedCurve) I.omSetSpeedCurve(layer, curCurve);
-          render();
+      contentEl.querySelectorAll(".am-speed-curve-item").forEach(bindEventsArg => {
+        bindEventsArg.onclick = () => {
+          curCurve = bindEventsArg.dataset.curve;
+          if (renderSpeedContrValue.omSetSpeedCurve) renderSpeedContrValue.omSetSpeedCurve(layer, curCurve);
+          renderHelper();
         };
       });
     }
 
-    render();
+    renderHelper();
   }
 
   let cachedEffectCatalog = null;
   async function loadEffectCatalog() {
     if (cachedEffectCatalog) return cachedEffectCatalog;
     try {
-      const res = await fetch("/effects-catalog.json");
-      if (res.ok) cachedEffectCatalog = await res.json();
-    } catch (e) {}
+      const ok = await fetch("/effects-catalog.json");
+      if (ok.ok) cachedEffectCatalog = await ok.json();
+    } catch (loadEffectCatalogResult) {}
     if (!cachedEffectCatalog || !Array.isArray(cachedEffectCatalog)) {
       try {
-        const res2 = await fetch("/effect-index.json");
-        if (res2.ok) {
-          const idx = await res2.json();
-          cachedEffectCatalog = Object.entries(idx).map(([id, file]) => {
+        const loadEffectCatalogOk = await fetch("/effect-index.json");
+        if (loadEffectCatalogOk.ok) {
+          const loadEffectCatalogValue = await loadEffectCatalogOk.json();
+          cachedEffectCatalog = Object.entries(loadEffectCatalogValue).map(([id, file]) => {
             const cleanName = id.split(".").pop().replace(/-/g, " ");
             const formatted = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
             return {
@@ -8162,7 +8162,7 @@
             };
           });
         }
-      } catch (e2) {}
+      } catch (loadEffectCatalogValueRaw) {}
     }
     if (!cachedEffectCatalog) cachedEffectCatalog = [];
     return cachedEffectCatalog;
@@ -8183,29 +8183,29 @@
     { id: "other", label: "Lainnya" }
   ];
 
-  function hexToRgba(hex) {
-    hex = String(hex || "").replace("#", "").trim();
-    if (hex.length === 6) hex = hex + "ff";
-    if (hex.length === 8) {
-      const r = parseInt(hex.slice(0, 2), 16) / 255;
-      const g = parseInt(hex.slice(2, 4), 16) / 255;
-      const b = parseInt(hex.slice(4, 6), 16) / 255;
-      const a = parseInt(hex.slice(6, 8), 16) / 255;
-      return [r, g, b, a];
+  function hexToRgba(hexToRgbaCondition) {
+    hexToRgbaCondition = String(hexToRgbaCondition || "").replace("#", "").trim();
+    if (hexToRgbaCondition.length === 6) hexToRgbaCondition = hexToRgbaCondition + "ff";
+    if (hexToRgbaCondition.length === 8) {
+      const hexToRgbaValue = parseInt(hexToRgbaCondition.slice(0, 2), 16) / 255;
+      const greenChannel = parseInt(hexToRgbaCondition.slice(2, 4), 16) / 255;
+      const blueChannel = parseInt(hexToRgbaCondition.slice(4, 6), 16) / 255;
+      const alphaChannel = parseInt(hexToRgbaCondition.slice(6, 8), 16) / 255;
+      return [hexToRgbaValue, greenChannel, blueChannel, alphaChannel];
     }
     return [1, 1, 1, 1];
   }
 
-  function rgbaToHex(arr) {
-    if (!Array.isArray(arr)) return "#ffffff";
-    const r = Math.round(Math.max(0, Math.min(1, arr[0] || 0)) * 255).toString(16).padStart(2, "0");
-    const g = Math.round(Math.max(0, Math.min(1, arr[1] || 0)) * 255).toString(16).padStart(2, "0");
-    const b = Math.round(Math.max(0, Math.min(1, arr[2] || 0)) * 255).toString(16).padStart(2, "0");
-    return `#${r}${g}${b}`;
+  function rgbaToHex(rgbaToHexArg) {
+    if (!Array.isArray(rgbaToHexArg)) return "#ffffff";
+    const rgbaToHexParsed = Math.round(Math.max(0, Math.min(1, rgbaToHexArg[0] || 0)) * 255).toString(16).padStart(2, "0");
+    const rgbaToHexValueClamped = Math.round(Math.max(0, Math.min(1, rgbaToHexArg[1] || 0)) * 255).toString(16).padStart(2, "0");
+    const rgbaToHexClamped = Math.round(Math.max(0, Math.min(1, rgbaToHexArg[2] || 0)) * 255).toString(16).padStart(2, "0");
+    return `#${rgbaToHexParsed}${rgbaToHexValueClamped}${rgbaToHexClamped}`;
   }
 
   async function openMobileEffectPicker(layer, onAdded) {
-    const I = window.__AM_INTERNAL || {};
+    const openMobileEffectValue = window.__AM_INTERNAL || {};
     const catalog = await loadEffectCatalog();
     let currentCat = "all";
     let searchQuery = "";
@@ -8223,8 +8223,8 @@
           <button id="am-fx-search-clear" style="background:transparent;border:0;color:#8c93a7;cursor:pointer;font-size:14px;display:none;padding:4px;">✕</button>
         </div>
         <div class="am-fx-cats-bar">
-          ${EFFECT_CATEGORIES.map(c => `
-            <button class="am-fx-cat-chip ${c.id === 'all' ? 'active' : ''}" data-cat="${c.id}">${c.label}</button>
+          ${EFFECT_CATEGORIES.map(openMobileEffectPickerId => `
+            <button class="am-fx-cat-chip ${openMobileEffectPickerId.id === 'all' ? 'active' : ''}" data-cat="${openMobileEffectPickerId.id}">${openMobileEffectPickerId.label}</button>
           `).join('')}
         </div>
         <div id="am-fx-grid" class="am-fx-picker-grid"></div>
@@ -8235,8 +8235,8 @@
 
     const closeBtn = modal.querySelector("#am-fx-picker-close");
     closeBtn.onclick = () => modal.remove();
-    modal.onclick = (e) => {
-      if (e.target === modal) modal.remove();
+    modal.onclick = (openMobileEffectPickerTarget) => {
+      if (openMobileEffectPickerTarget.target === modal) modal.remove();
     };
 
     const searchInput = modal.querySelector("#am-fx-picker-search");
@@ -8259,7 +8259,7 @@
     const catChips = modal.querySelectorAll(".am-fx-cat-chip");
     catChips.forEach(chip => {
       chip.onclick = () => {
-        catChips.forEach(c => c.classList.remove("active"));
+        catChips.forEach(openMobileEffectPickerClassList => openMobileEffectPickerClassList.classList.remove("active"));
         chip.classList.add("active");
         currentCat = chip.dataset.cat;
         renderGrid();
@@ -8271,14 +8271,14 @@
     function renderGrid() {
       let filtered = catalog;
       if (currentCat !== "all") {
-        filtered = filtered.filter(fx => fx.category === currentCat);
+        filtered = filtered.filter(category => category.category === currentCat);
       }
       if (searchQuery) {
-        filtered = filtered.filter(fx =>
-          (fx.name && fx.name.toLowerCase().includes(searchQuery)) ||
-          (fx.id && fx.id.toLowerCase().includes(searchQuery)) ||
-          (fx.desc && fx.desc.toLowerCase().includes(searchQuery)) ||
-          (fx.tags && fx.tags.some(t => t.toLowerCase().includes(searchQuery)))
+        filtered = filtered.filter(renderGridId =>
+          (renderGridId.name && renderGridId.name.toLowerCase().includes(searchQuery)) ||
+          (renderGridId.id && renderGridId.id.toLowerCase().includes(searchQuery)) ||
+          (renderGridId.desc && renderGridId.desc.toLowerCase().includes(searchQuery)) ||
+          (renderGridId.tags && renderGridId.tags.some(renderGridArg => renderGridArg.toLowerCase().includes(searchQuery)))
         );
       }
 
@@ -8287,18 +8287,18 @@
         return;
       }
 
-      gridEl.innerHTML = filtered.slice(0, 100).map(fx => {
-        const thumbUrl = fx.thumb || "./icons/ac_ic_effects.svg";
-        const tagsHtml = (fx.tags || []).slice(0, 2).map(t => `<span class="am-fx-tag-badge">${escapeHtml(t)}</span>`).join('');
-        const catBadge = `<span class="am-fx-tag-badge cat">${escapeHtml(fx.categoryLabel || fx.category || "Efek")}</span>`;
+      gridEl.innerHTML = filtered.slice(0, 100).map(thumb => {
+        const thumbUrl = thumb.thumb || "./icons/ac_ic_effects.svg";
+        const tagsHtml = (thumb.tags || []).slice(0, 2).map(tagsHtmlValue => `<span class="am-fx-tag-badge">${escapeHtml(tagsHtmlValue)}</span>`).join('');
+        const catBadge = `<span class="am-fx-tag-badge cat">${escapeHtml(thumb.categoryLabel || thumb.category || "Efek")}</span>`;
         return `
-          <div class="am-fx-card" data-id="${escapeHtml(fx.id)}">
+          <div class="am-fx-card" data-id="${escapeHtml(thumb.id)}">
             <div class="am-fx-card-thumb">
-              <img src="${thumbUrl}" onerror="this.src='./icons/ac_ic_effects.svg';this.style.width='36px';this.style.height='36px';" alt="${escapeHtml(fx.name)}">
+              <img src="${thumbUrl}" onerror="this.src='./icons/ac_ic_effects.svg';this.style.width='36px';this.style.height='36px';" alt="${escapeHtml(thumb.name)}">
             </div>
-            <div class="am-fx-card-title">${escapeHtml(fx.name)}</div>
+            <div class="am-fx-card-title">${escapeHtml(thumb.name)}</div>
             <div class="am-fx-card-tags">${catBadge}${tagsHtml}</div>
-            ${fx.desc ? `<div class="am-fx-card-desc">${escapeHtml(fx.desc)}</div>` : ''}
+            ${thumb.desc ? `<div class="am-fx-card-desc">${escapeHtml(thumb.desc)}</div>` : ''}
           </div>
         `;
       }).join('');
@@ -8306,25 +8306,25 @@
       gridEl.querySelectorAll(".am-fx-card").forEach(card => {
         card.onclick = async () => {
           const fxId = card.dataset.id;
-          const fxDef = catalog.find(x => x.id === fxId);
+          const fxDef = catalog.find(renderGridArgValue => renderGridArgValue.id === fxId);
           modal.remove();
 
           layer.effects = layer.effects || [];
 
           const initialParams = (fxDef && fxDef.params ? fxDef.params : [])
-            .filter(p => p.tag !== "tip")
-            .map(p => {
-              let val = p.default;
-              if (p.dataType === "color") {
-                val = typeof val === "string" ? hexToRgba(val) : (Array.isArray(val) ? val : [1, 1, 1, 1]);
-              } else if (!Array.isArray(val)) {
-                val = [Number(val) || 0];
+            .filter(renderGridTag => renderGridTag.tag !== "tip")
+            .map(dataType => {
+              let renderGridDefault = dataType.default;
+              if (dataType.dataType === "color") {
+                renderGridDefault = typeof renderGridDefault === "string" ? hexToRgba(renderGridDefault) : (Array.isArray(renderGridDefault) ? renderGridDefault : [1, 1, 1, 1]);
+              } else if (!Array.isArray(renderGridDefault)) {
+                renderGridDefault = [Number(renderGridDefault) || 0];
               }
               return {
-                id: p.id,
-                dataType: p.dataType,
+                id: dataType.id,
+                dataType: dataType.dataType,
                 channel: {
-                  value: val,
+                  value: renderGridDefault,
                   kfs: []
                 }
               };
@@ -8342,15 +8342,15 @@
           };
           layer.effects.push(newFx);
 
-          if (I.loadEffect) {
-            try { await I.loadEffect(fxId); } catch (e) {}
-          } else if (I.val2 && typeof I.val2.loadEffect === "function") {
-            try { await I.val2.loadEffect(fxId); } catch (e) {}
+          if (openMobileEffectValue.loadEffect) {
+            try { await openMobileEffectValue.loadEffect(fxId); } catch (renderGridValue) {}
+          } else if (openMobileEffectValue.val2 && typeof openMobileEffectValue.val2.loadEffect === "function") {
+            try { await openMobileEffectValue.val2.loadEffect(fxId); } catch (renderGridResult) {}
           }
 
-          if (I.pushUndo && I.sceneSnapshot) I.pushUndo(I.sceneSnapshot());
-          I.V = true;
-          if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H || 0);
+          if (openMobileEffectValue.pushUndo && openMobileEffectValue.sceneSnapshot) openMobileEffectValue.pushUndo(openMobileEffectValue.sceneSnapshot());
+          openMobileEffectValue.V = true;
+          if (openMobileEffectValue.val2 && openMobileEffectValue.val2.renderAt) openMobileEffectValue.val2.renderAt(openMobileEffectValue.H || 0);
 
           if (onAdded) onAdded(newFx);
         };
@@ -8361,7 +8361,7 @@
   }
 
   function renderEffects(contentEl, layer, selectedEffect = null) {
-    const I = window.__AM_INTERNAL || {};
+    const renderEffectsValue = window.__AM_INTERNAL || {};
     layer.effects = layer.effects || [];
 
     if (selectedEffect) {
@@ -8383,52 +8383,52 @@
     if (!layer.effects.length) {
       listEl.innerHTML = `<div style="text-align:center;color:#8c93a7;padding:24px 16px;font-size:12px;">Belum ada efek ditambahkan ke layer ini</div>`;
     } else {
-      layer.effects.forEach((fx, idx) => {
-        const item = document.createElement("div");
-        item.className = "am-fx-item";
-        item.style.cursor = "pointer";
-        const isHidden = fx.disabled || fx.hidden === true || fx.hidden === "true";
-        item.innerHTML = `
+      layer.effects.forEach((disabled, renderEffectsText) => {
+        const renderEffectsDivEl = document.createElement("div");
+        renderEffectsDivEl.className = "am-fx-item";
+        renderEffectsDivEl.style.cursor = "pointer";
+        const isHidden = disabled.disabled || disabled.hidden === true || disabled.hidden === "true";
+        renderEffectsDivEl.innerHTML = `
           <div style="display:flex;align-items:center;gap:10px;flex:1;overflow:hidden;">
             <button class="am-fx-toggle" style="background:transparent;border:0;cursor:pointer;padding:4px;display:flex;align-items:center;">
               <img src="./icons/ic_visibility.svg" style="width:18px;height:18px;filter:brightness(0) invert(${isHidden ? '0.4' : '1'});">
             </button>
             <div style="display:flex;flex-direction:column;gap:2px;overflow:hidden;">
-              <span class="am-fx-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(fx.name || fx.id || "Efek " + (idx + 1))}</span>
-              <span style="font-size:10px;color:#8c93a7;">${(fx.params || []).length} parameter</span>
+              <span class="am-fx-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(disabled.name || disabled.id || "Efek " + (renderEffectsText + 1))}</span>
+              <span style="font-size:10px;color:#8c93a7;">${(disabled.params || []).length} parameter</span>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
-            <button class="am-fx-del" data-idx="${idx}" style="background:transparent;border:0;cursor:pointer;padding:4px;">
+            <button class="am-fx-del" data-idx="${renderEffectsText}" style="background:transparent;border:0;cursor:pointer;padding:4px;">
               <img src="./icons/ac_ic_delete.svg" alt="Hapus">
             </button>
           </div>
         `;
 
-        item.querySelector(".am-fx-toggle").addEventListener("click", (e) => {
-          e.stopPropagation();
-          const curHidden = fx.disabled || fx.hidden === true || fx.hidden === "true";
-          fx.disabled = !curHidden;
-          fx.hidden = !curHidden;
+        renderEffectsDivEl.querySelector(".am-fx-toggle").addEventListener("click", (renderEffectsStopPropagation) => {
+          renderEffectsStopPropagation.stopPropagation();
+          const curHidden = disabled.disabled || disabled.hidden === true || disabled.hidden === "true";
+          disabled.disabled = !curHidden;
+          disabled.hidden = !curHidden;
           renderEffects(contentEl, layer);
-          I.V = true;
-          if (I.val2) I.val2.renderAt(I.H || 0);
+          renderEffectsValue.V = true;
+          if (renderEffectsValue.val2) renderEffectsValue.val2.renderAt(renderEffectsValue.H || 0);
         });
 
-        item.querySelector(".am-fx-del").addEventListener("click", (e) => {
-          e.stopPropagation();
-          layer.effects.splice(idx, 1);
+        renderEffectsDivEl.querySelector(".am-fx-del").addEventListener("click", (renderEffectsArg) => {
+          renderEffectsArg.stopPropagation();
+          layer.effects.splice(renderEffectsText, 1);
           renderEffects(contentEl, layer);
-          if (I.pushUndo && I.sceneSnapshot) I.pushUndo(I.sceneSnapshot());
-          I.V = true;
-          if (I.val2) I.val2.renderAt(I.H || 0);
+          if (renderEffectsValue.pushUndo && renderEffectsValue.sceneSnapshot) renderEffectsValue.pushUndo(renderEffectsValue.sceneSnapshot());
+          renderEffectsValue.V = true;
+          if (renderEffectsValue.val2) renderEffectsValue.val2.renderAt(renderEffectsValue.H || 0);
         });
 
-        item.addEventListener("click", () => {
-          renderEffects(contentEl, layer, fx);
+        renderEffectsDivEl.addEventListener("click", () => {
+          renderEffects(contentEl, layer, disabled);
         });
 
-        listEl.appendChild(item);
+        listEl.appendChild(renderEffectsDivEl);
       });
     }
 
@@ -8439,28 +8439,28 @@
     });
   }
 
-  async function renderEffectInspector(contentEl, layer, fx) {
-    const I = window.__AM_INTERNAL || {};
+  async function renderEffectInspector(contentEl, layer, effect) {
+    const renderEffectInspValue = window.__AM_INTERNAL || {};
     const catalog = await loadEffectCatalog();
-    const fxDef = fx._meta || catalog.find(x => x.id === fx.id) || {
-      id: fx.id,
-      name: fx.name || fx.id.split('.').pop(),
+    const fxDef = effect._meta || catalog.find(renderEffectInspectorId => renderEffectInspectorId.id === effect.id) || {
+      id: effect.id,
+      name: effect.name || effect.id.split('.').pop(),
       params: []
     };
 
-    if (I.loadEffect) {
-      try { await I.loadEffect(fx.id); } catch (e) {}
-    } else if (I.val2 && typeof I.val2.loadEffect === "function") {
-      try { await I.val2.loadEffect(fx.id); } catch (e) {}
+    if (renderEffectInspValue.loadEffect) {
+      try { await renderEffectInspValue.loadEffect(effect.id); } catch (renderEffectInspectorValueScoped) {}
+    } else if (renderEffectInspValue.val2 && typeof renderEffectInspValue.val2.loadEffect === "function") {
+      try { await renderEffectInspValue.val2.loadEffect(effect.id); } catch (renderEffectInspectorValueLocal) {}
     }
 
-    const isHidden = fx.disabled || fx.hidden === true || fx.hidden === "true";
-    const playheadSec = (I.H || 0) / 1000;
+    const isHidden = effect.disabled || effect.hidden === true || effect.hidden === "true";
+    const playheadSec = (renderEffectInspValue.H || 0) / 1000;
 
     let hasKfAtCurrentTime = false;
-    for (const p of fx.params || []) {
-      if (p.channel && Array.isArray(p.channel.kfs)) {
-        if (p.channel.kfs.some(k => Math.abs(Number(k.t) - playheadSec) < 0.002)) {
+    for (const channelValue of effect.params || []) {
+      if (channelValue.channel && Array.isArray(channelValue.channel.kfs)) {
+        if (channelValue.channel.kfs.some(renderEffectInspectorT => Math.abs(Number(renderEffectInspectorT.t) - playheadSec) < 0.002)) {
           hasKfAtCurrentTime = true;
           break;
         }
@@ -8472,7 +8472,7 @@
         <div class="am-fx-inspector-header">
           <button id="am-fx-insp-back" class="am-fx-inspector-back">
             <span>←</span>
-            <span>${escapeHtml(fx.name || fxDef.name || "Efek")}</span>
+            <span>${escapeHtml(effect.name || fxDef.name || "Efek")}</span>
           </button>
           <div class="am-fx-inspector-actions">
             <button id="am-fx-insp-toggle" class="am-fx-inspector-btn" title="Toggle Efek">
@@ -8500,46 +8500,46 @@
     };
 
     contentEl.querySelector("#am-fx-insp-toggle").onclick = () => {
-      const curHidden = fx.disabled || fx.hidden === true || fx.hidden === "true";
-      fx.disabled = !curHidden;
-      fx.hidden = !curHidden;
-      I.V = true;
-      if (I.val2) I.val2.renderAt(I.H || 0);
-      renderEffectInspector(contentEl, layer, fx);
+      const curHidden = effect.disabled || effect.hidden === true || effect.hidden === "true";
+      effect.disabled = !curHidden;
+      effect.hidden = !curHidden;
+      renderEffectInspValue.V = true;
+      if (renderEffectInspValue.val2) renderEffectInspValue.val2.renderAt(renderEffectInspValue.H || 0);
+      renderEffectInspector(contentEl, layer, effect);
     };
 
     contentEl.querySelector("#am-fx-insp-delete").onclick = () => {
-      const idx = layer.effects.indexOf(fx);
-      if (idx >= 0) layer.effects.splice(idx, 1);
-      if (I.pushUndo && I.sceneSnapshot) I.pushUndo(I.sceneSnapshot());
-      I.V = true;
-      if (I.val2) I.val2.renderAt(I.H || 0);
+      const renderEffectInspectorResult = layer.effects.indexOf(effect);
+      if (renderEffectInspectorResult >= 0) layer.effects.splice(renderEffectInspectorResult, 1);
+      if (renderEffectInspValue.pushUndo && renderEffectInspValue.sceneSnapshot) renderEffectInspValue.pushUndo(renderEffectInspValue.sceneSnapshot());
+      renderEffectInspValue.V = true;
+      if (renderEffectInspValue.val2) renderEffectInspValue.val2.renderAt(renderEffectInspValue.H || 0);
       renderEffects(contentEl, layer, null);
     };
 
     contentEl.querySelector("#am-fx-insp-kf-btn").onclick = () => {
-      const curTime = (I.H || 0) / 1000;
-      for (const p of fx.params || []) {
-        if (!p.channel) continue;
-        p.channel.kfs = p.channel.kfs || [];
-        const kfIdx = p.channel.kfs.findIndex(k => Math.abs(Number(k.t) - curTime) < 0.002);
+      const curTime = (renderEffectInspValue.H || 0) / 1000;
+      for (const renderEffectInspectorChannel of effect.params || []) {
+        if (!renderEffectInspectorChannel.channel) continue;
+        renderEffectInspectorChannel.channel.kfs = renderEffectInspectorChannel.channel.kfs || [];
+        const kfIdx = renderEffectInspectorChannel.channel.kfs.findIndex(renderEffectInspectorArgRaw => Math.abs(Number(renderEffectInspectorArgRaw.t) - curTime) < 0.002);
         if (kfIdx >= 0) {
-          p.channel.kfs.splice(kfIdx, 1);
+          renderEffectInspectorChannel.channel.kfs.splice(kfIdx, 1);
         } else {
-          p.channel.kfs.push({ t: curTime, v: p.channel.value.slice(), e: null, easing: null });
-          p.channel.kfs.sort((a, b) => a.t - b.t);
+          renderEffectInspectorChannel.channel.kfs.push({ t: curTime, v: renderEffectInspectorChannel.channel.value.slice(), e: null, easing: null });
+          renderEffectInspectorChannel.channel.kfs.sort((renderEffectInspectorArgParsed, renderEffectInspectorArgClamped) => renderEffectInspectorArgParsed.t - renderEffectInspectorArgClamped.t);
         }
       }
-      if (I.pushUndo && I.sceneSnapshot) I.pushUndo(I.sceneSnapshot());
-      I.V = true;
-      if (I.val2) I.val2.renderAt(I.H || 0);
-      renderEffectInspector(contentEl, layer, fx);
+      if (renderEffectInspValue.pushUndo && renderEffectInspValue.sceneSnapshot) renderEffectInspValue.pushUndo(renderEffectInspValue.sceneSnapshot());
+      renderEffectInspValue.V = true;
+      if (renderEffectInspValue.val2) renderEffectInspValue.val2.renderAt(renderEffectInspValue.H || 0);
+      renderEffectInspector(contentEl, layer, effect);
     };
 
     const paramsBox = contentEl.querySelector("#am-fx-params-box");
     const defParams = fxDef.params || [];
 
-    if (!defParams.length && (!fx.params || !fx.params.length)) {
+    if (!defParams.length && (!effect.params || !effect.params.length)) {
       paramsBox.innerHTML = `<div style="text-align:center;color:#8c93a7;padding:16px;font-size:12px;">Efek ini tidak memiliki parameter yang dapat diubah</div>`;
       return;
     }
@@ -8553,7 +8553,7 @@
         return;
       }
 
-      let pInst = (fx.params || []).find(p => p.id === pDef.id);
+      let pInst = (effect.params || []).find(renderEffectInspectorClamped => renderEffectInspectorClamped.id === pDef.id);
       if (!pInst) {
         let defVal = pDef.default;
         if (pDef.dataType === "color") {
@@ -8569,7 +8569,7 @@
             kfs: []
           }
         };
-        fx.params.push(pInst);
+        effect.params.push(pInst);
       }
 
       const card = document.createElement("div");
@@ -8586,25 +8586,25 @@
             </label>
           </div>
         `;
-        const cb = card.querySelector('input[type="checkbox"]');
+        const renderEffectInspElement = card.querySelector('input[type="checkbox"]');
         const sliderSpan = card.querySelector(".am-switch-slider");
         if (curVal) sliderSpan.style.background = "var(--am-y1)";
 
-        cb.onchange = () => {
-          const nv = cb.checked ? 1 : 0;
-          sliderSpan.style.background = cb.checked ? "var(--am-y1)" : "#252a3b";
-          pInst.channel.value = [nv];
+        renderEffectInspElement.onchange = () => {
+          const renderEffectInspectorValue = renderEffectInspElement.checked ? 1 : 0;
+          sliderSpan.style.background = renderEffectInspElement.checked ? "var(--am-y1)" : "#252a3b";
+          pInst.channel.value = [renderEffectInspectorValue];
           if (pInst.channel.kfs && pInst.channel.kfs.length) {
-            const t = (I.H || 0) / 1000;
-            const ki = pInst.channel.kfs.findIndex(k => Math.abs(Number(k.t) - t) < 0.002);
-            if (ki >= 0) pInst.channel.kfs[ki].v = [nv];
+            const renderEffectInspectorValueRaw = (renderEffectInspValue.H || 0) / 1000;
+            const renderEffectInspectorRaw = pInst.channel.kfs.findIndex(renderEffectInspectorArgScoped => Math.abs(Number(renderEffectInspectorArgScoped.t) - renderEffectInspectorValueRaw) < 0.002);
+            if (renderEffectInspectorRaw >= 0) pInst.channel.kfs[renderEffectInspectorRaw].v = [renderEffectInspectorValue];
             else {
-              pInst.channel.kfs.push({ t, v: [nv], e: null, easing: null });
-              pInst.channel.kfs.sort((a, b) => a.t - b.t);
+              pInst.channel.kfs.push({ t: renderEffectInspectorValueRaw, v: [renderEffectInspectorValue], e: null, easing: null });
+              pInst.channel.kfs.sort((renderEffectInspectorScoped, renderEffectInspectorArgLocal) => renderEffectInspectorScoped.t - renderEffectInspectorArgLocal.t);
             }
           }
-          I.V = true;
-          if (I.val2) I.val2.renderAt(I.H || 0);
+          renderEffectInspValue.V = true;
+          if (renderEffectInspValue.val2) renderEffectInspValue.val2.renderAt(renderEffectInspValue.H || 0);
         };
       } else if (pDef.dataType === "color" || pDef.tag === "color") {
         const curHex = rgbaToHex(pInst.channel.value);
@@ -8617,8 +8617,8 @@
             </div>
           </div>
           <div class="am-fx-palette">
-            ${["#ffffff", "#000000", "#ff3b30", "#34c759", "#007aff", "#5856d6", "#ff9500", "#1fc8ee"].map(c => `
-              <div class="am-fx-palette-chip" data-color="${c}" style="background:${c};"></div>
+            ${["#ffffff", "#000000", "#ff3b30", "#34c759", "#007aff", "#5856d6", "#ff9500", "#1fc8ee"].map(renderEffectInspectorArgValue => `
+              <div class="am-fx-palette-chip" data-color="${renderEffectInspectorArgValue}" style="background:${renderEffectInspectorArgValue};"></div>
             `).join('')}
           </div>
         `;
@@ -8626,22 +8626,22 @@
         const colorInput = card.querySelector(".am-fx-native-color");
         const hexDisplay = card.querySelector(".am-fx-color-hex");
 
-        function applyColor(hex) {
-          const rgba = hexToRgba(hex);
+        function applyColor(applyColorArg) {
+          const rgba = hexToRgba(applyColorArg);
           pInst.channel.value = rgba;
-          colorInput.value = hex;
-          hexDisplay.textContent = hex.toUpperCase();
+          colorInput.value = applyColorArg;
+          hexDisplay.textContent = applyColorArg.toUpperCase();
           if (pInst.channel.kfs && pInst.channel.kfs.length) {
-            const t = (I.H || 0) / 1000;
-            const ki = pInst.channel.kfs.findIndex(k => Math.abs(Number(k.t) - t) < 0.002);
-            if (ki >= 0) pInst.channel.kfs[ki].v = rgba.slice();
+            const applyColorValue = (renderEffectInspValue.H || 0) / 1000;
+            const applyColorResult = pInst.channel.kfs.findIndex(applyColorT => Math.abs(Number(applyColorT.t) - applyColorValue) < 0.002);
+            if (applyColorResult >= 0) pInst.channel.kfs[applyColorResult].v = rgba.slice();
             else {
-              pInst.channel.kfs.push({ t, v: rgba.slice(), e: null, easing: null });
-              pInst.channel.kfs.sort((a, b) => a.t - b.t);
+              pInst.channel.kfs.push({ t: applyColorValue, v: rgba.slice(), e: null, easing: null });
+              pInst.channel.kfs.sort((applyColorArgValue, applyColorArgRaw) => applyColorArgValue.t - applyColorArgRaw.t);
             }
           }
-          I.V = true;
-          if (I.val2) I.val2.renderAt(I.H || 0);
+          renderEffectInspValue.V = true;
+          if (renderEffectInspValue.val2) renderEffectInspValue.val2.renderAt(renderEffectInspValue.H || 0);
         }
 
         colorInput.oninput = () => applyColor(colorInput.value);
@@ -8654,16 +8654,16 @@
           <div class="am-fx-selector-row">
             <span class="am-fx-param-title">${escapeHtml(pDef.label || pDef.id)}</span>
             <select class="am-fx-select">
-              ${pDef.choices.map(c => `<option value="${c.value}" ${c.value === curVal ? 'selected' : ''}>${escapeHtml(c.label)}</option>`).join('')}
+              ${pDef.choices.map(renderEffectInspectorLabel => `<option value="${renderEffectInspectorLabel.value}" ${renderEffectInspectorLabel.value === curVal ? 'selected' : ''}>${escapeHtml(renderEffectInspectorLabel.label)}</option>`).join('')}
             </select>
           </div>
         `;
         const select = card.querySelector(".am-fx-select");
         select.onchange = () => {
-          const nv = parseInt(select.value) || 0;
-          pInst.channel.value = [nv];
-          I.V = true;
-          if (I.val2) I.val2.renderAt(I.H || 0);
+          const renderEffectInspectorValueClamped = parseInt(select.value) || 0;
+          pInst.channel.value = [renderEffectInspectorValueClamped];
+          renderEffectInspValue.V = true;
+          if (renderEffectInspValue.val2) renderEffectInspValue.val2.renderAt(renderEffectInspValue.H || 0);
         };
       } else {
         const minVal = pDef.min !== undefined ? pDef.min : 0;
@@ -8672,11 +8672,11 @@
         let curVal = Number(pInst.channel.value && pInst.channel.value[0]);
         if (!Number.isFinite(curVal)) curVal = Number(pDef.default) || 0;
 
-        function formatVal(v) {
-          if (pDef.isPercent) return (v * 100).toFixed(0) + "%";
-          if (pDef.isAngle) return v.toFixed(1) + "°";
-          if (pDef.dataType === "int") return Math.round(v).toString();
-          return v.toFixed(2);
+        function formatVal(formatValArg) {
+          if (pDef.isPercent) return (formatValArg * 100).toFixed(0) + "%";
+          if (pDef.isAngle) return formatValArg.toFixed(1) + "°";
+          if (pDef.dataType === "int") return Math.round(formatValArg).toString();
+          return formatValArg.toFixed(2);
         }
 
         card.innerHTML = `
@@ -8697,29 +8697,29 @@
           max: maxVal,
           step: stepVal,
           getVal: () => {
-            const v = Number(pInst.channel.value && pInst.channel.value[0]);
-            return Number.isFinite(v) ? v : (Number(pDef.default) || 0);
+            const renderEffectInspNumber = Number(pInst.channel.value && pInst.channel.value[0]);
+            return Number.isFinite(renderEffectInspNumber) ? renderEffectInspNumber : (Number(pDef.default) || 0);
           },
-          setVal: (nv) => {
-            nv = Math.max(minVal, Math.min(maxVal, nv));
-            valBox.textContent = formatVal(nv);
-            pInst.channel.value = [nv];
+          setVal: (renderEffectInspectorArg) => {
+            renderEffectInspectorArg = Math.max(minVal, Math.min(maxVal, renderEffectInspectorArg));
+            valBox.textContent = formatVal(renderEffectInspectorArg);
+            pInst.channel.value = [renderEffectInspectorArg];
 
             if (pInst.channel.kfs && pInst.channel.kfs.length) {
-              const t = (I.H || 0) / 1000;
-              const ki = pInst.channel.kfs.findIndex(k => Math.abs(Number(k.t) - t) < 0.002);
-              if (ki >= 0) pInst.channel.kfs[ki].v = [nv];
+              const renderEffectInspectorValueParsed = (renderEffectInspValue.H || 0) / 1000;
+              const renderEffectInspectorParsed = pInst.channel.kfs.findIndex(renderEffectInspectorLocal => Math.abs(Number(renderEffectInspectorLocal.t) - renderEffectInspectorValueParsed) < 0.002);
+              if (renderEffectInspectorParsed >= 0) pInst.channel.kfs[renderEffectInspectorParsed].v = [renderEffectInspectorArg];
               else {
-                pInst.channel.kfs.push({ t, v: [nv], e: null, easing: null });
-                pInst.channel.kfs.sort((a, b) => a.t - b.t);
+                pInst.channel.kfs.push({ t: renderEffectInspectorValueParsed, v: [renderEffectInspectorArg], e: null, easing: null });
+                pInst.channel.kfs.sort((renderEffectInspectorArgOuter, argOuter) => renderEffectInspectorArgOuter.t - argOuter.t);
               }
             }
 
-            I.V = true;
-            if (I.val2) I.val2.renderAt(I.H || 0);
+            renderEffectInspValue.V = true;
+            if (renderEffectInspValue.val2) renderEffectInspValue.val2.renderAt(renderEffectInspValue.H || 0);
           },
           onChange: () => {
-            if (I.pushUndo && I.sceneSnapshot) I.pushUndo(I.sceneSnapshot());
+            if (renderEffectInspValue.pushUndo && renderEffectInspValue.sceneSnapshot) renderEffectInspValue.pushUndo(renderEffectInspValue.sceneSnapshot());
           }
         });
       }
@@ -8730,18 +8730,18 @@
 
   // Hook layer selection to seamlessly toggle panels
   const origOnLayerSelected = window.omOnLayerSelected;
-  window.omOnLayerSelected = function(l) {
-    const I = window.__AM_INTERNAL || {};
-    if (I.omMulti && I.omMulti.size > 0) {
+  window.omOnLayerSelected = function(initAmMobileUiFlag) {
+    const initAmMobileUiValue = window.__AM_INTERNAL || {};
+    if (initAmMobileUiValue.omMulti && initAmMobileUiValue.omMulti.size > 0) {
       return;
     }
-    if (activeLiveShapeLayer && activeLiveShapeLayer !== l) closeLiveShape(false);
-    if (activeEditPointsLayer && activeEditPointsLayer !== l) closeEditPoints(false);
-    if (activeTextEditorLayer && activeTextEditorLayer !== l) closeTextEditor(false);
+    if (activeLiveShapeLayer && activeLiveShapeLayer !== initAmMobileUiFlag) closeLiveShape(false);
+    if (activeEditPointsLayer && activeEditPointsLayer !== initAmMobileUiFlag) closeEditPoints(false);
+    if (activeTextEditorLayer && activeTextEditorLayer !== initAmMobileUiFlag) closeTextEditor(false);
 
-    currentSelectedLayer = l;
+    currentSelectedLayer = initAmMobileUiFlag;
     if (typeof origOnLayerSelected === "function") {
-      origOnLayerSelected(l);
+      origOnLayerSelected(initAmMobileUiFlag);
     }
 
     const navDefault = document.getElementById("am-navbar-default");
@@ -8763,9 +8763,9 @@
     if (navEditPoints) navEditPoints.style.display = "none";
     if (navTextEdit) navTextEdit.style.display = "none";
 
-    if (l) {
+    if (initAmMobileUiFlag) {
       // Toggle Camera button vs Context Edit button
-      if (l.tag === "camera") {
+      if (initAmMobileUiFlag.tag === "camera") {
         if (btnCam) btnCam.style.display = "flex";
         if (btnCtx) btnCtx.style.display = "none";
         if (btnColor) {
@@ -8792,8 +8792,8 @@
       // Show Element Action Bar
       if (navDefault) navDefault.style.display = "none";
       if (navElem) navElem.style.display = "flex";
-      if (elemTitle) elemTitle.value = l.label || l.id || "Layer";
-      updateParentButtonState(l);
+      if (elemTitle) elemTitle.value = initAmMobileUiFlag.label || initAmMobileUiFlag.id || "Layer";
+      updateParentButtonState(initAmMobileUiFlag);
 
       // Show Element Edit Panel
       if (tlView) tlView.style.display = "none";
@@ -8801,14 +8801,14 @@
 
       // Context button label & icon
       if (ctxText && ctxIcon) {
-        const I = window.__AM_INTERNAL || {};
-        if (I.isGroup && I.isGroup(l)) {
+        const isGroup = window.__AM_INTERNAL || {};
+        if (isGroup.isGroup && isGroup.isGroup(initAmMobileUiFlag)) {
           ctxText.textContent = "Edit Grup";
           ctxIcon.src = "./icons/ac_ic_groupelements.svg";
-        } else if (l.tag === "text") {
+        } else if (initAmMobileUiFlag.tag === "text") {
           ctxText.textContent = "Edit Teks";
           ctxIcon.src = "./icons/ac_edit_text.svg";
-        } else if (l.path || l.points || l.tag === "drawing" || l.tag === "vector") {
+        } else if (initAmMobileUiFlag.path || initAmMobileUiFlag.points || initAmMobileUiFlag.tag === "drawing" || initAmMobileUiFlag.tag === "vector") {
           ctxText.textContent = "Edit Poin";
           ctxIcon.src = "./icons/ac_ic_editpoint.svg";
         } else {
@@ -8836,8 +8836,8 @@
       if (navSetting) navSetting.style.display = "none";
       if (tlView) tlView.style.display = "flex";
       if (elemPanel) elemPanel.style.display = "none";
-      const sub = document.getElementById("am-subpanel-container");
-      if (sub) sub.classList.remove("open");
+      const initAmMobileUiAmSubpanelContaiEl = document.getElementById("am-subpanel-container");
+      if (initAmMobileUiAmSubpanelContaiEl) initAmMobileUiAmSubpanelContaiEl.classList.remove("open");
       const lsPanel = document.getElementById("am-liveshape-panel");
       if (lsPanel) lsPanel.classList.remove("open");
       const epPanel = document.getElementById("am-editpoints-panel");
@@ -8883,20 +8883,20 @@
     }
   };
 
-  function detectProjectAspect(w, h) {
-    if (!w || !h) return "9:16";
-    const r = w / h;
-    if (Math.abs(r - 16 / 9) < 0.05) return "16:9";
-    if (Math.abs(r - 9 / 16) < 0.05) return "9:16";
-    if (Math.abs(r - 4 / 5) < 0.05) return "4:5";
-    if (Math.abs(r - 1) < 0.05) return "1:1";
-    if (Math.abs(r - 4 / 3) < 0.05) return "4:3";
+  function detectProjectAspect(detectProjectAspectArg, detectProjectAspectArgValue) {
+    if (!detectProjectAspectArg || !detectProjectAspectArgValue) return "9:16";
+    const detectProjectAspValue = detectProjectAspectArg / detectProjectAspectArgValue;
+    if (Math.abs(detectProjectAspValue - 16 / 9) < 0.05) return "16:9";
+    if (Math.abs(detectProjectAspValue - 9 / 16) < 0.05) return "9:16";
+    if (Math.abs(detectProjectAspValue - 4 / 5) < 0.05) return "4:5";
+    if (Math.abs(detectProjectAspValue - 1) < 0.05) return "1:1";
+    if (Math.abs(detectProjectAspValue - 4 / 3) < 0.05) return "4:3";
     return "custom";
   }
 
-  function detectProjectResLevel(aspect, w, h) {
+  function detectProjectResLevel(aspect, detectProjectResLevelFlag, detectProjectResLevelArg) {
     if (aspect === "custom") return "720";
-    const baseDim = (aspect === "16:9" || aspect === "4:3") ? h : w;
+    const baseDim = (aspect === "16:9" || aspect === "4:3") ? detectProjectResLevelArg : detectProjectResLevelFlag;
     if (baseDim >= 900) return "1080";
     if (baseDim >= 600) return "720";
     if (baseDim >= 500) return "540";
@@ -8906,32 +8906,32 @@
   function detectProjectBgKey(bgcolor) {
     if (!bgcolor) return "black";
     if (typeof bgcolor === "string") {
-      const s = bgcolor.toLowerCase();
-      if (s === "transparent" || s === "#00000000") return "transparent";
-      if (s === "#ffffffff" || s === "#ffffff") return "white";
-      if (s.includes("b3b3b3") || s.includes("808080") || s.includes("c0c0c0") || s.includes("d0d0d0")) return "grey";
+      const detectProjectBgKeyValue = bgcolor.toLowerCase();
+      if (detectProjectBgKeyValue === "transparent" || detectProjectBgKeyValue === "#00000000") return "transparent";
+      if (detectProjectBgKeyValue === "#ffffffff" || detectProjectBgKeyValue === "#ffffff") return "white";
+      if (detectProjectBgKeyValue.includes("b3b3b3") || detectProjectBgKeyValue.includes("808080") || detectProjectBgKeyValue.includes("c0c0c0") || detectProjectBgKeyValue.includes("d0d0d0")) return "grey";
       return "black";
     }
     if (Array.isArray(bgcolor)) {
-      const [r, g, b, a] = bgcolor;
-      if (a === 0 || a < 0.05) return "transparent";
-      if (r > 0.85 && g > 0.85 && b > 0.85) return "white";
-      if (r > 0.4 && r < 0.85 && Math.abs(r - g) < 0.08 && Math.abs(g - b) < 0.08) return "grey";
+      const [detectProjectBgKeyResult, detectProjectBgKeyValueRaw, detectProjectBgKeyRaw, detectProjectBgKeyValueParsed] = bgcolor;
+      if (detectProjectBgKeyValueParsed === 0 || detectProjectBgKeyValueParsed < 0.05) return "transparent";
+      if (detectProjectBgKeyResult > 0.85 && detectProjectBgKeyValueRaw > 0.85 && detectProjectBgKeyRaw > 0.85) return "white";
+      if (detectProjectBgKeyResult > 0.4 && detectProjectBgKeyResult < 0.85 && Math.abs(detectProjectBgKeyResult - detectProjectBgKeyValueRaw) < 0.08 && Math.abs(detectProjectBgKeyValueRaw - detectProjectBgKeyRaw) < 0.08) return "grey";
       return "black";
     }
     return "black";
   }
 
   function applyCanvasReconfiguration(changes = {}) {
-    const I = window.__AM_INTERNAL;
-    if (!I || !I.val) return;
-    const val = I.val;
+    const applyCanvasReconfigurationAmInternal = window.__AM_INTERNAL;
+    if (!applyCanvasReconfigurationAmInternal || !applyCanvasReconfigurationAmInternal.val) return;
+    const applyCanvasReconfigurationVal = applyCanvasReconfigurationAmInternal.val;
     let changed = false;
 
     if (changes.title !== undefined) {
       const cleanTitle = String(changes.title).trim();
-      if (cleanTitle && val.title !== cleanTitle) {
-        val.title = cleanTitle;
+      if (cleanTitle && applyCanvasReconfigurationVal.title !== cleanTitle) {
+        applyCanvasReconfigurationVal.title = cleanTitle;
         const topTitle = document.getElementById("am-project-title");
         if (topTitle) topTitle.value = cleanTitle;
         changed = true;
@@ -8939,40 +8939,40 @@
     }
 
     if (changes.width !== undefined && changes.height !== undefined) {
-      const w = Math.max(16, Math.round(changes.width));
-      const h = Math.max(16, Math.round(changes.height));
-      if (val.width !== w || val.height !== h) {
-        val.width = w;
-        val.height = h;
-        val.exportWidth = w;
-        val.exportHeight = h;
-        I.w = w;
-        I.h = h;
+      const applyCanvasReconfigurationMax = Math.max(16, Math.round(changes.width));
+      const applyCanvasReconfigurationHeight = Math.max(16, Math.round(changes.height));
+      if (applyCanvasReconfigurationVal.width !== applyCanvasReconfigurationMax || applyCanvasReconfigurationVal.height !== applyCanvasReconfigurationHeight) {
+        applyCanvasReconfigurationVal.width = applyCanvasReconfigurationMax;
+        applyCanvasReconfigurationVal.height = applyCanvasReconfigurationHeight;
+        applyCanvasReconfigurationVal.exportWidth = applyCanvasReconfigurationMax;
+        applyCanvasReconfigurationVal.exportHeight = applyCanvasReconfigurationHeight;
+        applyCanvasReconfigurationAmInternal.w = applyCanvasReconfigurationMax;
+        applyCanvasReconfigurationAmInternal.h = applyCanvasReconfigurationHeight;
 
         const view = document.getElementById("view");
         if (view) {
-          view.width = w;
-          view.height = h;
+          view.width = applyCanvasReconfigurationMax;
+          view.height = applyCanvasReconfigurationHeight;
         }
         const debugCanvas = document.getElementById("debugCanvas");
         if (debugCanvas) {
-          debugCanvas.width = w;
-          debugCanvas.height = h;
+          debugCanvas.width = applyCanvasReconfigurationMax;
+          debugCanvas.height = applyCanvasReconfigurationHeight;
         }
 
-        if (I.val2) {
-          if (I.val2.scene) {
-            I.val2.scene.width = w;
-            I.val2.scene.height = h;
+        if (applyCanvasReconfigurationAmInternal.val2) {
+          if (applyCanvasReconfigurationAmInternal.val2.scene) {
+            applyCanvasReconfigurationAmInternal.val2.scene.width = applyCanvasReconfigurationMax;
+            applyCanvasReconfigurationAmInternal.val2.scene.height = applyCanvasReconfigurationHeight;
           }
-          if (typeof I.val2.setResolution === "function") {
-            I.val2.setResolution(h);
+          if (typeof applyCanvasReconfigurationAmInternal.val2.setResolution === "function") {
+            applyCanvasReconfigurationAmInternal.val2.setResolution(applyCanvasReconfigurationHeight);
           } else {
-            I.val2.workWidth = w;
-            I.val2.workHeight = h;
-            I.val2.baseWidth = w;
-            I.val2.baseHeight = h;
-            if (typeof I.val2.Oe === "function") I.val2.Oe();
+            applyCanvasReconfigurationAmInternal.val2.workWidth = applyCanvasReconfigurationMax;
+            applyCanvasReconfigurationAmInternal.val2.workHeight = applyCanvasReconfigurationHeight;
+            applyCanvasReconfigurationAmInternal.val2.baseWidth = applyCanvasReconfigurationMax;
+            applyCanvasReconfigurationAmInternal.val2.baseHeight = applyCanvasReconfigurationHeight;
+            if (typeof applyCanvasReconfigurationAmInternal.val2.Oe === "function") applyCanvasReconfigurationAmInternal.val2.Oe();
           }
         }
         changed = true;
@@ -8980,53 +8980,53 @@
     }
 
     if (changes.fps !== undefined) {
-      const fps = Math.max(1, Math.min(120, Math.round(changes.fps)));
-      if (val.fps !== fps) {
-        val.fps = fps;
+      const applyCanvasReconValue = Math.max(1, Math.min(120, Math.round(changes.fps)));
+      if (applyCanvasReconfigurationVal.fps !== applyCanvasReconValue) {
+        applyCanvasReconfigurationVal.fps = applyCanvasReconValue;
         const topFps = document.getElementById("am-nav-fps");
-        if (topFps) topFps.textContent = `${fps} FPS`;
+        if (topFps) topFps.textContent = `${applyCanvasReconValue} FPS`;
         changed = true;
       }
     }
 
     if (changes.bgcolor !== undefined) {
-      const bg = changes.bgcolor;
+      const applyCanvasReconfigurationBgcolor = changes.bgcolor;
       const view = document.getElementById("view");
       if (view) {
         view.classList.remove("am-canvas-bg-black", "am-canvas-bg-white", "am-canvas-bg-grey", "am-canvas-bg-transparent");
       }
 
-      if (bg === "transparent") {
-        val.bgcolor = [0, 0, 0, 0];
+      if (applyCanvasReconfigurationBgcolor === "transparent") {
+        applyCanvasReconfigurationVal.bgcolor = [0, 0, 0, 0];
         if (view) view.classList.add("am-canvas-bg-transparent");
-      } else if (bg === "white") {
-        val.bgcolor = [1, 1, 1, 1];
+      } else if (applyCanvasReconfigurationBgcolor === "white") {
+        applyCanvasReconfigurationVal.bgcolor = [1, 1, 1, 1];
         if (view) view.classList.add("am-canvas-bg-white");
-      } else if (bg === "grey") {
-        val.bgcolor = [0.7, 0.7, 0.7, 1];
+      } else if (applyCanvasReconfigurationBgcolor === "grey") {
+        applyCanvasReconfigurationVal.bgcolor = [0.7, 0.7, 0.7, 1];
         if (view) view.classList.add("am-canvas-bg-grey");
       } else {
-        val.bgcolor = [0, 0, 0, 1];
+        applyCanvasReconfigurationVal.bgcolor = [0, 0, 0, 1];
         if (view) view.classList.add("am-canvas-bg-black");
       }
       changed = true;
     }
 
     if (changed) {
-      if (typeof I.fitCanvas === "function") I.fitCanvas();
-      if (I.val2 && typeof I.val2.renderAt === "function") {
-        I.val2.renderAt(I.H || 0);
+      if (typeof applyCanvasReconfigurationAmInternal.fitCanvas === "function") applyCanvasReconfigurationAmInternal.fitCanvas();
+      if (applyCanvasReconfigurationAmInternal.val2 && typeof applyCanvasReconfigurationAmInternal.val2.renderAt === "function") {
+        applyCanvasReconfigurationAmInternal.val2.renderAt(applyCanvasReconfigurationAmInternal.H || 0);
       }
-      if (typeof I.buildTimeline === "function") I.buildTimeline();
-      if (typeof I.bind4 === "function") I.bind4();
-      if (typeof I.omScheduleSave === "function") I.omScheduleSave();
+      if (typeof applyCanvasReconfigurationAmInternal.buildTimeline === "function") applyCanvasReconfigurationAmInternal.buildTimeline();
+      if (typeof applyCanvasReconfigurationAmInternal.bind4 === "function") applyCanvasReconfigurationAmInternal.bind4();
+      if (typeof applyCanvasReconfigurationAmInternal.omScheduleSave === "function") applyCanvasReconfigurationAmInternal.omScheduleSave();
     }
   }
 
   function openProjectSettings() {
-    const I = window.__AM_INTERNAL;
-    if (!I || !I.val) return;
-    const val = I.val;
+    const openProjectSettingsAmInternal = window.__AM_INTERNAL;
+    if (!openProjectSettingsAmInternal || !openProjectSettingsAmInternal.val) return;
+    const openProjectSettingsVal = openProjectSettingsAmInternal.val;
 
     let backdrop = document.getElementById("am-project-settings-backdrop");
     if (!backdrop) {
@@ -9138,8 +9138,8 @@
       `;
       document.body.appendChild(backdrop);
 
-      backdrop.addEventListener("click", (e) => {
-        if (e.target === backdrop) backdrop.classList.remove("open");
+      backdrop.addEventListener("click", (openProjectSettingsTarget) => {
+        if (openProjectSettingsTarget.target === backdrop) backdrop.classList.remove("open");
       });
       document.getElementById("am-settings-close").addEventListener("click", () => {
         backdrop.classList.remove("open");
@@ -9159,13 +9159,13 @@
       const bgSelect = document.getElementById("am-set-bg");
       const titleInput = document.getElementById("am-set-title");
 
-      function updateSizeLabel(w, h) {
-        if (sizeInfo) sizeInfo.textContent = `${w} × ${h}`;
+      function updateSizeLabel(updateSizeLabelArg, updateSizeLabelArgValue) {
+        if (sizeInfo) sizeInfo.textContent = `${updateSizeLabelArg} × ${updateSizeLabelArgValue}`;
       }
 
       function updateActiveAspectUI(aspect) {
-        backdrop.querySelectorAll(".am-aspect-card").forEach(c => {
-          c.classList.toggle("active", c.dataset.aspect === aspect);
+        backdrop.querySelectorAll(".am-aspect-card").forEach(updateActiveAspectUiClassList => {
+          updateActiveAspectUiClassList.classList.toggle("active", updateActiveAspectUiClassList.dataset.aspect === aspect);
         });
         if (aspect === "custom") {
           resSelect.style.display = "none";
@@ -9176,11 +9176,11 @@
         }
       }
 
-      function updateBgUI(key) {
-        backdrop.querySelectorAll(".am-color-swatch").forEach(s => {
-          s.classList.toggle("active", s.dataset.bg === key);
+      function updateBgUI(updateBgUiValue) {
+        backdrop.querySelectorAll(".am-color-swatch").forEach(updateBgUiClassList => {
+          updateBgUiClassList.classList.toggle("active", updateBgUiClassList.dataset.bg === updateBgUiValue);
         });
-        if (bgSelect) bgSelect.value = key;
+        if (bgSelect) bgSelect.value = updateBgUiValue;
       }
 
       // Aspect card selection
@@ -9190,10 +9190,10 @@
           updateActiveAspectUI(aspect);
 
           if (aspect === "custom") {
-            customW.value = val.width;
-            customH.value = val.height;
-            customRatio = (val.width / val.height) || (9 / 16);
-            updateSizeLabel(val.width, val.height);
+            customW.value = openProjectSettingsVal.width;
+            customH.value = openProjectSettingsVal.height;
+            customRatio = (openProjectSettingsVal.width / openProjectSettingsVal.height) || (9 / 16);
+            updateSizeLabel(openProjectSettingsVal.width, openProjectSettingsVal.height);
           } else {
             const level = resSelect.value || "720";
             const dims = (ASPECT_RESOLUTIONS[aspect] && ASPECT_RESOLUTIONS[aspect][level]) || { w: 720, h: 1280 };
@@ -9224,30 +9224,30 @@
       // Custom width / height inputs
       if (customW) {
         customW.addEventListener("input", () => {
-          const w = parseInt(customW.value, 10);
-          if (w >= 16) {
-            let h = parseInt(customH.value, 10) || val.height;
+          const openProjectSettingsParseInt = parseInt(customW.value, 10);
+          if (openProjectSettingsParseInt >= 16) {
+            let openProjectSettingsValue = parseInt(customH.value, 10) || openProjectSettingsVal.height;
             if (isSizeLinked && customRatio > 0) {
-              h = Math.max(16, Math.round((w / customRatio) / 2) * 2);
-              customH.value = h;
+              openProjectSettingsValue = Math.max(16, Math.round((openProjectSettingsParseInt / customRatio) / 2) * 2);
+              customH.value = openProjectSettingsValue;
             }
-            updateSizeLabel(w, h);
-            applyCanvasReconfiguration({ width: w, height: h });
+            updateSizeLabel(openProjectSettingsParseInt, openProjectSettingsValue);
+            applyCanvasReconfiguration({ width: openProjectSettingsParseInt, height: openProjectSettingsValue });
           }
         });
       }
 
       if (customH) {
         customH.addEventListener("input", () => {
-          const h = parseInt(customH.value, 10);
-          if (h >= 16) {
-            let w = parseInt(customW.value, 10) || val.width;
+          const parseIntValue = parseInt(customH.value, 10);
+          if (parseIntValue >= 16) {
+            let openProjectSettingsResult = parseInt(customW.value, 10) || openProjectSettingsVal.width;
             if (isSizeLinked && customRatio > 0) {
-              w = Math.max(16, Math.round((h * customRatio) / 2) * 2);
-              customW.value = w;
+              openProjectSettingsResult = Math.max(16, Math.round((parseIntValue * customRatio) / 2) * 2);
+              customW.value = openProjectSettingsResult;
             }
-            updateSizeLabel(w, h);
-            applyCanvasReconfiguration({ width: w, height: h });
+            updateSizeLabel(openProjectSettingsResult, parseIntValue);
+            applyCanvasReconfiguration({ width: openProjectSettingsResult, height: parseIntValue });
           }
         });
       }
@@ -9260,9 +9260,9 @@
             linkImg.src = isSizeLinked ? "./icons/ic_projectsetup_link.svg" : "./icons/ic_projectsetup_unlink.svg";
           }
           if (isSizeLinked) {
-            const w = parseInt(customW.value, 10) || val.width || 720;
-            const h = parseInt(customH.value, 10) || val.height || 1280;
-            customRatio = (w / h) || (9 / 16);
+            const openProjectSettingsValueRaw = parseInt(customW.value, 10) || openProjectSettingsVal.width || 720;
+            const openProjectSettingsRaw = parseInt(customH.value, 10) || openProjectSettingsVal.height || 1280;
+            customRatio = (openProjectSettingsValueRaw / openProjectSettingsRaw) || (9 / 16);
           }
         });
       }
@@ -9270,8 +9270,8 @@
       // Frame rate selection
       if (fpsSelect) {
         fpsSelect.addEventListener("change", () => {
-          const fps = parseInt(fpsSelect.value, 10) || 30;
-          applyCanvasReconfiguration({ fps });
+          const openProjectSettiValue = parseInt(fpsSelect.value, 10) || 30;
+          applyCanvasReconfiguration({ fps: openProjectSettiValue });
         });
       }
 
@@ -9302,12 +9302,12 @@
     }
 
     // Populate current values upon opening
-    const curW = val.width || 720;
-    const curH = val.height || 1280;
+    const curW = openProjectSettingsVal.width || 720;
+    const curH = openProjectSettingsVal.height || 1280;
     const curAspect = detectProjectAspect(curW, curH);
     const curRes = detectProjectResLevel(curAspect, curW, curH);
-    const curBg = detectProjectBgKey(val.bgcolor);
-    const curFps = Math.round(val.fps || 30);
+    const curBg = detectProjectBgKey(openProjectSettingsVal.bgcolor);
+    const curFps = Math.round(openProjectSettingsVal.fps || 30);
 
     const sizeInfo = document.getElementById("am-settings-size-info");
     if (sizeInfo) sizeInfo.textContent = `${curW} × ${curH}`;
@@ -9326,20 +9326,20 @@
 
     const fpsSelect = document.getElementById("am-set-fps");
     if (fpsSelect) {
-      const matchOpt = Array.from(fpsSelect.options).find(o => parseInt(o.value, 10) === curFps);
+      const matchOpt = Array.from(fpsSelect.options).find(openProjectSettingsArg => parseInt(openProjectSettingsArg.value, 10) === curFps);
       if (matchOpt) fpsSelect.value = String(curFps);
       else fpsSelect.value = "30";
     }
 
     const titleInput = document.getElementById("am-set-title");
-    if (titleInput) titleInput.value = val.title || "Proyek Baru";
+    if (titleInput) titleInput.value = openProjectSettingsVal.title || "Proyek Baru";
 
-    backdrop.querySelectorAll(".am-aspect-card").forEach(c => {
-      c.classList.toggle("active", c.dataset.aspect === curAspect);
+    backdrop.querySelectorAll(".am-aspect-card").forEach(openProjectSettingsClassList => {
+      openProjectSettingsClassList.classList.toggle("active", openProjectSettingsClassList.dataset.aspect === curAspect);
     });
 
-    backdrop.querySelectorAll(".am-color-swatch").forEach(s => {
-      s.classList.toggle("active", s.dataset.bg === curBg);
+    backdrop.querySelectorAll(".am-color-swatch").forEach(classListArg => {
+      classListArg.classList.toggle("active", classListArg.dataset.bg === curBg);
     });
     const bgSelect = document.getElementById("am-set-bg");
     if (bgSelect) bgSelect.value = curBg;
@@ -9354,14 +9354,14 @@
       if (!Object.getOwnPropertyDescriptor(window.__AM_INTERNAL, "w")) {
         Object.defineProperty(window.__AM_INTERNAL, "w", {
           get() {
-            const I = window.__AM_INTERNAL;
-            return (I.val && I.val.width) || (document.getElementById("view") ? document.getElementById("view").width : 0);
+            const valValue = window.__AM_INTERNAL;
+            return (valValue.val && valValue.val.width) || (document.getElementById("view") ? document.getElementById("view").width : 0);
           },
-          set(v) {
-            const I = window.__AM_INTERNAL;
-            if (I.val) {
-              I.val.width = Math.round(v);
-              I.val.exportWidth = Math.round(v);
+          set(initAmMobileUiArg) {
+            const initAmMobileUiAmInternal = window.__AM_INTERNAL;
+            if (initAmMobileUiAmInternal.val) {
+              initAmMobileUiAmInternal.val.width = Math.round(initAmMobileUiArg);
+              initAmMobileUiAmInternal.val.exportWidth = Math.round(initAmMobileUiArg);
             }
           },
           configurable: true
@@ -9370,14 +9370,14 @@
       if (!Object.getOwnPropertyDescriptor(window.__AM_INTERNAL, "h")) {
         Object.defineProperty(window.__AM_INTERNAL, "h", {
           get() {
-            const I = window.__AM_INTERNAL;
-            return (I.val && I.val.height) || (document.getElementById("view") ? document.getElementById("view").height : 0);
+            const initAmMobileUiResult = window.__AM_INTERNAL;
+            return (initAmMobileUiResult.val && initAmMobileUiResult.val.height) || (document.getElementById("view") ? document.getElementById("view").height : 0);
           },
-          set(v) {
-            const I = window.__AM_INTERNAL;
-            if (I.val) {
-              I.val.height = Math.round(v);
-              I.val.exportHeight = Math.round(v);
+          set(initAmMobileUiArgValue) {
+            const initAmMobileUiVal = window.__AM_INTERNAL;
+            if (initAmMobileUiVal.val) {
+              initAmMobileUiVal.val.height = Math.round(initAmMobileUiArgValue);
+              initAmMobileUiVal.val.exportHeight = Math.round(initAmMobileUiArgValue);
             }
           },
           configurable: true
@@ -9389,7 +9389,7 @@
   // ── 8. Authentic Export Sheet (export_list_popup_frag.xml) ──
   // ── 8. Authentic Export Sheet (export_list_popup_frag.xml) ──
   function openExportSheet() {
-    const I = window.__AM_INTERNAL;
+    const openExportSheetAmInternal = window.__AM_INTERNAL;
     let backdrop = document.getElementById("am-export-backdrop");
     if (!backdrop) {
       backdrop = document.createElement("div");
@@ -9588,10 +9588,10 @@
       const videoDescLabel = document.getElementById("am-video-desc-label");
 
       function updateEstimates() {
-        const durSec = Math.max(1, (I?.val?.totalTime || 3000) / 1000);
+        const durSec = Math.max(1, (openExportSheetAmInternal?.val?.totalTime || 3000) / 1000);
         const resNum = parseInt(currentRes, 10) || 720;
-        const w = Math.round(resNum * 9 / 16);
-        const mbps = Math.max(1.0, Math.min(40.0, (w * resNum * currentFps * currentQuality * 0.08) / 1000000));
+        const updateEstimatesRound = Math.round(resNum * 9 / 16);
+        const mbps = Math.max(1.0, Math.min(40.0, (updateEstimatesRound * resNum * currentFps * currentQuality * 0.08) / 1000000));
         const estMB = ((mbps + 0.128) * durSec) / 8;
         if (estSizeEl) estSizeEl.textContent = `~${estMB.toFixed(1)} MB`;
         const qLabel = document.getElementById("am-settings-quality-label");
@@ -9617,8 +9617,8 @@
         updateEstimates();
       }
 
-      backdrop.addEventListener("click", (e) => {
-        if (e.target === backdrop) backdrop.classList.remove("open");
+      backdrop.addEventListener("click", (openExportSheetTarget) => {
+        if (openExportSheetTarget.target === backdrop) backdrop.classList.remove("open");
       });
       document.getElementById("am-export-close").addEventListener("click", () => {
         backdrop.classList.remove("open");
@@ -9630,19 +9630,19 @@
       // Arrow button to settings
       const btnToSettings = document.getElementById("am-btn-to-settings");
       if (btnToSettings) {
-        btnToSettings.addEventListener("click", (e) => {
-          e.stopPropagation();
+        btnToSettings.addEventListener("click", (openExportSheetStopPropagation) => {
+          openExportSheetStopPropagation.stopPropagation();
           switchMode("settings");
         });
       }
 
       // Format selection
-      backdrop.querySelectorAll(".am-export-item").forEach(item => {
-        item.addEventListener("click", () => {
-          backdrop.querySelectorAll(".am-export-item").forEach(x => x.classList.remove("active"));
-          item.classList.add("active");
+      backdrop.querySelectorAll(".am-export-item").forEach(openExportSheetAddEventListener => {
+        openExportSheetAddEventListener.addEventListener("click", () => {
+          backdrop.querySelectorAll(".am-export-item").forEach(openExportSheetArg => openExportSheetArg.classList.remove("active"));
+          openExportSheetAddEventListener.classList.add("active");
           const quick = document.getElementById("am-video-quick-options");
-          if (quick) quick.style.display = item.dataset.type === "video" ? "flex" : "none";
+          if (quick) quick.style.display = openExportSheetAddEventListener.dataset.type === "video" ? "flex" : "none";
         });
       });
 
@@ -9663,11 +9663,11 @@
         quickFps.addEventListener("change", () => {
           currentFps = parseInt(quickFps.value, 10) || 30;
           const fpsBadges = document.querySelectorAll("#am-fps-segmented .am-segmented-btn");
-          fpsBadges.forEach(b => {
-            b.classList.toggle("active", b.dataset.fps === String(currentFps));
+          fpsBadges.forEach(openExportSheetClassList => {
+            openExportSheetClassList.classList.toggle("active", openExportSheetClassList.dataset.fps === String(currentFps));
           });
-          const lbl = document.getElementById("am-settings-fps-label");
-          if (lbl) lbl.textContent = `${currentFps} fps`;
+          const openExportSheetAmSettingsFpsLabEl = document.getElementById("am-settings-fps-label");
+          if (openExportSheetAmSettingsFpsLabEl) openExportSheetAmSettingsFpsLabEl.textContent = `${currentFps} fps`;
           updateEstimates();
         });
       }
@@ -9682,23 +9682,23 @@
       }
 
       // Codec segmented
-      document.querySelectorAll("#am-codec-segmented .am-segmented-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll("#am-codec-segmented .am-segmented-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          currentCodec = btn.dataset.codec || "h264";
+      document.querySelectorAll("#am-codec-segmented .am-segmented-btn").forEach(addEventListenerArg => {
+        addEventListenerArg.addEventListener("click", () => {
+          document.querySelectorAll("#am-codec-segmented .am-segmented-btn").forEach(openExportSheetArgValue => openExportSheetArgValue.classList.remove("active"));
+          addEventListenerArg.classList.add("active");
+          currentCodec = addEventListenerArg.dataset.codec || "h264";
         });
       });
 
       // FPS segmented
-      document.querySelectorAll("#am-fps-segmented .am-segmented-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll("#am-fps-segmented .am-segmented-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          currentFps = parseInt(btn.dataset.fps, 10) || 30;
+      document.querySelectorAll("#am-fps-segmented .am-segmented-btn").forEach(classList => {
+        classList.addEventListener("click", () => {
+          document.querySelectorAll("#am-fps-segmented .am-segmented-btn").forEach(openExportSheetArgRaw => openExportSheetArgRaw.classList.remove("active"));
+          classList.classList.add("active");
+          currentFps = parseInt(classList.dataset.fps, 10) || 30;
           if (quickFps) quickFps.value = String(currentFps);
-          const lbl = document.getElementById("am-settings-fps-label");
-          if (lbl) lbl.textContent = `${currentFps} fps`;
+          const amSettingsFpsLabelEl = document.getElementById("am-settings-fps-label");
+          if (amSettingsFpsLabelEl) amSettingsFpsLabelEl.textContent = `${currentFps} fps`;
           updateEstimates();
         });
       });
@@ -9733,11 +9733,11 @@
           if (expCodec) expCodec.value = currentCodec;
 
           showExportProgressModal(() => {
-            if (I?.cancelVideoExport) I.cancelVideoExport();
+            if (openExportSheetAmInternal?.cancelVideoExport) openExportSheetAmInternal.cancelVideoExport();
           });
 
-          if (I?.startVideoExport) {
-            I.startVideoExport({
+          if (openExportSheetAmInternal?.startVideoExport) {
+            openExportSheetAmInternal.startVideoExport({
               resolution: currentRes,
               fps: currentFps,
               bitrate: currentQuality,
@@ -9750,32 +9750,32 @@
 
         } else if (type === "sequence") {
           showExportProgressModal(() => {
-            if (I?.cancelVideoExport) I.cancelVideoExport();
+            if (openExportSheetAmInternal?.cancelVideoExport) openExportSheetAmInternal.cancelVideoExport();
           });
           const progTitle = document.querySelector("#am-export-progress-modal .am-progress-title");
           if (progTitle) progTitle.textContent = "Mengekspor Urutan Gambar...";
 
-          if (I?.exportImageSequenceZip) {
-            const onProg = (p) => {
+          if (openExportSheetAmInternal?.exportImageSequenceZip) {
+            const onProg = (frame) => {
               window.dispatchEvent(new CustomEvent("am-export-progress", {
                 detail: {
                   phase: "render",
-                  frame: p.frame,
-                  total: p.total,
-                  pct: p.pct,
-                  status: `Menyimpan frame ${p.frame}/${p.total}`
+                  frame: frame.frame,
+                  total: frame.total,
+                  pct: frame.pct,
+                  status: `Menyimpan frame ${frame.frame}/${frame.total}`
                 }
               }));
             };
             try {
-              const zipBlob = await I.exportImageSequenceZip(onProg);
+              const zipBlob = await openExportSheetAmInternal.exportImageSequenceZip(onProg);
               const modal = document.getElementById("am-export-progress-modal");
               if (modal) modal.classList.remove("open");
               if (zipBlob) {
-                const a = document.createElement("a");
-                a.download = (I?.val?.title || "project") + "_frames.zip";
-                a.href = URL.createObjectURL(zipBlob);
-                a.click();
+                const openExportSheetAEl = document.createElement("a");
+                openExportSheetAEl.download = (openExportSheetAmInternal?.val?.title || "project") + "_frames.zip";
+                openExportSheetAEl.href = URL.createObjectURL(zipBlob);
+                openExportSheetAEl.click();
               }
             } catch (err) {
               const modal = document.getElementById("am-export-progress-modal");
@@ -9785,46 +9785,46 @@
           }
 
         } else if (type === "currentframe") {
-          if (I?.exportCurrentFrameBlob) {
-            const blob = await I.exportCurrentFrameBlob();
+          if (openExportSheetAmInternal?.exportCurrentFrameBlob) {
+            const blob = await openExportSheetAmInternal.exportCurrentFrameBlob();
             if (blob) {
-              const a = document.createElement("a");
-              a.download = (I?.val?.title || "frame") + "_" + Math.round(I?.H || 0) + "ms.png";
-              a.href = URL.createObjectURL(blob);
-              a.click();
+              const aEl = document.createElement("a");
+              aEl.download = (openExportSheetAmInternal?.val?.title || "frame") + "_" + Math.round(openExportSheetAmInternal?.H || 0) + "ms.png";
+              aEl.href = URL.createObjectURL(blob);
+              aEl.click();
             }
           } else {
             const view = document.getElementById("view");
             if (view) {
-              const a = document.createElement("a");
-              a.download = (I?.val?.title || "frame") + "_" + Math.round(I?.H || 0) + "ms.png";
-              a.href = view.toDataURL("image/png");
-              a.click();
+              const aElValue = document.createElement("a");
+              aElValue.download = (openExportSheetAmInternal?.val?.title || "frame") + "_" + Math.round(openExportSheetAmInternal?.H || 0) + "ms.png";
+              aElValue.href = view.toDataURL("image/png");
+              aElValue.click();
             }
           }
         } else if (type === "xml") {
-          const xml = I?.omSerializeScene ? I.omSerializeScene() : "";
-          if (xml) {
-            const blob = new Blob([xml], { type: "application/xml" });
-            const a = document.createElement("a");
-            a.download = (I?.val?.title || "open_motion_preset") + ".xml";
-            a.href = URL.createObjectURL(blob);
-            a.click();
+          const openExportSheetFlag = openExportSheetAmInternal?.omSerializeScene ? openExportSheetAmInternal.omSerializeScene() : "";
+          if (openExportSheetFlag) {
+            const blob = new Blob([openExportSheetFlag], { type: "application/xml" });
+            const download = document.createElement("a");
+            download.download = (openExportSheetAmInternal?.val?.title || "open_motion_preset") + ".xml";
+            download.href = URL.createObjectURL(blob);
+            download.click();
           }
         } else if (type === "package" || isTemplate) {
-          const xml = I?.omSerializeScene ? I.omSerializeScene() : "";
-          const pkg = {
-            name: I?.val?.title || "Template Open Motion",
+          const openExportSheetValue = openExportSheetAmInternal?.omSerializeScene ? openExportSheetAmInternal.omSerializeScene() : "";
+          const openExportSheetResult = {
+            name: openExportSheetAmInternal?.val?.title || "Template Open Motion",
             isTemplate: !!isTemplate,
             exportedAt: new Date().toISOString(),
-            xml,
-            media: I?.val?.media || []
+            xml: openExportSheetValue,
+            media: openExportSheetAmInternal?.val?.media || []
           };
-          const blob = new Blob([JSON.stringify(pkg, null, 2)], { type: "application/json" });
-          const a = document.createElement("a");
-          a.download = (I?.val?.title || "project") + (isTemplate ? ".amtemplate" : ".amproject");
-          a.href = URL.createObjectURL(blob);
-          a.click();
+          const blob = new Blob([JSON.stringify(openExportSheetResult, null, 2)], { type: "application/json" });
+          const openExportSheetDownload = document.createElement("a");
+          openExportSheetDownload.download = (openExportSheetAmInternal?.val?.title || "project") + (isTemplate ? ".amtemplate" : ".amproject");
+          openExportSheetDownload.href = URL.createObjectURL(blob);
+          openExportSheetDownload.click();
         } else if (type === "gif") {
           alert("Format GIF akan segera diproses di build berikutnya.");
         }
@@ -9867,8 +9867,8 @@
       document.getElementById("am-prog-cancel").addEventListener("click", () => {
         const expCancel = document.getElementById("expCancel");
         if (expCancel) expCancel.click();
-        const I = window.__AM_INTERNAL;
-        if (I?.cancelVideoExport) I.cancelVideoExport();
+        const showExportProgressModalAmInternal = window.__AM_INTERNAL;
+        if (showExportProgressModalAmInternal?.cancelVideoExport) showExportProgressModalAmInternal.cancelVideoExport();
         modal.classList.remove("open");
       });
     }
@@ -9885,38 +9885,38 @@
     if (statEl) statEl.textContent = "Menyiapkan encoder...";
 
     // Listen for custom export events
-    function onProgress(e) {
-      const d = e.detail;
-      if (!d) return;
-      const pct = Math.min(100, Math.max(0, d.pct || 0));
-      if (fillEl) fillEl.style.width = pct + "%";
-      if (pctEl) pctEl.textContent = pct + "%";
+    function onProgress(detail) {
+      const onProgressDetail = detail.detail;
+      if (!onProgressDetail) return;
+      const onProgressValue = Math.min(100, Math.max(0, onProgressDetail.pct || 0));
+      if (fillEl) fillEl.style.width = onProgressValue + "%";
+      if (pctEl) pctEl.textContent = onProgressValue + "%";
 
       if (etaEl) {
-        if (d.etaMs && d.etaMs > 0) {
-          const s = Math.round(d.etaMs / 1000);
-          const m = Math.floor(s / 60);
-          const remS = s % 60;
-          etaEl.textContent = `${m}:${String(remS).padStart(2, "0")} tersisa`;
-        } else if (pct >= 100) {
+        if (onProgressDetail.etaMs && onProgressDetail.etaMs > 0) {
+          const onProgressRound = Math.round(onProgressDetail.etaMs / 1000);
+          const onProgressFloor = Math.floor(onProgressRound / 60);
+          const remS = onProgressRound % 60;
+          etaEl.textContent = `${onProgressFloor}:${String(remS).padStart(2, "0")} tersisa`;
+        } else if (onProgressValue >= 100) {
           etaEl.textContent = "Selesai";
         }
       }
 
       if (statEl) {
-        if (d.frame && d.total) {
-          statEl.textContent = `Merender frame ${d.frame}/${d.total}`;
-        } else if (d.status) {
-          statEl.textContent = d.status + (d.message ? ` - ${d.message}` : "");
+        if (onProgressDetail.frame && onProgressDetail.total) {
+          statEl.textContent = `Merender frame ${onProgressDetail.frame}/${onProgressDetail.total}`;
+        } else if (onProgressDetail.status) {
+          statEl.textContent = onProgressDetail.status + (onProgressDetail.message ? ` - ${onProgressDetail.message}` : "");
         }
       }
     }
 
-    function onComplete(e) {
+    function onComplete(onCompleteDetail) {
       cleanup();
       modal.classList.remove("open");
-      if (e.detail) {
-        showExportPreviewModal(e.detail);
+      if (onCompleteDetail.detail) {
+        showExportPreviewModal(onCompleteDetail.detail);
       }
     }
 
@@ -9925,10 +9925,10 @@
       modal.classList.remove("open");
     }
 
-    function onError(e) {
+    function onError(onErrorDetail) {
       cleanup();
       modal.classList.remove("open");
-      alert("Ekspor video gagal: " + (e.detail?.message || "Kesalahan tidak diketahui"));
+      alert("Ekspor video gagal: " + (onErrorDetail.detail?.message || "Kesalahan tidak diketahui"));
     }
 
     function cleanup() {
@@ -9946,7 +9946,7 @@
 
   // ── 10. Authentic Export Preview Modal (activity_export_preview.xml) ──
   function showExportPreviewModal(exportData) {
-    const I = window.__AM_INTERNAL;
+    const showExportPreviewModalAmInternal = window.__AM_INTERNAL;
     let modal = document.getElementById("am-export-preview-modal");
     if (!modal) {
       modal = document.createElement("div");
@@ -9993,11 +9993,11 @@
       const btnShare = document.getElementById("am-prev-btn-share");
       const btnClose = document.getElementById("am-prev-btn-close");
 
-      function formatTime(sec) {
-        if (!sec || isNaN(sec)) return "00:00";
-        const m = Math.floor(sec / 60);
-        const s = Math.floor(sec % 60);
-        return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+      function formatTime(formatTimeArg) {
+        if (!formatTimeArg || isNaN(formatTimeArg)) return "00:00";
+        const formatTimeValue = Math.floor(formatTimeArg / 60);
+        const formatTimeFloor = Math.floor(formatTimeArg % 60);
+        return `${String(formatTimeValue).padStart(2, "0")}:${String(formatTimeFloor).padStart(2, "0")}`;
       }
 
       function updatePlayState() {
@@ -10028,8 +10028,8 @@
 
       video.addEventListener("timeupdate", () => {
         if (video.duration) {
-          const pct = (video.currentTime / video.duration) * 100;
-          seekSlider.value = pct;
+          const showExportPrevieValue = (video.currentTime / video.duration) * 100;
+          seekSlider.value = showExportPrevieValue;
           timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
         }
       });
@@ -10044,10 +10044,10 @@
       btnSave.addEventListener("click", () => {
         const curData = modal._curData;
         if (!curData || !curData.blob) return;
-        const a = document.createElement("a");
-        a.href = curData.url || URL.createObjectURL(curData.blob);
-        a.download = curData.filename || `${I?.val?.title || "video"}.mp4`;
-        a.click();
+        const showExportPrevieAEl = document.createElement("a");
+        showExportPrevieAEl.href = curData.url || URL.createObjectURL(curData.blob);
+        showExportPrevieAEl.download = curData.filename || `${showExportPreviewModalAmInternal?.val?.title || "video"}.mp4`;
+        showExportPrevieAEl.click();
         saveText.textContent = "Tersimpan ✓";
         setTimeout(() => {
           saveText.textContent = "Simpan ke Galeri";
@@ -10058,15 +10058,15 @@
       btnShare.addEventListener("click", async () => {
         const curData = modal._curData;
         if (!curData || !curData.blob) return;
-        const filename = curData.filename || `${I?.val?.title || "video"}.mp4`;
+        const filename = curData.filename || `${showExportPreviewModalAmInternal?.val?.title || "video"}.mp4`;
         const file = new File([curData.blob], filename, { type: "video/mp4" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
             await navigator.share({
-              title: I?.val?.title || "Alight Motion Video",
+              title: showExportPreviewModalAmInternal?.val?.title || "Alight Motion Video",
               files: [file]
             });
-          } catch (e) {}
+          } catch (showExportPreviewModalValue) {}
         } else {
           btnSave.click();
         }
@@ -10082,7 +10082,7 @@
     modal._curData = exportData;
     const titleEl = document.getElementById("am-prev-title");
     if (titleEl) {
-      titleEl.textContent = exportData.filename || `${I?.val?.title || "Proyek"} - Hasil Ekspor`;
+      titleEl.textContent = exportData.filename || `${showExportPreviewModalAmInternal?.val?.title || "Proyek"} - Hasil Ekspor`;
     }
     const video = document.getElementById("am-prev-video");
     if (video && exportData.url) {
@@ -10159,7 +10159,7 @@
     document.head.appendChild(link);
     if (document.fonts && document.fonts.load) {
       document.fonts.load(`16px "${fontName}"`).then(() => {
-        if (I && I.val2) I.val2.renderAt(I.H);
+        if (toggleBookmark && toggleBookmark.val2) toggleBookmark.val2.renderAt(toggleBookmark.H);
       }).catch(() => {});
     }
   }
@@ -10199,7 +10199,7 @@
 
   function closeTextPopups() {
     const popups = document.querySelectorAll(".am-text-popup");
-    popups.forEach(p => p.classList.remove("open"));
+    popups.forEach(closeTextPopupsClassList => closeTextPopupsClassList.classList.remove("open"));
     const backdrop = document.getElementById("am-text-popup-backdrop");
     if (backdrop) backdrop.style.display = "none";
     currentActiveTextPopup = null;
@@ -10211,19 +10211,19 @@
     container.innerHTML = "";
     const activeFont = (activeTextEditorLayer && activeTextEditorLayer.font) || "Roboto";
 
-    AM_FONTS.slice(0, 12).forEach(f => {
-      ensureGoogleFont(f.family);
-      const item = document.createElement("div");
-      item.className = "am-mini-font-item" + (f.name === activeFont ? " active" : "");
-      item.innerHTML = `
-        <div class="am-mini-font-preview" style="font-family:'${f.family}', sans-serif;">Ag</div>
-        <div class="am-mini-font-name">${f.name}</div>
+    AM_FONTS.slice(0, 12).forEach(family => {
+      ensureGoogleFont(family.family);
+      const populateMiniFontDivEl = document.createElement("div");
+      populateMiniFontDivEl.className = "am-mini-font-item" + (family.name === activeFont ? " active" : "");
+      populateMiniFontDivEl.innerHTML = `
+        <div class="am-mini-font-preview" style="font-family:'${family.family}', sans-serif;">Ag</div>
+        <div class="am-mini-font-name">${family.name}</div>
       `;
-      item.addEventListener("click", () => {
-        applyFont(f.name);
+      populateMiniFontDivEl.addEventListener("click", () => {
+        applyFont(family.name);
         closeTextPopups();
       });
-      container.appendChild(item);
+      container.appendChild(populateMiniFontDivEl);
     });
   }
 
@@ -10232,20 +10232,20 @@
     if (!grid) return;
     grid.innerHTML = "";
     const activeFont = (activeTextEditorLayer && activeTextEditorLayer.font) || "Roboto";
-    const q = filterText.toLowerCase().trim();
+    const populateFontBrowserGridValue = filterText.toLowerCase().trim();
 
-    const filtered = AM_FONTS.filter(f => !q || f.name.toLowerCase().includes(q));
+    const filtered = AM_FONTS.filter(populateFontBrowserGridArg => !populateFontBrowserGridValue || populateFontBrowserGridArg.name.toLowerCase().includes(populateFontBrowserGridValue));
 
-    filtered.forEach(f => {
-      ensureGoogleFont(f.family);
+    filtered.forEach(populateFontBrowserGridFamily => {
+      ensureGoogleFont(populateFontBrowserGridFamily.family);
       const card = document.createElement("div");
-      card.className = "am-fb-card" + (f.name === activeFont ? " active" : "");
+      card.className = "am-fb-card" + (populateFontBrowserGridFamily.name === activeFont ? " active" : "");
       card.innerHTML = `
-        <div class="am-fb-card-preview" style="font-family:'${f.family}', sans-serif;">Open Motion</div>
-        <div class="am-fb-card-name">${f.name}</div>
+        <div class="am-fb-card-preview" style="font-family:'${populateFontBrowserGridFamily.family}', sans-serif;">Open Motion</div>
+        <div class="am-fb-card-name">${populateFontBrowserGridFamily.name}</div>
       `;
       card.addEventListener("click", () => {
-        applyFont(f.name);
+        applyFont(populateFontBrowserGridFamily.name);
         const modal = document.getElementById("am-font-browser-modal");
         if (modal) modal.classList.remove("open");
       });
@@ -10260,13 +10260,13 @@
     const fontLabel = document.getElementById("am-text-font-label");
     if (fontLabel) fontLabel.textContent = fontName;
     populateMiniFontList();
-    I.V = true;
-    if (I.val2) I.val2.renderAt(I.H);
+    toggleBookmark.V = true;
+    if (toggleBookmark.val2) toggleBookmark.val2.renderAt(toggleBookmark.H);
   }
 
-  function applyFontSize(sz) {
+  function applyFontSize(applyFontSizeValue) {
     if (!activeTextEditorLayer) return;
-    const safeSize = Math.max(6, Math.min(300, sz));
+    const safeSize = Math.max(6, Math.min(300, applyFontSizeValue));
     activeTextEditorLayer.fontSize = safeSize;
     const label = document.getElementById("am-text-size-label");
     const stepperVal = document.getElementById("am-text-size-stepper-val");
@@ -10274,81 +10274,81 @@
     if (label) label.textContent = safeSize + " pt";
     if (stepperVal) stepperVal.textContent = safeSize + " pt";
     if (slider) slider.value = safeSize;
-    I.V = true;
-    if (I.val2) I.val2.renderAt(I.H);
+    toggleBookmark.V = true;
+    if (toggleBookmark.val2) toggleBookmark.val2.renderAt(toggleBookmark.H);
   }
 
   function applyTextAlign(align) {
     if (!activeTextEditorLayer) return;
     activeTextEditorLayer.align = align;
-    const img = document.getElementById("am-img-text-align");
+    const applyTextAlignAmImgTextAlignEl = document.getElementById("am-img-text-align");
     const iconMap = {
       left: "./icons/ac_ic_textalign_left.svg",
       center: "./icons/ac_ic_textalign_center.svg",
       right: "./icons/ac_ic_textalign_right.svg",
       justify: "./icons/ac_ic_textalign_justify.svg"
     };
-    if (img) img.src = iconMap[align] || iconMap.center;
-    I.V = true;
-    if (I.val2) I.val2.renderAt(I.H);
+    if (applyTextAlignAmImgTextAlignEl) applyTextAlignAmImgTextAlignEl.src = iconMap[align] || iconMap.center;
+    toggleBookmark.V = true;
+    if (toggleBookmark.val2) toggleBookmark.val2.renderAt(toggleBookmark.H);
   }
 
-  function applyLetterSpacing(val) {
+  function applyLetterSpacing(letterSpacing) {
     if (!activeTextEditorLayer) return;
-    activeTextEditorLayer.letterSpacing = val;
+    activeTextEditorLayer.letterSpacing = letterSpacing;
     const display = document.getElementById("am-letter-spacing-val");
-    if (display) display.textContent = (val > 0 ? "+" : "") + val.toFixed(2) + " em";
+    if (display) display.textContent = (letterSpacing > 0 ? "+" : "") + letterSpacing.toFixed(2) + " em";
     const slider = document.getElementById("am-letter-spacing-slider");
-    if (slider) slider.value = val;
-    I.V = true;
-    if (I.val2) I.val2.renderAt(I.H);
+    if (slider) slider.value = letterSpacing;
+    toggleBookmark.V = true;
+    if (toggleBookmark.val2) toggleBookmark.val2.renderAt(toggleBookmark.H);
   }
 
-  function applyLineSpacing(val) {
+  function applyLineSpacing(lineSpacing) {
     if (!activeTextEditorLayer) return;
-    activeTextEditorLayer.lineSpacing = val;
+    activeTextEditorLayer.lineSpacing = lineSpacing;
     const display = document.getElementById("am-line-spacing-val");
-    if (display) display.textContent = val.toFixed(2) + "×";
+    if (display) display.textContent = lineSpacing.toFixed(2) + "×";
     const slider = document.getElementById("am-line-spacing-slider");
-    if (slider) slider.value = val;
-    I.V = true;
-    if (I.val2) I.val2.renderAt(I.H);
+    if (slider) slider.value = lineSpacing;
+    toggleBookmark.V = true;
+    if (toggleBookmark.val2) toggleBookmark.val2.renderAt(toggleBookmark.H);
   }
 
   function parseHexToRgbaArr(hexStr) {
-    let hex = String(hexStr || "#ffffffff").trim().replace(/^#/, "");
-    if (hex.length === 3) hex = hex.split("").map(c => c + c).join("") + "ff";
-    else if (hex.length === 6) hex += "ff";
-    else if (hex.length === 8) {}
-    else hex = "ffffffff";
-    const r = (parseInt(hex.slice(0, 2), 16) || 0) / 255;
-    const g = (parseInt(hex.slice(2, 4), 16) || 0) / 255;
-    const b = (parseInt(hex.slice(4, 6), 16) || 0) / 255;
-    const a = (parseInt(hex.slice(6, 8), 16) || 255) / 255;
-    return [r, g, b, a];
+    let parseHexToRgbaArrValue = String(hexStr || "#ffffffff").trim().replace(/^#/, "");
+    if (parseHexToRgbaArrValue.length === 3) parseHexToRgbaArrValue = parseHexToRgbaArrValue.split("").map(parseHexToRgbaArText => parseHexToRgbaArText + parseHexToRgbaArText).join("") + "ff";
+    else if (parseHexToRgbaArrValue.length === 6) parseHexToRgbaArrValue += "ff";
+    else if (parseHexToRgbaArrValue.length === 8) {}
+    else parseHexToRgbaArrValue = "ffffffff";
+    const parseHexToRgbaArValue = (parseInt(parseHexToRgbaArrValue.slice(0, 2), 16) || 0) / 255;
+    const parsedGreenChannel = (parseInt(parseHexToRgbaArrValue.slice(2, 4), 16) || 0) / 255;
+    const parsedBlueChannel = (parseInt(parseHexToRgbaArrValue.slice(4, 6), 16) || 0) / 255;
+    const parsedAlphaChannel = (parseInt(parseHexToRgbaArrValue.slice(6, 8), 16) || 255) / 255;
+    return [parseHexToRgbaArValue, parsedGreenChannel, parsedBlueChannel, parsedAlphaChannel];
   }
 
-  function applyTextColor(hex) {
+  function applyTextColor(applyTextColorResult) {
     if (!activeTextEditorLayer) return;
-    activeTextEditorLayer.color = hex;
-    activeTextEditorLayer.fillColor = parseHexToRgbaArr(hex);
+    activeTextEditorLayer.color = applyTextColorResult;
+    activeTextEditorLayer.fillColor = parseHexToRgbaArr(applyTextColorResult);
 
     const swatchCircle = document.getElementById("am-text-color-swatch");
-    if (swatchCircle) swatchCircle.style.background = hex;
+    if (swatchCircle) swatchCircle.style.background = applyTextColorResult;
 
     const hexIn = document.getElementById("am-text-hex-input");
-    if (hexIn) hexIn.value = hex.toUpperCase();
+    if (hexIn) hexIn.value = applyTextColorResult.toUpperCase();
 
     const nativePicker = document.getElementById("am-text-native-picker");
-    if (nativePicker) nativePicker.value = hex.slice(0, 7);
+    if (nativePicker) nativePicker.value = applyTextColorResult.slice(0, 7);
 
     const swatches = document.querySelectorAll(".am-text-swatch");
-    swatches.forEach(s => {
-      s.classList.toggle("active", s.dataset.color.toLowerCase() === hex.toLowerCase());
+    swatches.forEach(applyTextColorClassList => {
+      applyTextColorClassList.classList.toggle("active", applyTextColorClassList.dataset.color.toLowerCase() === applyTextColorResult.toLowerCase());
     });
 
-    I.V = true;
-    if (I.val2) I.val2.renderAt(I.H);
+    toggleBookmark.V = true;
+    if (toggleBookmark.val2) toggleBookmark.val2.renderAt(toggleBookmark.H);
   }
 
   function populateColorSwatches() {
@@ -10363,20 +10363,20 @@
     ];
     const curColor = (activeTextEditorLayer && (activeTextEditorLayer.color || "#ffffff")).toLowerCase();
 
-    colorSwatches.forEach(c => {
-      const s = document.createElement("div");
-      s.className = "am-text-swatch" + (c.toLowerCase() === curColor ? " active" : "");
-      s.dataset.color = c;
-      s.style.background = c;
-      s.addEventListener("click", () => applyTextColor(c));
-      grid.appendChild(s);
+    colorSwatches.forEach(populateColorSwatchesColor => {
+      const populateColorSwaDivEl = document.createElement("div");
+      populateColorSwaDivEl.className = "am-text-swatch" + (populateColorSwatchesColor.toLowerCase() === curColor ? " active" : "");
+      populateColorSwaDivEl.dataset.color = populateColorSwatchesColor;
+      populateColorSwaDivEl.style.background = populateColorSwatchesColor;
+      populateColorSwaDivEl.addEventListener("click", () => applyTextColor(populateColorSwatchesColor));
+      grid.appendChild(populateColorSwaDivEl);
     });
   }
 
   function openTextEditor(layer) {
     if (!layer || layer.tag !== "text") return;
     activeTextEditorLayer = layer;
-    textEditSnapBefore = I.sceneSnapshot ? I.sceneSnapshot() : null;
+    textEditSnapBefore = toggleBookmark.sceneSnapshot ? toggleBookmark.sceneSnapshot() : null;
 
     const navDefault = document.getElementById("am-navbar-default");
     const navElem = document.getElementById("am-navbar-element");
@@ -10414,8 +10414,8 @@
     const fontLabel = document.getElementById("am-text-font-label");
     if (fontLabel) fontLabel.textContent = fontName;
 
-    const sz = layer.fontSize || 28;
-    applyFontSize(sz);
+    const openTextEditorValue = layer.fontSize || 28;
+    applyFontSize(openTextEditorValue);
 
     const letSp = layer.letterSpacing !== undefined ? layer.letterSpacing : 0;
     applyLetterSpacing(letSp);
@@ -10426,10 +10426,10 @@
     let hexColor = "#ffffff";
     if (layer.color) hexColor = layer.color;
     else if (Array.isArray(layer.fillColor)) {
-      const r = Math.round((layer.fillColor[0] || 0) * 255).toString(16).padStart(2, "0");
-      const g = Math.round((layer.fillColor[1] || 0) * 255).toString(16).padStart(2, "0");
-      const b = Math.round((layer.fillColor[2] || 0) * 255).toString(16).padStart(2, "0");
-      hexColor = `#${r}${g}${b}`;
+      const openTextEditorResult = Math.round((layer.fillColor[0] || 0) * 255).toString(16).padStart(2, "0");
+      const openTextEditorValueRaw = Math.round((layer.fillColor[1] || 0) * 255).toString(16).padStart(2, "0");
+      const openTextEditorRaw = Math.round((layer.fillColor[2] || 0) * 255).toString(16).padStart(2, "0");
+      hexColor = `#${openTextEditorResult}${openTextEditorValueRaw}${openTextEditorRaw}`;
     }
     applyTextColor(hexColor);
 
@@ -10440,9 +10440,9 @@
 
   function closeTextEditor(commit = true) {
     if (!activeTextEditorLayer) return;
-    if (commit && textEditSnapBefore && I.pushUndo) {
-      I.pushUndo(textEditSnapBefore);
-      if (I.handle9) I.handle9(`[EDIT] Selesai edit teks: ${activeTextEditorLayer.label || "Teks"}`);
+    if (commit && textEditSnapBefore && toggleBookmark.pushUndo) {
+      toggleBookmark.pushUndo(textEditSnapBefore);
+      if (toggleBookmark.handle9) toggleBookmark.handle9(`[EDIT] Selesai edit teks: ${activeTextEditorLayer.label || "Teks"}`);
     }
 
     closeTextPopups();
@@ -10502,8 +10502,8 @@
       inputBox.addEventListener("input", function() {
         if (!activeTextEditorLayer) return;
         activeTextEditorLayer.textContent = this.value;
-        I.V = true;
-        if (I.val2) I.val2.renderAt(I.H);
+        toggleBookmark.V = true;
+        if (toggleBookmark.val2) toggleBookmark.val2.renderAt(toggleBookmark.H);
       });
     }
 
@@ -10558,9 +10558,9 @@
       btnEyedropper.addEventListener("click", async () => {
         if (window.EyeDropper) {
           try {
-            const res = await new window.EyeDropper().open();
-            if (res && res.sRGBHex) applyTextColor(res.sRGBHex);
-          } catch (e) {}
+            const initTextEditorEventsSRgbHex = await new window.EyeDropper().open();
+            if (initTextEditorEventsSRgbHex && initTextEditorEventsSRgbHex.sRGBHex) applyTextColor(initTextEditorEventsSRgbHex.sRGBHex);
+          } catch (initTextEditorEventsResult) {}
         } else if (nativePicker) {
           nativePicker.click();
         }
@@ -10575,10 +10575,10 @@
 
     if (hexInput) {
       hexInput.addEventListener("input", function() {
-        let v = this.value.trim();
-        if (!v.startsWith("#")) v = "#" + v;
-        if (/^#[0-9a-fA-F]{6}$/.test(v) || /^#[0-9a-fA-F]{8}$/.test(v)) {
-          applyTextColor(v);
+        let initTextEditorEventsValue = this.value.trim();
+        if (!initTextEditorEventsValue.startsWith("#")) initTextEditorEventsValue = "#" + initTextEditorEventsValue;
+        if (/^#[0-9a-fA-F]{6}$/.test(initTextEditorEventsValue) || /^#[0-9a-fA-F]{8}$/.test(initTextEditorEventsValue)) {
+          applyTextColor(initTextEditorEventsValue);
         }
       });
     }
@@ -10614,8 +10614,8 @@
 
     if (btnFbImport && fbFileInput) {
       btnFbImport.addEventListener("click", () => fbFileInput.click());
-      fbFileInput.addEventListener("change", async (e) => {
-        const file = e.target.files && e.target.files[0];
+      fbFileInput.addEventListener("change", async (initTextEditorEventsTarget) => {
+        const file = initTextEditorEventsTarget.target.files && initTextEditorEventsTarget.target.files[0];
         if (!file) return;
         const fontName = file.name.replace(/\.[^/.]+$/, "");
         const reader = new FileReader();
@@ -10624,9 +10624,9 @@
             const font = new FontFace(fontName, ev.target.result);
             await font.load();
             document.fonts.add(font);
-            if (I.val2) {
-              if (!I.val2.customFonts) I.val2.customFonts = new Map();
-              I.val2.customFonts.set(fontName, fontName);
+            if (toggleBookmark.val2) {
+              if (!toggleBookmark.val2.customFonts) toggleBookmark.val2.customFonts = new Map();
+              toggleBookmark.val2.customFonts.set(fontName, fontName);
             }
             AM_FONTS.unshift({ name: fontName, family: fontName, popular: true });
             applyFont(fontName);
@@ -10640,8 +10640,8 @@
     }
   }
 
-  function escapeHtml(s) {
-    return String(s || "")
+  function escapeHtml(escapeHtmlCondition) {
+    return String(escapeHtmlCondition || "")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -10649,43 +10649,43 @@
       .replace(/'/g, "&#39;");
   }
 
-  function generateOmId(len = 22) {
+  function generateOmId(generateOmIdBytes = 22) {
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let out = "";
+    let generateOmIdText = "";
     if (window.crypto && crypto.getRandomValues) {
-      const bytes = new Uint8Array(len);
+      const bytes = new Uint8Array(generateOmIdBytes);
       crypto.getRandomValues(bytes);
-      for (let i = 0; i < len; i++) out += alphabet[bytes[i] % alphabet.length];
+      for (let generateOmIdNumber = 0; generateOmIdNumber < generateOmIdBytes; generateOmIdNumber++) generateOmIdText += alphabet[bytes[generateOmIdNumber] % alphabet.length];
     } else {
-      for (let i = 0; i < len; i++) out += alphabet[Math.floor(Math.random() * alphabet.length)];
+      for (let generateOmIdValue = 0; generateOmIdValue < generateOmIdBytes; generateOmIdValue++) generateOmIdText += alphabet[Math.floor(Math.random() * alphabet.length)];
     }
-    return out;
+    return generateOmIdText;
   }
 
-  function getAspectClass(w, h) {
-    if (!w || !h) return "9-16";
-    const r = w / h;
-    if (Math.abs(r - 16 / 9) < 0.15) return "16-9";
-    if (Math.abs(r - 9 / 16) < 0.15) return "9-16";
-    if (Math.abs(r - 4 / 5) < 0.15) return "4-5";
-    if (Math.abs(r - 1) < 0.15) return "1-1";
-    if (Math.abs(r - 4 / 3) < 0.15) return "4-3";
-    return r > 1 ? "16-9" : "9-16";
+  function getAspectClass(getAspectClassArg, getAspectClassArgValue) {
+    if (!getAspectClassArg || !getAspectClassArgValue) return "9-16";
+    const getAspectClassValue = getAspectClassArg / getAspectClassArgValue;
+    if (Math.abs(getAspectClassValue - 16 / 9) < 0.15) return "16-9";
+    if (Math.abs(getAspectClassValue - 9 / 16) < 0.15) return "9-16";
+    if (Math.abs(getAspectClassValue - 4 / 5) < 0.15) return "4-5";
+    if (Math.abs(getAspectClassValue - 1) < 0.15) return "1-1";
+    if (Math.abs(getAspectClassValue - 4 / 3) < 0.15) return "4-3";
+    return getAspectClassValue > 1 ? "16-9" : "9-16";
   }
 
-  function calcDimensions(aspect, res) {
-    const r = parseInt(res, 10) || 720;
+  function calcDimensions(aspect, calcDimensionsValue) {
+    const calcDimensionsResult = parseInt(calcDimensionsValue, 10) || 720;
     switch (aspect) {
       case "16:9":
-        return { w: Math.round(r * 16 / 9 / 2) * 2, h: r };
+        return { w: Math.round(calcDimensionsResult * 16 / 9 / 2) * 2, h: calcDimensionsResult };
       case "9:16":
-        return { w: r, h: Math.round(r * 16 / 9 / 2) * 2 };
+        return { w: calcDimensionsResult, h: Math.round(calcDimensionsResult * 16 / 9 / 2) * 2 };
       case "4:5":
-        return { w: r, h: Math.round(r * 5 / 4 / 2) * 2 };
+        return { w: calcDimensionsResult, h: Math.round(calcDimensionsResult * 5 / 4 / 2) * 2 };
       case "1:1":
-        return { w: r, h: r };
+        return { w: calcDimensionsResult, h: calcDimensionsResult };
       case "4:3":
-        return { w: Math.round(r * 4 / 3 / 2) * 2, h: r };
+        return { w: Math.round(calcDimensionsResult * 4 / 3 / 2) * 2, h: calcDimensionsResult };
       default:
         return { w: 720, h: 1280 };
     }
@@ -10763,8 +10763,8 @@
 
         try {
           if (window.AM && window.AM.loadPreset) {
-            const newId = (I.omNewId ? I.omNewId() : generateOmId());
-            I.omProjectId = newId;
+            const newId = (toggleBookmark.omNewId ? toggleBookmark.omNewId() : generateOmId());
+            toggleBookmark.omProjectId = newId;
             if (history.pushState) {
               history.pushState({ projectId: newId }, "", "/proyek/" + newId);
             }
@@ -10775,9 +10775,9 @@
             if (root) root.style.display = "flex";
             if (statusEl) statusEl.style.display = "none";
             const topTitle = document.getElementById("am-project-title");
-            if (topTitle && I.val) topTitle.value = I.val.title || "Preset Impor";
-            if (I.fitCanvas) I.fitCanvas();
-            if (I.omScheduleSave) I.omScheduleSave();
+            if (topTitle && toggleBookmark.val) topTitle.value = toggleBookmark.val.title || "Preset Impor";
+            if (toggleBookmark.fitCanvas) toggleBookmark.fitCanvas();
+            if (toggleBookmark.omScheduleSave) toggleBookmark.omScheduleSave();
           }
         } catch (err) {
           if (statusEl) {
@@ -10792,25 +10792,25 @@
       const impInput = home.querySelector("#am-home-alight-link");
       if (impBtn && impInput) {
         impBtn.addEventListener("click", () => handleImportLink(impInput.value.trim()));
-        impInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") handleImportLink(impInput.value.trim());
+        impInput.addEventListener("keydown", (setupHomeScreenKey) => {
+          if (setupHomeScreenKey.key === "Enter") handleImportLink(impInput.value.trim());
         });
       }
 
       const tabs = home.querySelectorAll(".am-home-tab");
-      tabs.forEach(t => {
-        t.addEventListener("click", () => {
-          tabs.forEach(x => x.classList.remove("active"));
-          t.classList.add("active");
-          updateTabIndicator(t);
+      tabs.forEach(setupHomeScreenAddEventListener => {
+        setupHomeScreenAddEventListener.addEventListener("click", () => {
+          tabs.forEach(setupHomeScreenClassList => setupHomeScreenClassList.classList.remove("active"));
+          setupHomeScreenAddEventListener.classList.add("active");
+          updateTabIndicator(setupHomeScreenAddEventListener);
           const importBar = document.getElementById("am-home-import-bar");
           const container = document.getElementById("am-home-project-list");
 
-          if (t.dataset.tab === "projects") {
+          if (setupHomeScreenAddEventListener.dataset.tab === "projects") {
             if (importBar) importBar.style.display = "flex";
             if (container) container.className = "am-project-grid";
             loadHomeProjects();
-          } else if (t.dataset.tab === "tutorial") {
+          } else if (setupHomeScreenAddEventListener.dataset.tab === "tutorial") {
             if (importBar) importBar.style.display = "none";
             if (container) {
               container.className = "am-tutorial-grid";
@@ -10868,16 +10868,16 @@
         });
       });
 
-      const fab = home.querySelector("#am-home-fab");
-      if (fab) fab.addEventListener("click", openNewProjectModal);
+      const setupHomeScreenAmHomeFabEl = home.querySelector("#am-home-fab");
+      if (setupHomeScreenAmHomeFabEl) setupHomeScreenAmHomeFabEl.addEventListener("click", openNewProjectModal);
     }
   }
 
-  function updateTabIndicator(btn) {
-    const ind = document.getElementById("am-home-tab-indicator");
-    if (!ind || !btn) return;
-    ind.style.left = btn.offsetLeft + "px";
-    ind.style.width = btn.offsetWidth + "px";
+  function updateTabIndicator(offsetLeft) {
+    const updateTabIndicatAmHomeTabIndicatEl = document.getElementById("am-home-tab-indicator");
+    if (!updateTabIndicatAmHomeTabIndicatEl || !offsetLeft) return;
+    updateTabIndicatAmHomeTabIndicatEl.style.left = offsetLeft.offsetLeft + "px";
+    updateTabIndicatAmHomeTabIndicatEl.style.width = offsetLeft.offsetWidth + "px";
   }
 
   async function loadHomeProjects() {
@@ -10886,11 +10886,11 @@
     container.className = "am-project-grid";
     container.innerHTML = '<div style="grid-column: 1 / -1; padding:30px; text-align:center; color:#8c93a7;">Memuat proyek...</div>';
     try {
-      const res = await fetch("/api/projects");
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const data = await res.json();
-      const list = data.projects || [];
-      if (!list.length) {
+      const loadHomeProjectsOk = await fetch("/api/projects");
+      if (!loadHomeProjectsOk.ok) throw new Error("HTTP " + loadHomeProjectsOk.status);
+      const projects = await loadHomeProjectsOk.json();
+      const loadHomeProjectsResult = projects.projects || [];
+      if (!loadHomeProjectsResult.length) {
         container.innerHTML = `
           <div class="am-home-empty" style="grid-column: 1 / -1;">
             <img src="/icons/ac_projectlist_projects.svg" alt="Empty">
@@ -10900,20 +10900,20 @@
         return;
       }
       container.innerHTML = "";
-      list.forEach(p => {
-        const item = document.createElement("div");
-        item.className = "am-project-card";
-        const title = p.name || p.id || "Proyek Tanpa Judul";
-        const dateStr = p.updatedAt ? new Date(p.updatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "Baru saja";
-        const w = p.width || 720;
-        const h = p.height || 1280;
-        const aspectClass = getAspectClass(w, h);
-        const resLabel = h >= 1080 ? "1080p FHD" : (h >= 720 ? "720p HD" : `${h}p`);
+      loadHomeProjectsResult.forEach(loadHomeProjectsId => {
+        const loadHomeProjectsDivEl = document.createElement("div");
+        loadHomeProjectsDivEl.className = "am-project-card";
+        const title = loadHomeProjectsId.name || loadHomeProjectsId.id || "Proyek Tanpa Judul";
+        const dateStr = loadHomeProjectsId.updatedAt ? new Date(loadHomeProjectsId.updatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "Baru saja";
+        const loadHomeProjectsValueRaw = loadHomeProjectsId.width || 720;
+        const loadHomeProjectsValue = loadHomeProjectsId.height || 1280;
+        const aspectClass = getAspectClass(loadHomeProjectsValueRaw, loadHomeProjectsValue);
+        const resLabel = loadHomeProjectsValue >= 1080 ? "1080p FHD" : (loadHomeProjectsValue >= 720 ? "720p HD" : `${loadHomeProjectsValue}p`);
 
-        item.innerHTML = `
+        loadHomeProjectsDivEl.innerHTML = `
           <div class="am-project-thumb">
             <div class="am-project-canvas-preview ratio-${aspectClass}">
-              ${p.thumb ? `<img src="${p.thumb}" alt="Thumb" loading="lazy">` : `
+              ${loadHomeProjectsId.thumb ? `<img src="${loadHomeProjectsId.thumb}" alt="Thumb" loading="lazy">` : `
                 <div class="am-project-thumb-placeholder">
                   <img src="/icons/ac_projectlist_projects.svg" alt="Project">
                 </div>
@@ -10924,34 +10924,34 @@
           <div class="am-project-meta">
             <div class="am-project-name" title="${escapeHtml(title)}">${escapeHtml(title)}</div>
             <div class="am-project-details-row">
-              <div class="am-project-details">${p.hasPassword ? "🔒 " : ""}${w}×${h} • ${dateStr}</div>
-              <button class="am-project-del" title="Hapus Proyek" data-id="${p.id}">
+              <div class="am-project-details">${loadHomeProjectsId.hasPassword ? "🔒 " : ""}${loadHomeProjectsValueRaw}×${loadHomeProjectsValue} • ${dateStr}</div>
+              <button class="am-project-del" title="Hapus Proyek" data-id="${loadHomeProjectsId.id}">
                 <img src="/icons/ac_ic_delete.svg" alt="Hapus">
               </button>
             </div>
           </div>
         `;
 
-        item.addEventListener("click", (e) => {
-          if (e.target.closest(".am-project-del")) return;
-          openProjectById(p.id);
+        loadHomeProjectsDivEl.addEventListener("click", (loadHomeProjectsTarget) => {
+          if (loadHomeProjectsTarget.target.closest(".am-project-del")) return;
+          openProjectById(loadHomeProjectsId.id);
         });
 
-        const delBtn = item.querySelector(".am-project-del");
+        const delBtn = loadHomeProjectsDivEl.querySelector(".am-project-del");
         if (delBtn) {
-          delBtn.addEventListener("click", async (e) => {
-            e.stopPropagation();
+          delBtn.addEventListener("click", async (loadHomeProjectsStopPropagation) => {
+            loadHomeProjectsStopPropagation.stopPropagation();
             try {
-              await fetch("/api/project/" + p.id, { method: "DELETE" });
+              await fetch("/api/project/" + loadHomeProjectsId.id, { method: "DELETE" });
               loadHomeProjects();
             } catch (err) {}
           });
         }
 
-        container.appendChild(item);
+        container.appendChild(loadHomeProjectsDivEl);
       });
-    } catch (e) {
-      container.innerHTML = '<div style="grid-column: 1 / -1; padding:30px; text-align:center; color:#ff8a8a;">Gagal memuat proyek: ' + e.message + '</div>';
+    } catch (message) {
+      container.innerHTML = '<div style="grid-column: 1 / -1; padding:30px; text-align:center; color:#ff8a8a;">Gagal memuat proyek: ' + message.message + '</div>';
     }
   }
 
@@ -10963,16 +10963,16 @@
     if (history.pushState && location.pathname !== "/proyek/" + id) {
       history.pushState({ projectId: id }, "", "/proyek/" + id);
     }
-    const fn = (window.__AM_INTERNAL && window.__AM_INTERNAL.omOpenProject) || I.omOpenProject;
-    if (fn) {
-      await fn(id);
+    const openProjectByIdValue = (window.__AM_INTERNAL && window.__AM_INTERNAL.omOpenProject) || toggleBookmark.omOpenProject;
+    if (openProjectByIdValue) {
+      await openProjectByIdValue(id);
     } else {
       setTimeout(() => {
-        const retryFn = (window.__AM_INTERNAL && window.__AM_INTERNAL.omOpenProject) || I.omOpenProject;
+        const retryFn = (window.__AM_INTERNAL && window.__AM_INTERNAL.omOpenProject) || toggleBookmark.omOpenProject;
         if (retryFn) retryFn(id);
       }, 100);
     }
-    if (I.fitCanvas) I.fitCanvas();
+    if (toggleBookmark.fitCanvas) toggleBookmark.fitCanvas();
   }
 
   function openNewProjectModal() {
@@ -11060,17 +11060,17 @@
       `;
       document.body.appendChild(backdrop);
 
-      backdrop.querySelectorAll(".am-aspect-card").forEach(c => {
-        c.addEventListener("click", () => {
-          backdrop.querySelectorAll(".am-aspect-card").forEach(x => x.classList.remove("active"));
-          c.classList.add("active");
+      backdrop.querySelectorAll(".am-aspect-card").forEach(openNewProjectModalAddEventListener => {
+        openNewProjectModalAddEventListener.addEventListener("click", () => {
+          backdrop.querySelectorAll(".am-aspect-card").forEach(openNewProjectModalArg => openNewProjectModalArg.classList.remove("active"));
+          openNewProjectModalAddEventListener.classList.add("active");
         });
       });
 
-      backdrop.querySelectorAll(".am-color-swatch").forEach(s => {
-        s.addEventListener("click", () => {
-          backdrop.querySelectorAll(".am-color-swatch").forEach(x => x.classList.remove("active"));
-          s.classList.add("active");
+      backdrop.querySelectorAll(".am-color-swatch").forEach(openNewProjectModalClassList => {
+        openNewProjectModalClassList.addEventListener("click", () => {
+          backdrop.querySelectorAll(".am-color-swatch").forEach(openNewProjectModalArgValue => openNewProjectModalArgValue.classList.remove("active"));
+          openNewProjectModalClassList.classList.add("active");
         });
       });
 
@@ -11101,8 +11101,8 @@
 
           try {
             if (window.AM && window.AM.loadPreset) {
-              const newId = (I.omNewId ? I.omNewId() : generateOmId());
-              I.omProjectId = newId;
+              const newId = (toggleBookmark.omNewId ? toggleBookmark.omNewId() : generateOmId());
+              toggleBookmark.omProjectId = newId;
               if (history.pushState) {
                 history.pushState({ projectId: newId }, "", "/proyek/" + newId);
               }
@@ -11113,9 +11113,9 @@
               if (home) home.classList.add("hidden");
               if (root) root.style.display = "flex";
               const topTitle = document.getElementById("am-project-title");
-              if (topTitle && I.val) topTitle.value = I.val.title || "Preset Impor";
-              if (I.fitCanvas) I.fitCanvas();
-              if (I.omScheduleSave) I.omScheduleSave();
+              if (topTitle && toggleBookmark.val) topTitle.value = toggleBookmark.val.title || "Preset Impor";
+              if (toggleBookmark.fitCanvas) toggleBookmark.fitCanvas();
+              if (toggleBookmark.omScheduleSave) toggleBookmark.omScheduleSave();
             }
           } catch (err) {
             errBox.textContent = err.message || "Gagal membuka link Alight Motion.";
@@ -11130,31 +11130,31 @@
       const modalXmlBtn = document.getElementById("am-modal-btn-file-xml");
       if (modalXmlBtn) {
         modalXmlBtn.addEventListener("click", () => {
-          const fi = document.createElement("input");
-          fi.type = "file";
-          fi.accept = ".xml,.xml2,text/xml,application/xml";
-          fi.onchange = async (e) => {
-            const f = e.target.files[0];
-            if (!f) return;
+          const openNewProjectMoInputEl = document.createElement("input");
+          openNewProjectMoInputEl.type = "file";
+          openNewProjectMoInputEl.accept = ".xml,.xml2,text/xml,application/xml";
+          openNewProjectMoInputEl.onchange = async (openNewProjectModalTarget) => {
+            const openNewProjectModalValue = openNewProjectModalTarget.target.files[0];
+            if (!openNewProjectModalValue) return;
             backdrop.classList.remove("open");
             const home = document.getElementById("am-home-screen");
             const root = document.getElementById("am-mobile-root");
             if (home) home.classList.add("hidden");
             if (root) root.style.display = "flex";
             if (window.AM && window.AM.loadPreset) {
-              const newId = (I.omNewId ? I.omNewId() : generateOmId());
-              I.omProjectId = newId;
+              const newId = (toggleBookmark.omNewId ? toggleBookmark.omNewId() : generateOmId());
+              toggleBookmark.omProjectId = newId;
               if (history.pushState) {
                 history.pushState({ projectId: newId }, "", "/proyek/" + newId);
               }
-              await window.AM.loadPreset(f);
+              await window.AM.loadPreset(openNewProjectModalValue);
               const topTitle = document.getElementById("am-project-title");
-              if (topTitle && I.val) topTitle.value = I.val.title || f.name.replace(/\.[^/.]+$/, "");
-              if (I.fitCanvas) I.fitCanvas();
-              if (I.omScheduleSave) I.omScheduleSave();
+              if (topTitle && toggleBookmark.val) topTitle.value = toggleBookmark.val.title || openNewProjectModalValue.name.replace(/\.[^/.]+$/, "");
+              if (toggleBookmark.fitCanvas) toggleBookmark.fitCanvas();
+              if (toggleBookmark.omScheduleSave) toggleBookmark.omScheduleSave();
             }
           };
-          fi.click();
+          openNewProjectMoInputEl.click();
         });
       }
 
@@ -11166,11 +11166,11 @@
         const resSelect = document.getElementById("am-new-proj-res");
         const resVal = resSelect ? resSelect.value : "720";
         const dims = calcDimensions(aspect, resVal);
-        const w = dims.w;
-        const h = dims.h;
+        const openNewProjectModalW = dims.w;
+        const openNewProjectModalH = dims.h;
 
         const fpsIn = document.getElementById("am-new-proj-fps");
-        const fps = fpsIn ? parseInt(fpsIn.value, 10) : 30;
+        const openNewProjectModalResult = fpsIn ? parseInt(fpsIn.value, 10) : 30;
         const bgCard = backdrop.querySelector(".am-color-swatch.active");
         const bgHex = bgCard ? bgCard.dataset.color : "#000000";
 
@@ -11181,11 +11181,11 @@
 
         backdrop.classList.remove("open");
 
-        const xml = `<?xml version="1.0" encoding="utf-8"?>
-<scene title="${escapeHtml(title)}" width="${w}" height="${h}" exportWidth="${w}" exportHeight="${h}" bgcolor="${bgcolorHex}" totalTime="5000" fps="${fps}" modifiedTime="${Date.now()}" amver="1028425" ffver="106" am="com.alightcreative.motion/5.0.273.1028425" amplatform="android" retime="freeze" retimeAdaptFPS="false"></scene>`;
+        const openNewProjectMoText = `<?xml version="1.0" encoding="utf-8"?>
+<scene title="${escapeHtml(title)}" width="${openNewProjectModalW}" height="${openNewProjectModalH}" exportWidth="${openNewProjectModalW}" exportHeight="${openNewProjectModalH}" bgcolor="${bgcolorHex}" totalTime="5000" fps="${openNewProjectModalResult}" modifiedTime="${Date.now()}" amver="1028425" ffver="106" am="com.alightcreative.motion/5.0.273.1028425" amplatform="android" retime="freeze" retimeAdaptFPS="false"></scene>`;
 
-        const newId = (I.omNewId ? I.omNewId() : generateOmId());
-        I.omProjectId = newId;
+        const newId = (toggleBookmark.omNewId ? toggleBookmark.omNewId() : generateOmId());
+        toggleBookmark.omProjectId = newId;
         if (history.pushState) {
           history.pushState({ projectId: newId }, "", "/proyek/" + newId);
         }
@@ -11194,12 +11194,12 @@
           await fetch("/api/project/" + newId, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: newId, name: title, xml, width: w, height: h, fps, uploads: [] })
+            body: JSON.stringify({ id: newId, name: title, xml: openNewProjectMoText, width: openNewProjectModalW, height: openNewProjectModalH, fps: openNewProjectModalResult, uploads: [] })
           });
-        } catch (e) {}
+        } catch (openNewProjectModalValueRaw) {}
 
         if (window.AM && window.AM.loadPreset) {
-          await window.AM.loadPreset(new File([xml], title + ".xml", { type: "text/xml" }));
+          await window.AM.loadPreset(new File([openNewProjectMoText], title + ".xml", { type: "text/xml" }));
         }
 
         const home = document.getElementById("am-home-screen");
@@ -11209,7 +11209,7 @@
 
         const projTitleEl = document.getElementById("am-project-title");
         if (projTitleEl) projTitleEl.value = title;
-        if (I.fitCanvas) I.fitCanvas();
+        if (toggleBookmark.fitCanvas) toggleBookmark.fitCanvas();
       });
     }
 
@@ -11223,16 +11223,16 @@
     if (isProyek) {
       if (root) root.style.display = "flex";
       if (home) home.classList.add("hidden");
-      const m = /\/proyek\/([A-Za-z0-9_-]{8,64})/.exec(location.pathname);
-      if (m) {
-        const id = m[1];
-        if (I.omProjectId !== id) {
-          const fn = (window.__AM_INTERNAL && window.__AM_INTERNAL.omOpenProject) || I.omOpenProject;
-          if (fn) {
-            fn(id);
+      const checkInitialRouteFlag = /\/proyek\/([A-Za-z0-9_-]{8,64})/.exec(location.pathname);
+      if (checkInitialRouteFlag) {
+        const id = checkInitialRouteFlag[1];
+        if (toggleBookmark.omProjectId !== id) {
+          const checkInitialRouteValue = (window.__AM_INTERNAL && window.__AM_INTERNAL.omOpenProject) || toggleBookmark.omOpenProject;
+          if (checkInitialRouteValue) {
+            checkInitialRouteValue(id);
           } else {
             setTimeout(() => {
-              const retryFn = (window.__AM_INTERNAL && window.__AM_INTERNAL.omOpenProject) || I.omOpenProject;
+              const retryFn = (window.__AM_INTERNAL && window.__AM_INTERNAL.omOpenProject) || toggleBookmark.omOpenProject;
               if (retryFn) retryFn(id);
             }, 100);
           }
@@ -11296,8 +11296,8 @@
   let cvActiveChannel = null;
   let cvActiveCat = "bezier";
   let cvActivePresetIdx = 3;
-  let cvP1 = { x: 0.42, y: 0.0 };
-  let cvP2 = { x: 0.58, y: 1.0 };
+  let recordValue = { x: 0.42, y: 0.0 };
+  let initAmMobileUiRecord = { x: 0.58, y: 1.0 };
   let cvCurrentToken = "cubicBezier 0.42 0.0 0.58 1.0";
   let cvOnBackCallback = null;
   let cvDragTarget = 0;
@@ -11305,109 +11305,109 @@
 
   function parseCurveToken(token) {
     if (!token) return { type: "linear", p1: { x: 0, y: 0 }, p2: { x: 1, y: 1 } };
-    const s = String(token).trim();
-    if (s === "linear" || s === "none") {
+    const parseCurveTokenValue = String(token).trim();
+    if (parseCurveTokenValue === "linear" || parseCurveTokenValue === "none") {
       return { type: "linear", p1: { x: 0, y: 0 }, p2: { x: 1, y: 1 } };
     }
-    const m = s.match(/cubicBezier\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/i);
-    if (m) {
+    const parseCurveTokenFlag = parseCurveTokenValue.match(/cubicBezier\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/i);
+    if (parseCurveTokenFlag) {
       return {
         type: "bezier",
-        p1: { x: parseFloat(m[1]) || 0, y: parseFloat(m[2]) || 0 },
-        p2: { x: parseFloat(m[3]) || 1, y: parseFloat(m[4]) || 1 }
+        p1: { x: parseFloat(parseCurveTokenFlag[1]) || 0, y: parseFloat(parseCurveTokenFlag[2]) || 0 },
+        p2: { x: parseFloat(parseCurveTokenFlag[3]) || 1, y: parseFloat(parseCurveTokenFlag[4]) || 1 }
       };
     }
-    if (s.startsWith("step")) {
-      return { type: "steps", p1: { x: 0, y: 0 }, p2: { x: 1, y: 1 }, raw: s };
+    if (parseCurveTokenValue.startsWith("step")) {
+      return { type: "steps", p1: { x: 0, y: 0 }, p2: { x: 1, y: 1 }, raw: parseCurveTokenValue };
     }
-    if (s.includes("bounce")) {
-      return { type: "bounce", p1: { x: 0.3, y: 0 }, p2: { x: 0.8, y: 1 }, raw: s };
+    if (parseCurveTokenValue.includes("bounce")) {
+      return { type: "bounce", p1: { x: 0.3, y: 0 }, p2: { x: 0.8, y: 1 }, raw: parseCurveTokenValue };
     }
-    if (s.includes("elastic")) {
-      return { type: "bounce", p1: { x: 0.5, y: 0 }, p2: { x: 0.5, y: 1 }, raw: s };
+    if (parseCurveTokenValue.includes("elastic")) {
+      return { type: "bounce", p1: { x: 0.5, y: 0 }, p2: { x: 0.5, y: 1 }, raw: parseCurveTokenValue };
     }
-    return { type: "custom", p1: { x: 0.5, y: 0 }, p2: { x: 0.5, y: 1 }, raw: s };
+    return { type: "custom", p1: { x: 0.5, y: 0 }, p2: { x: 0.5, y: 1 }, raw: parseCurveTokenValue };
   }
 
   function resolveCurveKeyable(layer, prop, channel) {
     if (channel && channel.kfs) return channel;
     if (!layer) return null;
-    const tr = layer.transform || {};
-    if (prop === "loc") return tr.location;
-    if (prop === "rot") return tr.rotation;
-    if (prop === "sc") return tr.scale;
-    if (prop === "op") return tr.opacity || layer.opacity;
-    if (prop === "skew") return tr.skew;
-    if (prop === "pivot") return tr.pivot;
+    const resolveCurveKeyaValue = layer.transform || {};
+    if (prop === "loc") return resolveCurveKeyaValue.location;
+    if (prop === "rot") return resolveCurveKeyaValue.rotation;
+    if (prop === "sc") return resolveCurveKeyaValue.scale;
+    if (prop === "op") return resolveCurveKeyaValue.opacity || layer.opacity;
+    if (prop === "skew") return resolveCurveKeyaValue.skew;
+    if (prop === "pivot") return resolveCurveKeyaValue.pivot;
     if (prop === "points" && layer.pointsKeyable) return layer.pointsKeyable;
-    if (tr[prop] && tr[prop].kfs) return tr[prop];
+    if (resolveCurveKeyaValue[prop] && resolveCurveKeyaValue[prop].kfs) return resolveCurveKeyaValue[prop];
     if (layer[prop] && layer[prop].kfs) return layer[prop];
     return null;
   }
 
-  function getActiveCurveInterval(k) {
-    if (!k || !k.kfs || k.kfs.length < 2) return null;
-    const sorted = [...k.kfs].sort((a, b) => a.t - b.t);
-    const tt = (I.H || 0) / 1000;
-    let idx = 0;
-    for (let i = 0; i < sorted.length - 1; i++) {
-      if (tt >= sorted[i].t - 0.001) {
-        idx = i;
+  function getActiveCurveInterval(getActiveCurveIntervalKfs) {
+    if (!getActiveCurveIntervalKfs || !getActiveCurveIntervalKfs.kfs || getActiveCurveIntervalKfs.kfs.length < 2) return null;
+    const sorted = [...getActiveCurveIntervalKfs.kfs].sort((getActiveCurveIntervalT, getActiveCurveIntervalArg) => getActiveCurveIntervalT.t - getActiveCurveIntervalArg.t);
+    const getActiveCurveInValue = (toggleBookmark.H || 0) / 1000;
+    let getActiveCurveInNumber = 0;
+    for (let getActiveCurveIntervalNumber = 0; getActiveCurveIntervalNumber < sorted.length - 1; getActiveCurveIntervalNumber++) {
+      if (getActiveCurveInValue >= sorted[getActiveCurveIntervalNumber].t - 0.001) {
+        getActiveCurveInNumber = getActiveCurveIntervalNumber;
       }
     }
     return {
-      index: idx,
+      index: getActiveCurveInNumber,
       total: sorted.length - 1,
-      kf0: sorted[idx],
-      kf1: sorted[idx + 1],
+      kf0: sorted[getActiveCurveInNumber],
+      kf1: sorted[getActiveCurveInNumber + 1],
       sorted
     };
   }
 
-  function setCurveEasingOnKeyable(k, token, allKeyframes = false) {
-    if (!k || !k.kfs || !k.kfs.length) return;
-    const snap = I.sceneSnapshot ? I.sceneSnapshot() : null;
-    const parseFn = (window.__AM_INTERNAL && window.__AM_INTERNAL.obj) || I.obj;
+  function setCurveEasingOnKeyable(setCurveEasingOnKeyableKfs, token, allKeyframes = false) {
+    if (!setCurveEasingOnKeyableKfs || !setCurveEasingOnKeyableKfs.kfs || !setCurveEasingOnKeyableKfs.kfs.length) return;
+    const snap = toggleBookmark.sceneSnapshot ? toggleBookmark.sceneSnapshot() : null;
+    const parseFn = (window.__AM_INTERNAL && window.__AM_INTERNAL.obj) || toggleBookmark.obj;
     const easingObj = parseFn ? parseFn(token) : null;
-    const interval = getActiveCurveInterval(k);
+    const interval = getActiveCurveInterval(setCurveEasingOnKeyableKfs);
 
     if (allKeyframes || !interval) {
-      k.kfs.forEach(f => {
-        f.e = token;
-        f.easing = easingObj;
+      setCurveEasingOnKeyableKfs.kfs.forEach(setCurveEasingOnKeyableE => {
+        setCurveEasingOnKeyableE.e = token;
+        setCurveEasingOnKeyableE.easing = easingObj;
       });
     } else {
       interval.kf1.e = token;
       interval.kf1.easing = easingObj;
     }
 
-    if (snap && I.pushUndo) I.pushUndo(snap);
-    I.V = true;
-    if (I.val2 && I.val2.renderAt) {
-      try { I.val2.renderAt(I.H); } catch (e) {}
+    if (snap && toggleBookmark.pushUndo) toggleBookmark.pushUndo(snap);
+    toggleBookmark.V = true;
+    if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) {
+      try { toggleBookmark.val2.renderAt(toggleBookmark.H); } catch (setCurveEasingOnKeyableValue) {}
     }
   }
 
-  function getCurveDisplayLabel(token, p1, p2) {
+  function getCurveDisplayLabel(token, getCurveDisplayLabelX, getCurveDisplayLabelY) {
     if (token && token.startsWith("step")) return "TANGGA (STEPS)";
     if (token && token.includes("bounce")) return "PANTULAN (BOUNCE)";
     if (token && token.includes("elastic")) return "ELASTIS (ELASTIC)";
     if (token && token.includes("cyclic")) return "BERKALA (CYCLIC)";
     if (token === "linear" || token === "none") return "LINEAR";
 
-    const eps = 0.03;
-    const isNear = (a, b) => Math.abs(a - b) < eps;
-    if (isNear(p1.x, 0) && isNear(p1.y, 0) && isNear(p2.x, 1) && isNear(p2.y, 1)) return "LINEAR";
-    if (isNear(p1.x, 0.42) && isNear(p1.y, 0) && isNear(p2.x, 1) && isNear(p2.y, 1)) return "MASUK MUDAH";
-    if (isNear(p1.x, 0) && isNear(p1.y, 0) && isNear(p2.x, 0.58) && isNear(p2.y, 1)) return "KELUAR MUDAH";
-    if (isNear(p1.x, 0.42) && isNear(p1.y, 0) && isNear(p2.x, 0.58) && isNear(p2.y, 1)) return "MASUK-KELUAR MUDAH";
+    const getCurveDisplayLNumber = 0.03;
+    const isNear = (isNearValue, getCurveDisplayLabelArg) => Math.abs(isNearValue - getCurveDisplayLabelArg) < getCurveDisplayLNumber;
+    if (isNear(getCurveDisplayLabelX.x, 0) && isNear(getCurveDisplayLabelX.y, 0) && isNear(getCurveDisplayLabelY.x, 1) && isNear(getCurveDisplayLabelY.y, 1)) return "LINEAR";
+    if (isNear(getCurveDisplayLabelX.x, 0.42) && isNear(getCurveDisplayLabelX.y, 0) && isNear(getCurveDisplayLabelY.x, 1) && isNear(getCurveDisplayLabelY.y, 1)) return "MASUK MUDAH";
+    if (isNear(getCurveDisplayLabelX.x, 0) && isNear(getCurveDisplayLabelX.y, 0) && isNear(getCurveDisplayLabelY.x, 0.58) && isNear(getCurveDisplayLabelY.y, 1)) return "KELUAR MUDAH";
+    if (isNear(getCurveDisplayLabelX.x, 0.42) && isNear(getCurveDisplayLabelX.y, 0) && isNear(getCurveDisplayLabelY.x, 0.58) && isNear(getCurveDisplayLabelY.y, 1)) return "MASUK-KELUAR MUDAH";
     return "KUSTOM (BEZIER)";
   }
 
   function renderCurveCanvas() {
     const labelEl = document.getElementById("am-curve-label");
     if (labelEl) {
-      labelEl.textContent = getCurveDisplayLabel(cvCurrentToken, cvP1, cvP2);
+      labelEl.textContent = getCurveDisplayLabel(cvCurrentToken, recordValue, initAmMobileUiRecord);
     }
 
     const canvas = document.getElementById("am-curve-canvas");
@@ -11415,150 +11415,150 @@
     const rect = canvas.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
 
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.round(rect.width * dpr);
-    canvas.height = Math.round(rect.height * dpr);
+    const renderCurveCanvaValue = window.devicePixelRatio || 1;
+    canvas.width = Math.round(rect.width * renderCurveCanvaValue);
+    canvas.height = Math.round(rect.height * renderCurveCanvaValue);
     const ctx = canvas.getContext("2d");
 
-    const padX = 36 * dpr;
-    const padY = 36 * dpr;
+    const padX = 36 * renderCurveCanvaValue;
+    const padY = 36 * renderCurveCanvaValue;
     const boxW = canvas.width - 2 * padX;
     const boxH = canvas.height - 2 * padY;
 
-    const toX = u => padX + u * boxW;
-    const toY = v => padY + (1 - v) * boxH;
+    const renderCurveCanvaCallback = toXValue => padX + toXValue * boxW;
+    const renderCurveCanvasValue = toYValue => padY + (1 - toYValue) * boxH;
 
     ctx.fillStyle = "#474d70";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-    ctx.lineWidth = 1 * dpr;
+    ctx.lineWidth = 1 * renderCurveCanvaValue;
     ctx.beginPath();
-    for (let i = 1; i < 4; i++) {
-      const gx = toX(i / 4);
-      const gy = toY(i / 4);
-      ctx.moveTo(gx, toY(0));
-      ctx.lineTo(gx, toY(1));
-      ctx.moveTo(toX(0), gy);
-      ctx.lineTo(toX(1), gy);
+    for (let renderCurveCanvasNumber = 1; renderCurveCanvasNumber < 4; renderCurveCanvasNumber++) {
+      const renderCurveCanvasRenderCurveCanvaCallback = renderCurveCanvaCallback(renderCurveCanvasNumber / 4);
+      const renderCurveCanvaCallbackValue = renderCurveCanvasValue(renderCurveCanvasNumber / 4);
+      ctx.moveTo(renderCurveCanvasRenderCurveCanvaCallback, renderCurveCanvasValue(0));
+      ctx.lineTo(renderCurveCanvasRenderCurveCanvaCallback, renderCurveCanvasValue(1));
+      ctx.moveTo(renderCurveCanvaCallback(0), renderCurveCanvaCallbackValue);
+      ctx.lineTo(renderCurveCanvaCallback(1), renderCurveCanvaCallbackValue);
     }
     ctx.stroke();
 
     ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
-    ctx.lineWidth = 1.2 * dpr;
-    ctx.strokeRect(toX(0), toY(1), boxW, boxH);
+    ctx.lineWidth = 1.2 * renderCurveCanvaValue;
+    ctx.strokeRect(renderCurveCanvaCallback(0), renderCurveCanvasValue(1), boxW, boxH);
 
     ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-    ctx.setLineDash([4 * dpr, 4 * dpr]);
+    ctx.setLineDash([4 * renderCurveCanvaValue, 4 * renderCurveCanvaValue]);
     ctx.beginPath();
-    ctx.moveTo(toX(0), toY(0));
-    ctx.lineTo(toX(1), toY(1));
+    ctx.moveTo(renderCurveCanvaCallback(0), renderCurveCanvasValue(0));
+    ctx.lineTo(renderCurveCanvaCallback(1), renderCurveCanvasValue(1));
     ctx.stroke();
     ctx.setLineDash([]);
 
     ctx.strokeStyle = "rgba(255, 255, 255, 0.65)";
-    ctx.lineWidth = 1.5 * dpr;
+    ctx.lineWidth = 1.5 * renderCurveCanvaValue;
     ctx.beginPath();
-    ctx.moveTo(toX(0), toY(0));
-    ctx.lineTo(toX(cvP1.x), toY(cvP1.y));
-    ctx.moveTo(toX(1), toY(1));
-    ctx.lineTo(toX(cvP2.x), toY(cvP2.y));
+    ctx.moveTo(renderCurveCanvaCallback(0), renderCurveCanvasValue(0));
+    ctx.lineTo(renderCurveCanvaCallback(recordValue.x), renderCurveCanvasValue(recordValue.y));
+    ctx.moveTo(renderCurveCanvaCallback(1), renderCurveCanvasValue(1));
+    ctx.lineTo(renderCurveCanvaCallback(initAmMobileUiRecord.x), renderCurveCanvasValue(initAmMobileUiRecord.y));
     ctx.stroke();
 
     ctx.strokeStyle = "#00ffa8";
-    ctx.lineWidth = 3.5 * dpr;
+    ctx.lineWidth = 3.5 * renderCurveCanvaValue;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.beginPath();
-    ctx.moveTo(toX(0), toY(0));
+    ctx.moveTo(renderCurveCanvaCallback(0), renderCurveCanvasValue(0));
 
-    const evalFn = (window.__AM_INTERNAL && window.__AM_INTERNAL._r) || I._r;
+    const evalFn = (window.__AM_INTERNAL && window.__AM_INTERNAL._r) || toggleBookmark._r;
     if (cvActiveCat === "bezier" || cvCurrentToken.startsWith("cubicBezier") || cvCurrentToken === "linear") {
-      ctx.bezierCurveTo(toX(cvP1.x), toY(cvP1.y), toX(cvP2.x), toY(cvP2.y), toX(1), toY(1));
+      ctx.bezierCurveTo(renderCurveCanvaCallback(recordValue.x), renderCurveCanvasValue(recordValue.y), renderCurveCanvaCallback(initAmMobileUiRecord.x), renderCurveCanvasValue(initAmMobileUiRecord.y), renderCurveCanvaCallback(1), renderCurveCanvasValue(1));
     } else if (evalFn) {
-      const fn = evalFn(cvCurrentToken);
-      if (fn) {
+      const renderCurveCanvasEvalFn = evalFn(cvCurrentToken);
+      if (renderCurveCanvasEvalFn) {
         const steps = 80;
-        for (let s = 1; s <= steps; s++) {
-          const t = s / steps;
-          const val = fn(t);
-          ctx.lineTo(toX(t), toY(val));
+        for (let renderCurveCanvaNumber = 1; renderCurveCanvaNumber <= steps; renderCurveCanvaNumber++) {
+          const renderCurveCanvasResult = renderCurveCanvaNumber / steps;
+          const renderCurveCanvasRaw = renderCurveCanvasEvalFn(renderCurveCanvasResult);
+          ctx.lineTo(renderCurveCanvaCallback(renderCurveCanvasResult), renderCurveCanvasValue(renderCurveCanvasRaw));
         }
       } else {
-        ctx.bezierCurveTo(toX(cvP1.x), toY(cvP1.y), toX(cvP2.x), toY(cvP2.y), toX(1), toY(1));
+        ctx.bezierCurveTo(renderCurveCanvaCallback(recordValue.x), renderCurveCanvasValue(recordValue.y), renderCurveCanvaCallback(initAmMobileUiRecord.x), renderCurveCanvasValue(initAmMobileUiRecord.y), renderCurveCanvaCallback(1), renderCurveCanvasValue(1));
       }
     } else {
-      ctx.bezierCurveTo(toX(cvP1.x), toY(cvP1.y), toX(cvP2.x), toY(cvP2.y), toX(1), toY(1));
+      ctx.bezierCurveTo(renderCurveCanvaCallback(recordValue.x), renderCurveCanvasValue(recordValue.y), renderCurveCanvaCallback(initAmMobileUiRecord.x), renderCurveCanvasValue(initAmMobileUiRecord.y), renderCurveCanvaCallback(1), renderCurveCanvasValue(1));
     }
     ctx.stroke();
 
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
-    ctx.arc(toX(0), toY(0), 3.5 * dpr, 0, Math.PI * 2);
-    ctx.arc(toX(1), toY(1), 3.5 * dpr, 0, Math.PI * 2);
+    ctx.arc(renderCurveCanvaCallback(0), renderCurveCanvasValue(0), 3.5 * renderCurveCanvaValue, 0, Math.PI * 2);
+    ctx.arc(renderCurveCanvaCallback(1), renderCurveCanvasValue(1), 3.5 * renderCurveCanvaValue, 0, Math.PI * 2);
     ctx.fill();
 
-    const drawHandle = (p, isTarget) => {
-      const hx = toX(p.x);
-      const hy = toY(p.y);
+    const drawHandle = (renderCurveCanvasX, isTarget) => {
+      const renderCurveCanvasCoord = renderCurveCanvaCallback(renderCurveCanvasX.x);
+      const renderCurveCanvasValueRaw = renderCurveCanvasValue(renderCurveCanvasX.y);
 
       if (isTarget) {
         ctx.fillStyle = "rgba(0, 255, 168, 0.25)";
         ctx.beginPath();
-        ctx.arc(hx, hy, 16 * dpr, 0, Math.PI * 2);
+        ctx.arc(renderCurveCanvasCoord, renderCurveCanvasValueRaw, 16 * renderCurveCanvaValue, 0, Math.PI * 2);
         ctx.fill();
       }
 
       ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 2.5 * dpr;
+      ctx.lineWidth = 2.5 * renderCurveCanvaValue;
       ctx.fillStyle = "#00ffa8";
       ctx.beginPath();
-      ctx.arc(hx, hy, 7.5 * dpr, 0, Math.PI * 2);
+      ctx.arc(renderCurveCanvasCoord, renderCurveCanvasValueRaw, 7.5 * renderCurveCanvaValue, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
     };
 
-    drawHandle(cvP1, cvDragTarget === 1);
-    drawHandle(cvP2, cvDragTarget === 2);
+    drawHandle(recordValue, cvDragTarget === 1);
+    drawHandle(initAmMobileUiRecord, cvDragTarget === 2);
 
     if (labelEl) {
-      labelEl.textContent = getCurveDisplayLabel(cvCurrentToken, cvP1, cvP2);
+      labelEl.textContent = getCurveDisplayLabel(cvCurrentToken, recordValue, initAmMobileUiRecord);
     }
   }
 
   function updateCategoryTabsUI() {
-    document.querySelectorAll(".am-curve-cat-btn").forEach(btn => {
-      const cat = btn.dataset.cat;
-      const isActive = cat === cvActiveCat;
-      btn.classList.toggle("active", isActive);
-      const holder = btn.closest(".am-curve-tab-holder");
-      const cue = holder ? holder.querySelector(".am-curve-cat-cue") : null;
-      if (cue) cue.classList.toggle("active", isActive);
+    document.querySelectorAll(".am-curve-cat-btn").forEach(updateCategoryTabsUiDataset => {
+      const updateCategoryTabsUiCat = updateCategoryTabsUiDataset.dataset.cat;
+      const isActive = updateCategoryTabsUiCat === cvActiveCat;
+      updateCategoryTabsUiDataset.classList.toggle("active", isActive);
+      const holder = updateCategoryTabsUiDataset.closest(".am-curve-tab-holder");
+      const updateCategoryTabsUiFlag = holder ? holder.querySelector(".am-curve-cat-cue") : null;
+      if (updateCategoryTabsUiFlag) updateCategoryTabsUiFlag.classList.toggle("active", isActive);
     });
 
     const catData = CURVE_CATEGORIES[cvActiveCat] || CURVE_CATEGORIES.bezier;
-    catData.presets.forEach((preset, i) => {
-      const btn = document.getElementById(`am-curve-preset-${i}`);
-      if (!btn) return;
-      btn.title = preset.name;
-      const img = btn.querySelector("img");
-      if (img) img.src = preset.icon;
+    catData.presets.forEach((preset, updateCategoryTabsUiArg) => {
+      const updateCategoryTaElement = document.getElementById(`am-curve-preset-${updateCategoryTabsUiArg}`);
+      if (!updateCategoryTaElement) return;
+      updateCategoryTaElement.title = preset.name;
+      const updateCategoryTaImgEl = updateCategoryTaElement.querySelector("img");
+      if (updateCategoryTaImgEl) updateCategoryTaImgEl.src = preset.icon;
 
       const isPresetActive = preset.token === cvCurrentToken ||
         (cvActiveCat === "bezier" && preset.p1 &&
-         Math.abs(preset.p1[0] - cvP1.x) < 0.02 && Math.abs(preset.p1[1] - cvP1.y) < 0.02 &&
-         Math.abs(preset.p2[0] - cvP2.x) < 0.02 && Math.abs(preset.p2[1] - cvP2.y) < 0.02);
-      btn.classList.toggle("active", isPresetActive);
+         Math.abs(preset.p1[0] - recordValue.x) < 0.02 && Math.abs(preset.p1[1] - recordValue.y) < 0.02 &&
+         Math.abs(preset.p2[0] - initAmMobileUiRecord.x) < 0.02 && Math.abs(preset.p2[1] - initAmMobileUiRecord.y) < 0.02);
+      updateCategoryTaElement.classList.toggle("active", isPresetActive);
     });
   }
 
   function updateCurvePanelUI() {
-    const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-    const interval = getActiveCurveInterval(k);
+    const updateCurvePanelUiResolveCurveKeyable = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+    const interval = getActiveCurveInterval(updateCurvePanelUiResolveCurveKeyable);
     const warning = document.getElementById("am-curve-warning");
     const kfImg = document.getElementById("am-curve-img-kf");
 
-    if (!k || !k.kfs || k.kfs.length < 2) {
+    if (!updateCurvePanelUiResolveCurveKeyable || !updateCurvePanelUiResolveCurveKeyable.kfs || updateCurvePanelUiResolveCurveKeyable.kfs.length < 2) {
       if (warning) warning.style.display = "flex";
       if (kfImg) kfImg.src = "./icons/ac_ic_add_keyframe.svg";
       renderCurveCanvas();
@@ -11567,28 +11567,28 @@
 
     if (warning) warning.style.display = "none";
 
-    const tt = (I.H || 0) / 1000;
-    const hasKfAtPh = !!(k.kfs.some(f => Math.abs(Number(f.t) - tt) < 0.002));
+    const updateCurvePanelValue = (toggleBookmark.H || 0) / 1000;
+    const hasKfAtPh = !!(updateCurvePanelUiResolveCurveKeyable.kfs.some(updateCurvePanelUiT => Math.abs(Number(updateCurvePanelUiT.t) - updateCurvePanelValue) < 0.002));
     if (kfImg) {
       kfImg.src = hasKfAtPh ? "./icons/ac_ic_delete_keyframe.svg" : "./icons/ac_ic_add_keyframe.svg";
     }
 
     if (interval) {
-      const tok = interval.kf1.e || "linear";
-      cvCurrentToken = tok;
-      const parsed = parseCurveToken(tok);
-      cvP1 = { ...parsed.p1 };
-      cvP2 = { ...parsed.p2 };
+      const updateCurvePanelUiValue = interval.kf1.e || "linear";
+      cvCurrentToken = updateCurvePanelUiValue;
+      const parsed = parseCurveToken(updateCurvePanelUiValue);
+      recordValue = { ...parsed.p1 };
+      initAmMobileUiRecord = { ...parsed.p2 };
 
-      if (tok.startsWith("step")) cvActiveCat = "steps";
-      else if (tok.includes("bounce") || tok.includes("elastic")) cvActiveCat = "bounce";
-      else if (tok.includes("cyclic") || tok.includes("random")) cvActiveCat = "custom";
+      if (updateCurvePanelUiValue.startsWith("step")) cvActiveCat = "steps";
+      else if (updateCurvePanelUiValue.includes("bounce") || updateCurvePanelUiValue.includes("elastic")) cvActiveCat = "bounce";
+      else if (updateCurvePanelUiValue.includes("cyclic") || updateCurvePanelUiValue.includes("random")) cvActiveCat = "custom";
       else cvActiveCat = "bezier";
     }
 
     const labelEl = document.getElementById("am-curve-label");
     if (labelEl) {
-      labelEl.textContent = getCurveDisplayLabel(cvCurrentToken, cvP1, cvP2);
+      labelEl.textContent = getCurveDisplayLabel(cvCurrentToken, recordValue, initAmMobileUiRecord);
     }
 
     updateCategoryTabsUI();
@@ -11601,79 +11601,79 @@
 
     let dragSnap = null;
 
-    canvas.addEventListener("pointerdown", e => {
-      const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-      if (!k || !k.kfs || k.kfs.length < 2) return;
+    canvas.addEventListener("pointerdown", initAnimationCurveEditorClientX => {
+      const valueParsed = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+      if (!valueParsed || !valueParsed.kfs || valueParsed.kfs.length < 2) return;
 
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const padX = 36 * dpr;
-      const padY = 36 * dpr;
+      const initAnimationCurValue = window.devicePixelRatio || 1;
+      const padX = 36 * initAnimationCurValue;
+      const padY = 36 * initAnimationCurValue;
       const boxW = canvas.width - 2 * padX;
       const boxH = canvas.height - 2 * padY;
 
-      const toX = u => padX + u * boxW;
-      const toY = v => padY + (1 - v) * boxH;
+      const initAnimationCurCallback = initAnimationCurveEditorArg => padX + initAnimationCurveEditorArg * boxW;
+      const initAnimationCurveEditorClamped = initAnimationCurveEditorArgValue => padY + (1 - initAnimationCurveEditorArgValue) * boxH;
 
-      const px = (e.clientX - rect.left) * dpr;
-      const py = (e.clientY - rect.top) * dpr;
+      const initAnimationCurveEditorValueScoped = (initAnimationCurveEditorClientX.clientX - rect.left) * initAnimationCurValue;
+      const valueScoped = (initAnimationCurveEditorClientX.clientY - rect.top) * initAnimationCurValue;
 
-      const d1 = Math.hypot(px - toX(cvP1.x), py - toY(cvP1.y));
-      const d2 = Math.hypot(px - toX(cvP2.x), py - toY(cvP2.y));
-      const threshold = 32 * dpr;
+      const hypot = Math.hypot(initAnimationCurveEditorValueScoped - initAnimationCurCallback(recordValue.x), valueScoped - initAnimationCurveEditorClamped(recordValue.y));
+      const initAnimationCurveEditorHypot = Math.hypot(initAnimationCurveEditorValueScoped - initAnimationCurCallback(initAmMobileUiRecord.x), valueScoped - initAnimationCurveEditorClamped(initAmMobileUiRecord.y));
+      const threshold = 32 * initAnimationCurValue;
 
-      if (d1 <= threshold && d1 <= d2) {
+      if (hypot <= threshold && hypot <= initAnimationCurveEditorHypot) {
         cvDragTarget = 1;
-      } else if (d2 <= threshold) {
+      } else if (initAnimationCurveEditorHypot <= threshold) {
         cvDragTarget = 2;
       } else {
         cvDragTarget = 0;
         return;
       }
 
-      dragSnap = I.sceneSnapshot ? I.sceneSnapshot() : null;
-      canvas.setPointerCapture(e.pointerId);
+      dragSnap = toggleBookmark.sceneSnapshot ? toggleBookmark.sceneSnapshot() : null;
+      canvas.setPointerCapture(initAnimationCurveEditorClientX.pointerId);
       renderCurveCanvas();
     });
 
-    canvas.addEventListener("pointermove", e => {
+    canvas.addEventListener("pointermove", initAnimationCurveEditorClientY => {
       if (!cvDragTarget) return;
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const padX = 36 * dpr;
-      const padY = 36 * dpr;
+      const initAnimationCurveEditorValue = window.devicePixelRatio || 1;
+      const padX = 36 * initAnimationCurveEditorValue;
+      const padY = 36 * initAnimationCurveEditorValue;
       const boxW = canvas.width - 2 * padX;
       const boxH = canvas.height - 2 * padY;
 
-      const px = (e.clientX - rect.left) * dpr;
-      const py = (e.clientY - rect.top) * dpr;
+      const initAnimationCurveEditorValueInner = (initAnimationCurveEditorClientY.clientX - rect.left) * initAnimationCurveEditorValue;
+      const valueInner = (initAnimationCurveEditorClientY.clientY - rect.top) * initAnimationCurveEditorValue;
 
-      let u = (px - padX) / boxW;
-      let v = 1 - (py - padY) / boxH;
+      let initAnimationCurveEditorResult = (initAnimationCurveEditorValueInner - padX) / boxW;
+      let initAnimationCurveEditorValueRaw = 1 - (valueInner - padY) / boxH;
 
-      u = Math.max(0, Math.min(1, u));
-      v = Math.max(-0.5, Math.min(1.5, v));
+      initAnimationCurveEditorResult = Math.max(0, Math.min(1, initAnimationCurveEditorResult));
+      initAnimationCurveEditorValueRaw = Math.max(-0.5, Math.min(1.5, initAnimationCurveEditorValueRaw));
 
       if (cvDragTarget === 1) {
-        cvP1.x = +u.toFixed(4);
-        cvP1.y = +v.toFixed(4);
+        recordValue.x = +initAnimationCurveEditorResult.toFixed(4);
+        recordValue.y = +initAnimationCurveEditorValueRaw.toFixed(4);
       } else if (cvDragTarget === 2) {
-        cvP2.x = +u.toFixed(4);
-        cvP2.y = +v.toFixed(4);
+        initAmMobileUiRecord.x = +initAnimationCurveEditorResult.toFixed(4);
+        initAmMobileUiRecord.y = +initAnimationCurveEditorValueRaw.toFixed(4);
       }
 
       cvActiveCat = "bezier";
-      cvCurrentToken = `cubicBezier ${cvP1.x} ${cvP1.y} ${cvP2.x} ${cvP2.y}`;
+      cvCurrentToken = `cubicBezier ${recordValue.x} ${recordValue.y} ${initAmMobileUiRecord.x} ${initAmMobileUiRecord.y}`;
 
-      const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-      const interval = getActiveCurveInterval(k);
-      if (k && interval) {
-        const parseFn = (window.__AM_INTERNAL && window.__AM_INTERNAL.obj) || I.obj;
+      const initAnimationCurveEditorScoped = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+      const interval = getActiveCurveInterval(initAnimationCurveEditorScoped);
+      if (initAnimationCurveEditorScoped && interval) {
+        const parseFn = (window.__AM_INTERNAL && window.__AM_INTERNAL.obj) || toggleBookmark.obj;
         interval.kf1.e = cvCurrentToken;
         interval.kf1.easing = parseFn ? parseFn(cvCurrentToken) : null;
-        I.V = true;
-        if (I.val2 && I.val2.renderAt) {
-          try { I.val2.renderAt(I.H); } catch (err) {}
+        toggleBookmark.V = true;
+        if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) {
+          try { toggleBookmark.val2.renderAt(toggleBookmark.H); } catch (err) {}
         }
       }
 
@@ -11684,7 +11684,7 @@
     const finishDrag = () => {
       if (!cvDragTarget) return;
       cvDragTarget = 0;
-      if (dragSnap && I.pushUndo) I.pushUndo(dragSnap);
+      if (dragSnap && toggleBookmark.pushUndo) toggleBookmark.pushUndo(dragSnap);
       dragSnap = null;
       renderCurveCanvas();
     };
@@ -11692,37 +11692,37 @@
     canvas.addEventListener("pointerup", finishDrag);
     canvas.addEventListener("pointercancel", finishDrag);
 
-    document.querySelectorAll(".am-curve-preset-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const idx = parseInt(btn.dataset.idx, 10) || 0;
+    document.querySelectorAll(".am-curve-preset-btn").forEach(initAnimationCurveEditorAddEventListener => {
+      initAnimationCurveEditorAddEventListener.addEventListener("click", () => {
+        const initAnimationCurveEditorValueLocal = parseInt(initAnimationCurveEditorAddEventListener.dataset.idx, 10) || 0;
         const catData = CURVE_CATEGORIES[cvActiveCat] || CURVE_CATEGORIES.bezier;
-        const preset = catData.presets[idx];
+        const preset = catData.presets[initAnimationCurveEditorValueLocal];
         if (!preset) return;
 
-        cvActivePresetIdx = idx;
+        cvActivePresetIdx = initAnimationCurveEditorValueLocal;
         cvCurrentToken = preset.token;
-        if (preset.p1) cvP1 = { x: preset.p1[0], y: preset.p1[1] };
-        if (preset.p2) cvP2 = { x: preset.p2[0], y: preset.p2[1] };
+        if (preset.p1) recordValue = { x: preset.p1[0], y: preset.p1[1] };
+        if (preset.p2) initAmMobileUiRecord = { x: preset.p2[0], y: preset.p2[1] };
 
-        const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-        setCurveEasingOnKeyable(k, cvCurrentToken, false);
+        const initAnimationCurveEditorInner = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+        setCurveEasingOnKeyable(initAnimationCurveEditorInner, cvCurrentToken, false);
         updateCategoryTabsUI();
         renderCurveCanvas();
       });
     });
 
-    document.querySelectorAll(".am-curve-cat-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const cat = btn.dataset.cat;
-        if (!CURVE_CATEGORIES[cat]) return;
-        cvActiveCat = cat;
-        const defaultPreset = CURVE_CATEGORIES[cat].presets[0];
+    document.querySelectorAll(".am-curve-cat-btn").forEach(initAnimationCurveEditorDataset => {
+      initAnimationCurveEditorDataset.addEventListener("click", () => {
+        const initAnimationCurveEditorCat = initAnimationCurveEditorDataset.dataset.cat;
+        if (!CURVE_CATEGORIES[initAnimationCurveEditorCat]) return;
+        cvActiveCat = initAnimationCurveEditorCat;
+        const defaultPreset = CURVE_CATEGORIES[initAnimationCurveEditorCat].presets[0];
         if (defaultPreset) {
           cvCurrentToken = defaultPreset.token;
-          if (defaultPreset.p1) cvP1 = { x: defaultPreset.p1[0], y: defaultPreset.p1[1] };
-          if (defaultPreset.p2) cvP2 = { x: defaultPreset.p2[0], y: defaultPreset.p2[1] };
-          const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-          setCurveEasingOnKeyable(k, cvCurrentToken, false);
+          if (defaultPreset.p1) recordValue = { x: defaultPreset.p1[0], y: defaultPreset.p1[1] };
+          if (defaultPreset.p2) initAmMobileUiRecord = { x: defaultPreset.p2[0], y: defaultPreset.p2[1] };
+          const initAnimationCurveEditorValueStart = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+          setCurveEasingOnKeyable(initAnimationCurveEditorValueStart, cvCurrentToken, false);
         }
         updateCategoryTabsUI();
         renderCurveCanvas();
@@ -11732,35 +11732,35 @@
     const btnReverse = document.getElementById("am-curve-btn-reverse");
     if (btnReverse) {
       btnReverse.addEventListener("click", () => {
-        const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-        if (!k || !k.kfs || k.kfs.length < 2) return;
+        const initAnimationCurveEditorKfs = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+        if (!initAnimationCurveEditorKfs || !initAnimationCurveEditorKfs.kfs || initAnimationCurveEditorKfs.kfs.length < 2) return;
 
         if (cvCurrentToken.startsWith("cubicBezier") || cvCurrentToken === "linear" || cvActiveCat === "bezier") {
-          const nx1 = +(1 - cvP2.x).toFixed(4);
-          const ny1 = +(1 - cvP2.y).toFixed(4);
-          const nx2 = +(1 - cvP1.x).toFixed(4);
-          const ny2 = +(1 - cvP1.y).toFixed(4);
-          cvP1 = { x: nx1, y: ny1 };
-          cvP2 = { x: nx2, y: ny2 };
-          cvCurrentToken = `cubicBezier ${nx1} ${ny1} ${nx2} ${ny2}`;
+          const valueLocal = +(1 - initAmMobileUiRecord.x).toFixed(4);
+          const initAnimationCurveEditorLocal = +(1 - initAmMobileUiRecord.y).toFixed(4);
+          const initAnimationCurveEditorValueOuter = +(1 - recordValue.x).toFixed(4);
+          const valueOuter = +(1 - recordValue.y).toFixed(4);
+          recordValue = { x: valueLocal, y: initAnimationCurveEditorLocal };
+          initAmMobileUiRecord = { x: initAnimationCurveEditorValueOuter, y: valueOuter };
+          cvCurrentToken = `cubicBezier ${valueLocal} ${initAnimationCurveEditorLocal} ${initAnimationCurveEditorValueOuter} ${valueOuter}`;
         } else if (cvCurrentToken.startsWith("reverse ")) {
           cvCurrentToken = cvCurrentToken.replace(/^reverse\s+/, "");
         } else {
           cvCurrentToken = "reverse " + cvCurrentToken;
         }
 
-        setCurveEasingOnKeyable(k, cvCurrentToken, false);
+        setCurveEasingOnKeyable(initAnimationCurveEditorKfs, cvCurrentToken, false);
         updateCategoryTabsUI();
         renderCurveCanvas();
-        if (I.handle9) I.handle9("[EDIT] Balik Kurva");
+        if (toggleBookmark.handle9) toggleBookmark.handle9("[EDIT] Balik Kurva");
       });
     }
 
     const btnOverflow = document.getElementById("am-curve-btn-overflow");
     const menuOverflow = document.getElementById("am-curve-overflow-menu");
     if (btnOverflow && menuOverflow) {
-      btnOverflow.addEventListener("click", e => {
-        e.stopPropagation();
+      btnOverflow.addEventListener("click", initAnimationCurveEditorStopPropagation => {
+        initAnimationCurveEditorStopPropagation.stopPropagation();
         menuOverflow.style.display = menuOverflow.style.display === "none" ? "flex" : "none";
       });
 
@@ -11776,7 +11776,7 @@
       btnCopy.addEventListener("click", () => {
         cvCopiedToken = cvCurrentToken;
         if (menuOverflow) menuOverflow.style.display = "none";
-        if (I.handle9) I.handle9("[EDIT] Kurva disalin");
+        if (toggleBookmark.handle9) toggleBookmark.handle9("[EDIT] Kurva disalin");
       });
     }
 
@@ -11785,19 +11785,19 @@
       btnPaste.addEventListener("click", () => {
         if (menuOverflow) menuOverflow.style.display = "none";
         if (!cvCopiedToken) {
-          if (I.handle9) I.handle9("[EDIT] Belum ada kurva yang disalin");
+          if (toggleBookmark.handle9) toggleBookmark.handle9("[EDIT] Belum ada kurva yang disalin");
           return;
         }
         cvCurrentToken = cvCopiedToken;
         const parsed = parseCurveToken(cvCurrentToken);
-        cvP1 = { ...parsed.p1 };
-        cvP2 = { ...parsed.p2 };
+        recordValue = { ...parsed.p1 };
+        initAmMobileUiRecord = { ...parsed.p2 };
 
-        const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-        setCurveEasingOnKeyable(k, cvCurrentToken, false);
+        const valueStart = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+        setCurveEasingOnKeyable(valueStart, cvCurrentToken, false);
         updateCategoryTabsUI();
         renderCurveCanvas();
-        if (I.handle9) I.handle9("[EDIT] Kurva ditempel");
+        if (toggleBookmark.handle9) toggleBookmark.handle9("[EDIT] Kurva ditempel");
       });
     }
 
@@ -11805,39 +11805,39 @@
     if (btnPasteAll) {
       btnPasteAll.addEventListener("click", () => {
         if (menuOverflow) menuOverflow.style.display = "none";
-        const tok = cvCopiedToken || cvCurrentToken;
-        const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-        setCurveEasingOnKeyable(k, tok, true);
+        const initAnimationCurveEditorStart = cvCopiedToken || cvCurrentToken;
+        const initAnimationCurveEditorValueEnd = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+        setCurveEasingOnKeyable(initAnimationCurveEditorValueEnd, initAnimationCurveEditorStart, true);
         updateCategoryTabsUI();
         renderCurveCanvas();
-        if (I.handle9) I.handle9("[EDIT] Kurva ditempel ke semua keyframe");
+        if (toggleBookmark.handle9) toggleBookmark.handle9("[EDIT] Kurva ditempel ke semua keyframe");
       });
     }
 
     const btnKf = document.getElementById("am-curve-btn-kf");
     if (btnKf) {
       btnKf.addEventListener("click", () => {
-        const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-        if (!k) return;
-        const tt = (I.H || 0) / 1000;
-        const hasKf = !!(k.kfs && k.kfs.some(f => Math.abs(Number(f.t) - tt) < 0.002));
+        const resolveCurveKeyableValue = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+        if (!resolveCurveKeyableValue) return;
+        const initAnimationCurveEditorParsed = (toggleBookmark.H || 0) / 1000;
+        const hasKf = !!(resolveCurveKeyableValue.kfs && resolveCurveKeyableValue.kfs.some(initAnimationCurveEditorArgRaw => Math.abs(Number(initAnimationCurveEditorArgRaw.t) - initAnimationCurveEditorParsed) < 0.002));
         if (hasKf) {
-          if (I.omKfRemoveAt && typeof cvActiveProp === "string") I.omKfRemoveAt(cvActiveProp);
-          else if (k.kfs) {
-            const idx = k.kfs.findIndex(f => Math.abs(Number(f.t) - tt) < 0.002);
-            if (idx >= 0) k.kfs.splice(idx, 1);
+          if (toggleBookmark.omKfRemoveAt && typeof cvActiveProp === "string") toggleBookmark.omKfRemoveAt(cvActiveProp);
+          else if (resolveCurveKeyableValue.kfs) {
+            const initAnimationCurveEditorOuter = resolveCurveKeyableValue.kfs.findIndex(initAnimationCurveEditorArgParsed => Math.abs(Number(initAnimationCurveEditorArgParsed.t) - initAnimationCurveEditorParsed) < 0.002);
+            if (initAnimationCurveEditorOuter >= 0) resolveCurveKeyableValue.kfs.splice(initAnimationCurveEditorOuter, 1);
           }
         } else {
-          if (I.omKfInsert && typeof cvActiveProp === "string") I.omKfInsert(cvActiveProp);
-          else if (k.kfs) {
-            const val = Array.isArray(k.value) ? k.value.slice() : [Number(k.value) || 0];
-            k.kfs.push({ t: tt, v: val, e: cvCurrentToken, easing: null });
-            k.kfs.sort((a, b) => a.t - b.t);
+          if (toggleBookmark.omKfInsert && typeof cvActiveProp === "string") toggleBookmark.omKfInsert(cvActiveProp);
+          else if (resolveCurveKeyableValue.kfs) {
+            const valueEnd = Array.isArray(resolveCurveKeyableValue.value) ? resolveCurveKeyableValue.value.slice() : [Number(resolveCurveKeyableValue.value) || 0];
+            resolveCurveKeyableValue.kfs.push({ t: initAnimationCurveEditorParsed, v: valueEnd, e: cvCurrentToken, easing: null });
+            resolveCurveKeyableValue.kfs.sort((initAnimationCurveEditorArgClamped, initAnimationCurveEditorArgScoped) => initAnimationCurveEditorArgClamped.t - initAnimationCurveEditorArgScoped.t);
           }
         }
-        I.V = true;
-        if (I.val2 && I.val2.renderAt) {
-          try { I.val2.renderAt(I.H); } catch (e) {}
+        toggleBookmark.V = true;
+        if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) {
+          try { toggleBookmark.val2.renderAt(toggleBookmark.H); } catch (initAnimationCurveEditorMin) {}
         }
         updateCurvePanelUI();
       });
@@ -11846,22 +11846,22 @@
     const btnPromptAddKf = document.getElementById("am-curve-btn-add-kf-prompt");
     if (btnPromptAddKf) {
       btnPromptAddKf.addEventListener("click", () => {
-        const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-        if (!k) return;
-        k.kfs = k.kfs || [];
-        const val = Array.isArray(k.value) ? k.value.slice() : [Number(k.value) || 0];
-        if (k.kfs.length === 0) {
-          k.kfs.push({ t: 0, v: val.slice(), e: null, easing: null });
-          k.kfs.push({ t: 1, v: val.slice(), e: cvCurrentToken, easing: null });
-        } else if (k.kfs.length === 1) {
-          const t0 = k.kfs[0].t;
-          const t1 = t0 >= 1 ? 0 : Math.min(t0 + 1, (I.val ? I.val.totalTime / 1000 : 2));
-          k.kfs.push({ t: t1, v: val.slice(), e: cvCurrentToken, easing: null });
-          k.kfs.sort((a, b) => a.t - b.t);
+        const initAnimationCurveEditorResolveCurveKeyable = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+        if (!initAnimationCurveEditorResolveCurveKeyable) return;
+        initAnimationCurveEditorResolveCurveKeyable.kfs = initAnimationCurveEditorResolveCurveKeyable.kfs || [];
+        const initAnimationCurveEditorValueClamped = Array.isArray(initAnimationCurveEditorResolveCurveKeyable.value) ? initAnimationCurveEditorResolveCurveKeyable.value.slice() : [Number(initAnimationCurveEditorResolveCurveKeyable.value) || 0];
+        if (initAnimationCurveEditorResolveCurveKeyable.kfs.length === 0) {
+          initAnimationCurveEditorResolveCurveKeyable.kfs.push({ t: 0, v: initAnimationCurveEditorValueClamped.slice(), e: null, easing: null });
+          initAnimationCurveEditorResolveCurveKeyable.kfs.push({ t: 1, v: initAnimationCurveEditorValueClamped.slice(), e: cvCurrentToken, easing: null });
+        } else if (initAnimationCurveEditorResolveCurveKeyable.kfs.length === 1) {
+          const initAnimationCurveEditorT = initAnimationCurveEditorResolveCurveKeyable.kfs[0].t;
+          const initAnimationCurveEditorEnd = initAnimationCurveEditorT >= 1 ? 0 : Math.min(initAnimationCurveEditorT + 1, (toggleBookmark.val ? toggleBookmark.val.totalTime / 1000 : 2));
+          initAnimationCurveEditorResolveCurveKeyable.kfs.push({ t: initAnimationCurveEditorEnd, v: initAnimationCurveEditorValueClamped.slice(), e: cvCurrentToken, easing: null });
+          initAnimationCurveEditorResolveCurveKeyable.kfs.sort((initAnimationCurveEditorArgLocal, initAnimationCurveEditorArgOuter) => initAnimationCurveEditorArgLocal.t - initAnimationCurveEditorArgOuter.t);
         }
-        I.V = true;
-        if (I.val2 && I.val2.renderAt) {
-          try { I.val2.renderAt(I.H); } catch (e) {}
+        toggleBookmark.V = true;
+        if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) {
+          try { toggleBookmark.val2.renderAt(toggleBookmark.H); } catch (initAnimationCurveEditorValueMax) {}
         }
         updateCurvePanelUI();
       });
@@ -11872,42 +11872,42 @@
 
     if (btnPrev) {
       btnPrev.addEventListener("click", () => {
-        const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-        if (!k || !k.kfs || k.kfs.length < 2) return;
-        const sorted = [...k.kfs].sort((a, b) => a.t - b.t);
-        const tt = (I.H || 0) / 1000;
-        for (let i = sorted.length - 1; i >= 0; i--) {
-          if (sorted[i].t < tt - 0.01) {
-            I.H = Math.round(sorted[i].t * 1000);
-            if (I.seek) I.seek(I.H);
-            else if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+        const kfsValue = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+        if (!kfsValue || !kfsValue.kfs || kfsValue.kfs.length < 2) return;
+        const sorted = [...kfsValue.kfs].sort((initAnimationCurveEditorArgInner, argInner) => initAnimationCurveEditorArgInner.t - argInner.t);
+        const initAnimationCurveEditorValueMin = (toggleBookmark.H || 0) / 1000;
+        for (let initAnimationCurveEditorRaw = sorted.length - 1; initAnimationCurveEditorRaw >= 0; initAnimationCurveEditorRaw--) {
+          if (sorted[initAnimationCurveEditorRaw].t < initAnimationCurveEditorValueMin - 0.01) {
+            toggleBookmark.H = Math.round(sorted[initAnimationCurveEditorRaw].t * 1000);
+            if (toggleBookmark.seek) toggleBookmark.seek(toggleBookmark.H);
+            else if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) toggleBookmark.val2.renderAt(toggleBookmark.H);
             updateCurvePanelUI();
             return;
           }
         }
-        I.H = Math.round(sorted[0].t * 1000);
-        if (I.seek) I.seek(I.H);
+        toggleBookmark.H = Math.round(sorted[0].t * 1000);
+        if (toggleBookmark.seek) toggleBookmark.seek(toggleBookmark.H);
         updateCurvePanelUI();
       });
     }
 
     if (btnNext) {
       btnNext.addEventListener("click", () => {
-        const k = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
-        if (!k || !k.kfs || k.kfs.length < 2) return;
-        const sorted = [...k.kfs].sort((a, b) => a.t - b.t);
-        const tt = (I.H || 0) / 1000;
-        for (let i = 0; i < sorted.length; i++) {
-          if (sorted[i].t > tt + 0.01) {
-            I.H = Math.round(sorted[i].t * 1000);
-            if (I.seek) I.seek(I.H);
-            else if (I.val2 && I.val2.renderAt) I.val2.renderAt(I.H);
+        const initAnimationCurveEditorValueParsed = resolveCurveKeyable(cvActiveLayer, cvActiveProp, cvActiveChannel);
+        if (!initAnimationCurveEditorValueParsed || !initAnimationCurveEditorValueParsed.kfs || initAnimationCurveEditorValueParsed.kfs.length < 2) return;
+        const sorted = [...initAnimationCurveEditorValueParsed.kfs].sort((initAnimationCurveEditorArgStart, argStart) => initAnimationCurveEditorArgStart.t - argStart.t);
+        const valueMin = (toggleBookmark.H || 0) / 1000;
+        for (let initAnimationCurveEditorNumber = 0; initAnimationCurveEditorNumber < sorted.length; initAnimationCurveEditorNumber++) {
+          if (sorted[initAnimationCurveEditorNumber].t > valueMin + 0.01) {
+            toggleBookmark.H = Math.round(sorted[initAnimationCurveEditorNumber].t * 1000);
+            if (toggleBookmark.seek) toggleBookmark.seek(toggleBookmark.H);
+            else if (toggleBookmark.val2 && toggleBookmark.val2.renderAt) toggleBookmark.val2.renderAt(toggleBookmark.H);
             updateCurvePanelUI();
             return;
           }
         }
-        I.H = Math.round(sorted[sorted.length - 1].t * 1000);
-        if (I.seek) I.seek(I.H);
+        toggleBookmark.H = Math.round(sorted[sorted.length - 1].t * 1000);
+        if (toggleBookmark.seek) toggleBookmark.seek(toggleBookmark.H);
         updateCurvePanelUI();
       });
     }
@@ -11927,7 +11927,7 @@
 
   function openAnimationCurvePanel(options = {}) {
     cvActiveProp = options.prop || "loc";
-    cvActiveLayer = options.layer || currentSelectedLayer || (I.omLayerCur && I.omLayerCur()) || null;
+    cvActiveLayer = options.layer || currentSelectedLayer || (toggleBookmark.omLayerCur && toggleBookmark.omLayerCur()) || null;
     cvActiveChannel = options.channel || null;
     cvOnBackCallback = options.onBack || null;
 
@@ -11971,9 +11971,9 @@
     }
 
     if (typeof cvOnBackCallback === "function") {
-      const cb = cvOnBackCallback;
+      const closeAnimationCurvePanelValue = cvOnBackCallback;
       cvOnBackCallback = null;
-      cb();
+      closeAnimationCurvePanelValue();
       return;
     }
 

@@ -10,12 +10,12 @@
    ?alight=... bersifat opsional; tanpa itu simple mode menampilkan input link. */
 (function () {
     try {
-        var q = new URLSearchParams(location.search);
-        var flag = function (k) { var v = (q.get(k) || '').toLowerCase(); return v === 'true' || v === '1' || v === 'yes'; };
-        var m = (q.get('mode') || '').toLowerCase();
-        var on = m === 'simple' || m === 'instant' || flag('instant') || flag('simple');
-        if (on) document.documentElement.classList.add('simple');
-    } catch (e) {}
+        var queryParams = new URLSearchParams(location.search);
+        var isEnabled = function (localArg) { var localValue = (queryParams.get(localArg) || '').toLowerCase(); return localValue === 'true' || localValue === '1' || localValue === 'yes'; };
+        var localValueRaw = (queryParams.get('mode') || '').toLowerCase();
+        var simpleModeEnabled = localValueRaw === 'simple' || localValueRaw === 'instant' || isEnabled('instant') || isEnabled('simple');
+        if (simpleModeEnabled) document.documentElement.classList.add('simple');
+    } catch (valueRaw) {}
 })();
 </script>
 <title>Open Motion</title>
@@ -1153,15 +1153,15 @@
 <span id="bootErrorText"></span></div>
 <script>
 (function () {
-    function show(msg) {
-        var box = document.getElementById('bootError');
-        var text = document.getElementById('bootErrorText');
-        if (!box || !text) return;
-        text.textContent = '\n' + String(msg && (msg.stack || msg.message || msg) || 'Unknown error');
-        box.style.display = 'block';
+    function show(errorValue) {
+        var errorBoxEl = document.getElementById('bootError');
+        var errorTextEl = document.getElementById('bootErrorText');
+        if (!errorBoxEl || !errorTextEl) return;
+        errorTextEl.textContent = '\n' + String(errorValue && (errorValue.stack || errorValue.message || errorValue) || 'Unknown error');
+        errorBoxEl.style.display = 'block';
     }
-    window.addEventListener('error', function (e) { show(e.error || e.message); });
-    window.addEventListener('unhandledrejection', function (e) { show(e.reason); });
+    window.addEventListener('error', function (error) { show(error.error || error.message); });
+    window.addEventListener('unhandledrejection', function (reason) { show(reason.reason); });
 })();
 </script>
 <script type="module" src="./preset.js"></script>
